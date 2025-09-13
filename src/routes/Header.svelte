@@ -7,117 +7,149 @@
 	}
 </script>
 
+{#if $session.data?.user}
 <header>
 	<nav>
-		<ul>
-			<li aria-current={page.url.pathname === '/' ? 'page' : undefined}>
-				<a href="/">Home</a>
-			</li>
-			{#if $session.data?.user}
-				<li>
-					<span>Welcome, {$session.data.user.name}</span>
+		<section class="brand">
+			<h1>Rowera</h1>
+		</section>
+		
+		<section class="center-nav">
+			<ul class="main-nav">
+				<li aria-current={page.url.pathname === '/' ? 'page' : undefined}>
+					<a href="/">Projects</a>
+				</li>
+				<li aria-current={page.url.pathname === '/posts' ? 'page' : undefined}>
+					<a href="/posts">Posts</a>
+				</li>
+				<li aria-current={page.url.pathname === '/pages' ? 'page' : undefined}>
+					<a href="/pages">Pages</a>
 				</li>
 				<li>
-					<button onclick={handleLogout}>Logout</button>
+					<button class="preview-btn">Preview</button>
 				</li>
-			{:else}
+			</ul>
+		</section>
+		
+		<section class="user-nav">
+			<ul>
+				<li aria-current={page.url.pathname === '/presentation' ? 'page' : undefined}>
+					<a href="/presentation">Presentation</a>
+				</li>
+				<li aria-current={page.url.pathname === '/preferences' ? 'page' : undefined}>
+					<a href="/preferences">Preferences</a>
+				</li>
+				<li aria-current={page.url.pathname === '/profile' ? 'page' : undefined}>
+					<a href="/profile">Profile</a>
+				</li>
+			</ul>
+		</section>
+	</nav>
+</header>
+{:else}
+<header>
+	<nav>
+		<section class="brand">
+			<h1>Rowera</h1>
+		</section>
+		
+		<section class="auth-nav">
+			<ul>
 				<li aria-current={page.url.pathname === '/login' ? 'page' : undefined}>
 					<a href="/login">Login</a>
 				</li>
 				<li aria-current={page.url.pathname === '/signup' ? 'page' : undefined}>
 					<a href="/signup">Sign Up</a>
 				</li>
-			{/if}
-		</ul>
+			</ul>
+		</section>
 	</nav>
 </header>
+{/if}
 
 <style>
 	header {
-		display: flex;
-		justify-content: space-between;
-	}
-
-	.corner {
-		width: 3em;
-		height: 3em;
-	}
-
-	.corner a {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 100%;
-		height: 100%;
-	}
-
-	.corner img {
-		width: 2em;
-		height: 2em;
-		object-fit: contain;
+		background: #fff;
+		border-bottom: 1px solid #e9ecef;
+		padding: 1rem 2rem;
 	}
 
 	nav {
 		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+	}
+
+	.brand h1 {
+		margin: 0;
+		font-size: 1.5rem;
+		font-weight: bold;
+		color: #495057;
+	}
+
+	.center-nav {
+		display: flex;
 		justify-content: center;
-		--background: rgba(255, 255, 255, 0.7);
+		flex-grow: 1;
 	}
 
-	svg {
-		width: 2em;
-		height: 3em;
-		display: block;
-	}
-
-	path {
-		fill: var(--background);
-	}
-
-	ul {
-		position: relative;
+	.main-nav {
+		display: flex;
+		align-items: center;
+		gap: 2rem;
+		list-style: none;
 		padding: 0;
 		margin: 0;
-		height: 3em;
+	}
+
+	.user-nav ul, .auth-nav ul {
 		display: flex;
-		justify-content: center;
 		align-items: center;
+		gap: 1.5rem;
 		list-style: none;
-		background: var(--background);
-		background-size: contain;
+		padding: 0;
+		margin: 0;
 	}
 
-	li {
-		position: relative;
-		height: 100%;
-	}
-
-	li[aria-current='page']::before {
-		--size: 6px;
-		content: '';
-		width: 0;
-		height: 0;
-		position: absolute;
-		top: 0;
-		left: calc(50% - var(--size));
-		border: var(--size) solid transparent;
-		border-top: var(--size) solid var(--color-theme-1);
-	}
-
-	nav a {
-		display: flex;
-		height: 100%;
-		align-items: center;
-		padding: 0 0.5rem;
-		color: var(--color-text);
-		font-weight: 700;
-		font-size: 0.8rem;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
+	.main-nav a, .user-nav a, .auth-nav a {
+		color: #495057;
 		text-decoration: none;
-		transition: color 0.2s linear;
+		font-weight: 500;
+		transition: color 0.2s ease;
 	}
 
-	a:hover {
-		color: var(--color-theme-1);
+	.main-nav a:hover, .auth-nav a:hover {
+		color: #007bff;
+	}
+
+	.user-nav a {
+		font-size: 0.9rem;
+		font-weight: 400;
+		color: #6c757d;
+	}
+
+	.user-nav a:hover {
+		color: #495057;
+	}
+
+	.preview-btn {
+		background: #007bff;
+		color: white;
+		border: none;
+		padding: 0.5rem 1rem;
+		border-radius: 4px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+	}
+
+	.preview-btn:hover {
+		background: #0056b3;
+	}
+
+	li[aria-current='page'] a {
+		color: #007bff;
+		font-weight: 600;
 	}
 </style>
