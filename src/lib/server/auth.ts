@@ -21,7 +21,7 @@ export const auth = betterAuth({
 	plugins: [
 		username(),
 		organization(),
-		sveltekitCookies(getRequestEvent),
+		sveltekitCookies(getRequestEvent), // must be last plugin
 	],
 	socialProviders: {},
 });
