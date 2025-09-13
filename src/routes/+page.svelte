@@ -7,13 +7,13 @@
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Better Auth Demo" />
+	<title>Rowera CMS</title>
+	<meta name="description" content="Rowera - Semantic CMS" />
 </svelte:head>
 
+<h1>Rowera CMS</h1>
+
 <main>
-	<h1>Better Auth Demo</h1>
-	
 	{#if $session.data?.user}
 		<div>
 			<p>Welcome, {$session.data.user.name}!</p>

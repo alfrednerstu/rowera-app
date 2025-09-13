@@ -1,57 +1,74 @@
-<script lang="ts">
-	import Header from './Header.svelte';
-	import '../app.css';
-
-	let { children } = $props();
+<script>
+	let { children } = $props()
 </script>
 
-<div class="app">
-	<Header />
-
-	<main>
+<div class="admin-layout">
+	<nav class="sidebar">
+		<header>
+			<h1>Rowera</h1>
+		</header>
+		
+		<ul class="nav-menu">
+			<li><a href="/">Home</a></li>
+			<li><a href="/posts">Posts</a></li>
+			<li><a href="/pages">Pages</a></li>
+			<li><a href="/partials">Partials</a></li>
+			<li><a href="/presentation">Presentation</a></li>
+			<li><a href="/preferences">Preferences</a></li>
+			<li><a href="/profile">Profile</a></li>
+		</ul>
+	</nav>
+	
+	<main class="content">
 		{@render children()}
 	</main>
-
-	<footer>
-		<p>
-			visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to learn about SvelteKit
-		</p>
-	</footer>
 </div>
 
 <style>
-	.app {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
+	.admin-layout {
+		display: grid;
+		grid-template-columns: 250px 1fr;
+		height: 100vh;
 	}
-
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 64rem;
-		margin: 0 auto;
-		box-sizing: border-box;
+	
+	.sidebar {
+		background: #f8f9fa;
+		border-right: 1px solid #e9ecef;
+		padding: 1.5rem;
 	}
-
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 12px;
+	
+	.sidebar header h1 {
+		margin: 0 0 2rem 0;
+		font-size: 1.5rem;
+		color: #495057;
 	}
-
-	footer a {
-		font-weight: bold;
+	
+	.nav-menu {
+		list-style: none;
+		padding: 0;
+		margin: 0;
 	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
+	
+	.nav-menu li {
+		margin-bottom: 0.5rem;
+	}
+	
+	.nav-menu a {
+		display: block;
+		padding: 0.75rem 1rem;
+		color: #6c757d;
+		text-decoration: none;
+		border-radius: 4px;
+		transition: all 0.2s ease;
+	}
+	
+	.nav-menu a:hover {
+		background: #e9ecef;
+		color: #495057;
+	}
+	
+	.content {
+		padding: 2rem;
+		overflow-y: auto;
 	}
 </style>
