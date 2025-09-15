@@ -261,7 +261,7 @@ export const invitation = pgTable('invitation', {
   email: varchar('email', { length: 255 }).notNull(),
   role: varchar('role', { length: 50 }).notNull().default('member'),
   inviterId: text('inviter_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-  teamId: text('team_id').references(() => teams.id),
+  teamId: text('team_id').references(() => team.id),
   token: varchar('token', { length: 255 }).notNull().unique(),
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -279,8 +279,8 @@ export const userRelations = relations(user, ({ many }) => ({
   presentations: many(presentation),
   sessions: many(session),
   accounts: many(account),
-  memberships: many(members),
-  teamMemberships: many(teamMembers),
+  memberships: many(member),
+  teamMemberships: many(teamMember),
 }));
 
 export const productRelations = relations(product, ({ one, many }) => ({
@@ -441,53 +441,53 @@ export const accountRelations = relations(account, ({ one }) => ({
   })
 }));
 
-export const organizationsRelations = relations(organizations, ({ one, many }) => ({
+export const organizationRelations = relations(organization, ({ one, many }) => ({
   owner: one(user, {
-    fields: [organizations.ownerId],
+    fields: [organization.ownerId],
     references: [user.id]
   }),
-  members: many(members),
-  teams: many(teams),
-  invitations: many(invitations),
+  members: many(member),
+  teams: many(team),
+  invitations: many(invitation),
 }));
 
-export const membersRelations = relations(members, ({ one }) => ({
+export const membersRelations = relations(member, ({ one }) => ({
   user: one(user, {
-    fields: [members.userId],
+    fields: [member.userId],
     references: [user.id]
   }),
-  organization: one(organizations, {
-    fields: [members.organizationId],
-    references: [organizations.id]
+  organization: one(organization, {
+    fields: [member.organizationId],
+    references: [organization.id]
   }),
 }));
 
-export const teamsRelations = relations(teams, ({ one, many }) => ({
-  organization: one(organizations, {
-    fields: [teams.organizationId],
-    references: [organizations.id]
+export const teamsRelations = relations(team, ({ one, many }) => ({
+  organization: one(organization, {
+    fields: [team.organizationId],
+    references: [organization.id]
   }),
-  members: many(teamMembers),
+  members: many(teamMember),
 }));
 
-export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
-  team: one(teams, {
-    fields: [teamMembers.teamId],
-    references: [teams.id]
+export const teamMembersRelations = relations(teamMember, ({ one }) => ({
+  team: one(team, {
+    fields: [teamMember.teamId],
+    references: [team.id]
   }),
   user: one(user, {
-    fields: [teamMembers.userId],
+    fields: [teamMember.userId],
     references: [user.id]
   }),
 }));
 
-export const invitationsRelations = relations(invitations, ({ one }) => ({
-  organization: one(organizations, {
-    fields: [invitations.organizationId],
-    references: [organizations.id]
+export const invitationRelations = relations(invitation, ({ one }) => ({
+  organization: one(organization, {
+    fields: [invitation.organizationId],
+    references: [organization.id]
   }),
   inviter: one(user, {
-    fields: [invitations.inviterId],
+    fields: [invitation.inviterId],
     references: [user.id]
   }),
 }));
