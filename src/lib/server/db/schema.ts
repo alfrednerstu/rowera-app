@@ -2,8 +2,8 @@ import { pgTable, serial, integer, varchar, text, timestamp, boolean, json, uuid
 import { relations } from 'drizzle-orm';
 
 // User table for authentication and profile
-export const users = pgTable('user', {
-  id: uuid('id').primaryKey().defaultRandom(),
+export const user = pgTable('user', {
+  id: text('id').primaryKey(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   name: varchar('name', { length: 255 }),
   image: varchar('image', { length: 500 }),
@@ -16,94 +16,180 @@ export const users = pgTable('user', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 }, (t) => [
-  index('idx_users_email').on(t.email),
+  index('idx_user_email').on(t.email),
 ]);
 
-// Feeds - collections where posts can be added
-export const feeds = pgTable('feed', {
+// Product - top-level container for content
+export const product = pgTable('product', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
-  slug: varchar('slug', { length: 255 }).notNull().unique(),
-  description: text('description'),
-  isPublic: boolean('is_public').notNull().default(true),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
+// Publication - groups posts under a product
+export const publication = pgTable('publication', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(),
+  slug: varchar('slug', { length: 255 }).notNull(),
+  productId: uuid('product_id').notNull().references(() => product.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
+// Project - groups pieces under a product
+export const project = pgTable('project', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(),
+  slug: varchar('slug', { length: 255 }).notNull(),
+  productId: uuid('product_id').notNull().references(() => product.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
+// Preset - template used by posts and pieces
+export const preset = pgTable('preset', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(),
+  publicationId: uuid('publication_id').references(() => publication.id, { onDelete: 'cascade' }),
+  projectId: uuid('project_id').references(() => project.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
+// Piece - belongs to project, can use preset
+export const piece = pgTable('piece', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(),
+  slug: varchar('slug', { length: 255 }).notNull(),
+  projectId: uuid('project_id').notNull().references(() => project.id, { onDelete: 'cascade' }),
+  presetId: uuid('preset_id').references(() => preset.id, { onDelete: 'restrict' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
+// Primitive - basic building block
+export const primitive = pgTable('primitive', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(),
+  tagName: varchar('tag_name', { length: 50 }).notNull(),
+  attributes: json('attributes'),
+  defaultContent: text('default_content'),
+  cssStyles: text('css_styles'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
+// Part - belongs to exactly one of page/post/piece
+export const part = pgTable('part', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(),
+  pageId: uuid('page_id').references(() => page.id, { onDelete: 'cascade' }),
+  postId: uuid('post_id').references(() => post.id, { onDelete: 'cascade' }),
+  pieceId: uuid('piece_id').references(() => piece.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
+// Junctions for partials on page/post/piece
+export const pagePartial = pgTable('page_partial', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  pageId: uuid('page_id').notNull().references(() => page.id, { onDelete: 'cascade' }),
+  partialId: uuid('partial_id').notNull().references(() => partial.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+});
+
+export const postPartial = pgTable('post_partial', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  postId: uuid('post_id').notNull().references(() => post.id, { onDelete: 'cascade' }),
+  partialId: uuid('partial_id').notNull().references(() => partial.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+});
+
+export const piecePartial = pgTable('piece_partial', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  pieceId: uuid('piece_id').notNull().references(() => piece.id, { onDelete: 'cascade' }),
+  partialId: uuid('partial_id').notNull().references(() => partial.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+});
+
 // Posts - content items that can be added to feeds
-export const posts = pgTable('post', {
+export const post = pgTable('post', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: varchar('title', { length: 500 }).notNull(),
   slug: varchar('slug', { length: 500 }).notNull(),
   content: json('content').notNull(), // Array of partial instances with filled data
   isPublished: boolean('is_published').notNull().default(false),
   publishedAt: timestamp('published_at'),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  feedId: uuid('feed_id').notNull().references(() => feeds.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  publicationId: uuid('publication_id').references(() => publication.id, { onDelete: 'cascade' }),
+  presetId: uuid('preset_id').references(() => preset.id, { onDelete: 'restrict' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
 // Pages - standalone one-off pages
-export const pages = pgTable('page', {
+export const page = pgTable('page', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: varchar('title', { length: 500 }).notNull(),
   slug: varchar('slug', { length: 500 }).notNull().unique(),
   content: json('content').notNull(), // Array of partial instances with filled data
   isPublished: boolean('is_published').notNull().default(false),
   publishedAt: timestamp('published_at'),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  productId: uuid('product_id').references(() => product.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
 // Partials - reusable components made of semantic HTML elements
-export const partials = pgTable('partial', {
+export const partial = pgTable('partial', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   slug: varchar('slug', { length: 255 }).notNull(),
   description: text('description'),
   elements: json('elements').notNull(), // Array of semantic HTML elements with their structure
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
 // Presentations - visual style definitions that can be applied
-export const presentations = pgTable('presentation', {
+export const presentation = pgTable('presentation', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   slug: varchar('slug', { length: 255 }).notNull().unique(),
   cssVariables: json('css_variables'), // CSS custom properties
   globalStyles: text('global_styles'), // Global CSS rules
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  productId: uuid('product_id').references(() => product.id, { onDelete: 'cascade' }),
   isActive: boolean('is_active').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
 // Better Auth core tables (UUID-based)
-export const sessions = pgTable('session', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+export const session = pgTable('session', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   expiresAt: timestamp('expires_at').notNull(),
   ipAddress: varchar('ip_address', { length: 45 }),
   userAgent: varchar('user_agent', { length: 255 }),
   token: varchar('token', { length: 255 }).notNull().unique(),
   // Organization plugin session fields
-  activeOrganizationId: uuid('active_organization_id'),
-  activeTeamId: uuid('active_team_id'),
+  activeOrganizationId: text('active_organization_id'),
+  activeTeamId: text('active_team_id'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 }, (t) => [
-  index('idx_sessions_user_id').on(t.userId),
-  index('idx_sessions_token').on(t.token),
+  index('idx_session_user_id').on(t.userId),
+  index('idx_session_token').on(t.token),
 ]);
 
-export const accounts = pgTable('account', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+export const account = pgTable('account', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   provider: varchar('provider', { length: 50 }).notNull(),
   providerAccountId: varchar('provider_account_id', { length: 255 }).notNull(),
   accessToken: text('access_token'),
@@ -117,8 +203,8 @@ export const accounts = pgTable('account', {
   index('idx_accounts_user_id').on(t.userId),
 ]);
 
-export const verifications = pgTable('verification', {
-  id: uuid('id').primaryKey().defaultRandom(),
+export const verification = pgTable('verification', {
+  id: text('id').primaryKey(),
   identifier: varchar('identifier', { length: 255 }).notNull(),
   value: text('value').notNull(),
   expiresAt: timestamp('expires_at').notNull(),
@@ -129,53 +215,53 @@ export const verifications = pgTable('verification', {
 ]);
 
 // Organization plugin tables (with Teams)
-export const organizations = pgTable('organization', {
-  id: uuid('id').primaryKey().defaultRandom(),
+export const organization = pgTable('organization', {
+  id: text('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
   slug: varchar('slug', { length: 255 }).notNull().unique(),
-  ownerId: uuid('owner_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  ownerId: text('owner_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 }, (t) => [
-  index('idx_organizations_slug').on(t.slug),
+  index('idx_organization_slug').on(t.slug),
 ]);
 
-export const members = pgTable('member', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  organizationId: uuid('organization_id').notNull().references(() => organizations.id, { onDelete: 'cascade' }),
+export const member = pgTable('member', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  organizationId: text('organization_id').notNull().references(() => organization.id, { onDelete: 'cascade' }),
   role: varchar('role', { length: 50 }).notNull().default('member'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 }, (t) => [
-  index('idx_members_user_id').on(t.userId),
-  index('idx_members_organization_id').on(t.organizationId),
+  index('idx_member_user_id').on(t.userId),
+  index('idx_member_organization_id').on(t.organizationId),
 ]);
 
-export const teams = pgTable('team', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  organizationId: uuid('organization_id').notNull().references(() => organizations.id, { onDelete: 'cascade' }),
+export const team = pgTable('team', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id').notNull().references(() => organization.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 255 }).notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
-export const teamMembers = pgTable('team_member', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  teamId: uuid('team_id').notNull().references(() => teams.id, { onDelete: 'cascade' }),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+export const teamMember = pgTable('team_member', {
+  id: text('id').primaryKey(),
+  teamId: text('team_id').notNull().references(() => team.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   role: varchar('role', { length: 50 }).notNull().default('member'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
-export const invitations = pgTable('invitation', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  organizationId: uuid('organization_id').notNull().references(() => organizations.id, { onDelete: 'cascade' }),
+export const invitation = pgTable('invitation', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id').notNull().references(() => organization.id, { onDelete: 'cascade' }),
   email: varchar('email', { length: 255 }).notNull(),
   role: varchar('role', { length: 50 }).notNull().default('member'),
-  inviterId: uuid('inviter_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  teamId: uuid('team_id').references(() => teams.id),
+  inviterId: text('inviter_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  teamId: text('team_id').references(() => teams.id),
   token: varchar('token', { length: 255 }).notNull().unique(),
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -186,76 +272,179 @@ export const invitations = pgTable('invitation', {
 ]);
 
 // Relations
-export const usersRelations = relations(users, ({ many }) => ({
-  feeds: many(feeds),
-  posts: many(posts),
-  pages: many(pages),
-  partials: many(partials),
-  presentations: many(presentations),
-  sessions: many(sessions),
-  accounts: many(accounts),
+export const userRelations = relations(user, ({ many }) => ({
+  posts: many(post),
+  pages: many(page),
+  partials: many(partial),
+  presentations: many(presentation),
+  sessions: many(session),
+  accounts: many(account),
   memberships: many(members),
   teamMemberships: many(teamMembers),
 }));
 
-export const feedsRelations = relations(feeds, ({ one, many }) => ({
-  user: one(users, {
-    fields: [feeds.userId],
-    references: [users.id]
+export const productRelations = relations(product, ({ one, many }) => ({
+  owner: one(user, {
+    fields: [product.userId],
+    references: [user.id]
   }),
-  posts: many(posts)
+  pages: many(page),
+  publications: many(publication),
+  projects: many(project)
 }));
 
-export const postsRelations = relations(posts, ({ one }) => ({
-  user: one(users, {
-    fields: [posts.userId],
-    references: [users.id]
+export const postRelations = relations(post, ({ one }) => ({
+  user: one(user, {
+    fields: [post.userId],
+    references: [user.id]
   }),
-  feed: one(feeds, {
-    fields: [posts.feedId],
-    references: [feeds.id]
+  publication: one(publication, {
+    fields: [post.publicationId!],
+    references: [publication.id]
+  }),
+  preset: one(preset, {
+    fields: [post.presetId!],
+    references: [preset.id]
   })
 }));
 
-export const pagesRelations = relations(pages, ({ one }) => ({
-  user: one(users, {
-    fields: [pages.userId],
-    references: [users.id]
+export const pageRelations = relations(page, ({ one }) => ({
+  user: one(user, {
+    fields: [page.userId],
+    references: [user.id]
+  }),
+  product: one(product, {
+    fields: [page.productId!],
+    references: [product.id]
   })
 }));
 
-export const partialsRelations = relations(partials, ({ one }) => ({
-  user: one(users, {
-    fields: [partials.userId],
-    references: [users.id]
+export const partialRelations = relations(partial, ({ one }) => ({
+  user: one(user, {
+    fields: [partial.userId],
+    references: [user.id]
   })
 }));
 
-export const presentationsRelations = relations(presentations, ({ one }) => ({
-  user: one(users, {
-    fields: [presentations.userId],
-    references: [users.id]
+export const presentationRelations = relations(presentation, ({ one }) => ({
+  user: one(user, {
+    fields: [presentation.userId],
+    references: [user.id]
+  }),
+  product: one(product, {
+    fields: [presentation.productId!],
+    references: [product.id]
   })
 }));
 
-export const sessionsRelations = relations(sessions, ({ one }) => ({
-  user: one(users, {
-    fields: [sessions.userId],
-    references: [users.id]
+export const publicationRelations = relations(publication, ({ one, many }) => ({
+  product: one(product, {
+    fields: [publication.productId],
+    references: [product.id]
+  }),
+  posts: many(post),
+  presets: many(preset)
+}));
+
+export const presetRelations = relations(preset, ({ one, many }) => ({
+  publication: one(publication, {
+    fields: [preset.publicationId],
+    references: [publication.id]
+  }),
+  project: one(project, {
+    fields: [preset.projectId!],
+    references: [project.id]
+  }),
+  posts: many(post),
+  pieces: many(piece)
+}));
+
+export const projectRelations = relations(project, ({ one, many }) => ({
+  product: one(product, {
+    fields: [project.productId],
+    references: [product.id]
+  }),
+  pieces: many(piece),
+  presets: many(preset)
+}));
+
+export const pieceRelations = relations(piece, ({ one, many }) => ({
+  project: one(project, {
+    fields: [piece.projectId],
+    references: [project.id]
+  }),
+  preset: one(preset, {
+    fields: [piece.presetId!],
+    references: [preset.id]
+  })
+}));
+
+export const partRelations = relations(part, ({ one }) => ({
+  page: one(page, {
+    fields: [part.pageId!],
+    references: [page.id]
+  }),
+  post: one(post, {
+    fields: [part.postId!],
+    references: [post.id]
+  }),
+  piece: one(piece, {
+    fields: [part.pieceId!],
+    references: [piece.id]
+  })
+}));
+
+export const pagePartialRelations = relations(pagePartial, ({ one }) => ({
+  page: one(page, {
+    fields: [pagePartial.pageId],
+    references: [page.id]
+  }),
+  partial: one(partial, {
+    fields: [pagePartial.partialId],
+    references: [partial.id]
+  })
+}));
+
+export const postPartialRelations = relations(postPartial, ({ one }) => ({
+  post: one(post, {
+    fields: [postPartial.postId],
+    references: [post.id]
+  }),
+  partial: one(partial, {
+    fields: [postPartial.partialId],
+    references: [partial.id]
+  })
+}));
+
+export const piecePartialRelations = relations(piecePartial, ({ one }) => ({
+  piece: one(piece, {
+    fields: [piecePartial.pieceId],
+    references: [piece.id]
+  }),
+  partial: one(partial, {
+    fields: [piecePartial.partialId],
+    references: [partial.id]
+  })
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id]
   }),
 }));
 
-export const accountsRelations = relations(accounts, ({ one }) => ({
-  user: one(users, {
-    fields: [accounts.userId],
-    references: [users.id]
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id]
   })
 }));
 
 export const organizationsRelations = relations(organizations, ({ one, many }) => ({
-  owner: one(users, {
+  owner: one(user, {
     fields: [organizations.ownerId],
-    references: [users.id]
+    references: [user.id]
   }),
   members: many(members),
   teams: many(teams),
@@ -263,9 +452,9 @@ export const organizationsRelations = relations(organizations, ({ one, many }) =
 }));
 
 export const membersRelations = relations(members, ({ one }) => ({
-  user: one(users, {
+  user: one(user, {
     fields: [members.userId],
-    references: [users.id]
+    references: [user.id]
   }),
   organization: one(organizations, {
     fields: [members.organizationId],
@@ -286,9 +475,9 @@ export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
     fields: [teamMembers.teamId],
     references: [teams.id]
   }),
-  user: one(users, {
+  user: one(user, {
     fields: [teamMembers.userId],
-    references: [users.id]
+    references: [user.id]
   }),
 }));
 
@@ -297,12 +486,8 @@ export const invitationsRelations = relations(invitations, ({ one }) => ({
     fields: [invitations.organizationId],
     references: [organizations.id]
   }),
-  team: one(teams, {
-    fields: [invitations.teamId!],
-    references: [teams.id]
-  }),
-  inviter: one(users, {
+  inviter: one(user, {
     fields: [invitations.inviterId],
-    references: [users.id]
+    references: [user.id]
   }),
 }));

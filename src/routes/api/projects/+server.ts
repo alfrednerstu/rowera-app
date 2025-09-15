@@ -1,0 +1,53 @@
+import { json } from '@sveltejs/kit'
+import { db } from '$lib/server/db'
+import { projects, products } from '$lib/server/db/schema'
+import { eq, and } from 'drizzle-orm'
+import type { RequestHandler } from './$types'
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.session?.user?.id) {
+		return json({ error: 'Unauthorized' }, { status: 401 })
+	}
+	
+	try {
+		const { name, slug, productId } = await request.json()
+		
+		if (!name?.trim()) {
+			return json({ error: 'Project name is required' }, { status: 400 })
+		}
+		
+		if (!slug?.trim()) {
+			return json({ error: 'Project slug is required' }, { status: 400 })
+		}
+		
+		if (!productId) {
+			return json({ error: 'Product is required' }, { status: 400 })
+		}
+		
+		// Verify that the product belongs to the user
+		const product = await db.select()
+			.from(products)
+			.where(
+				and(
+					eq(products.id, productId),
+					eq(products.userId, locals.session.user.id)
+				)
+			)
+			.limit(1)
+		
+		if (!product.length) {
+			return json({ error: 'Product not found or access denied' }, { status: 404 })
+		}
+		
+		const [project] = await db.insert(projects).values({
+			name: name.trim(),
+			slug: slug.trim(),
+			productId
+		}).returning()
+		
+		return json(project)
+	} catch (error) {
+		console.error('Error creating project:', error)
+		return json({ error: 'Failed to create project' }, { status: 500 })
+	}
+}
