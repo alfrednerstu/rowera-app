@@ -25,6 +25,9 @@
 				<li aria-current={page.url.pathname === '/pages' ? 'page' : undefined}>
 					<a href="/pages">Pages</a>
 				</li>
+				<li aria-current={page.url.pathname === '/primitives' ? 'page' : undefined}>
+					<a href="/primitives">Primitives</a>
+				</li>
 				<li>
 					<button class="preview-btn">Preview</button>
 				</li>
