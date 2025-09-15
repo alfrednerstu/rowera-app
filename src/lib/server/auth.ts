@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { username, organization } from "better-auth/plugins";
+import { username, organization, admin } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 import { getRequestEvent } from "$app/server";
 import { db } from "./db";
@@ -21,6 +21,10 @@ export const auth = betterAuth({
 	plugins: [
 		username(),
 		organization(),
+		admin({
+			adminUserIds: ["274286d8-0132-44ca-8898-1b483061a65d"], // alfred's user ID
+			adminRoles: ["admin"]
+		}),
 		sveltekitCookies(getRequestEvent), // must be last plugin
 	],
 	socialProviders: {},
