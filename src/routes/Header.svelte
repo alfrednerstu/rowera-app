@@ -10,11 +10,11 @@
 {#if $session.data?.user}
 <header>
 	<nav>
-		<section class="brand">
-			<h1>Rowera</h1>
+		<section>
+			<h1><a href='/'>Rowera</a></h1>
 		</section>
 		
-		<section class="center-nav">
+		<section>
 			<ul class="main-nav">
 				<li aria-current={page.url.pathname === '/' ? 'page' : undefined}>
 					<a href="/">Projects</a>
@@ -26,12 +26,12 @@
 					<a href="/pages">Pages</a>
 				</li>
 				<li>
-					<button class="preview-btn">Preview</button>
+					<button>Preview</button>
 				</li>
 			</ul>
 		</section>
 		
-		<section class="user-nav">
+		<section>
 			<ul>
 				<li aria-current={page.url.pathname === '/presentation' ? 'page' : undefined}>
 					<a href="/presentation">Presentation</a>
@@ -49,11 +49,11 @@
 {:else}
 <header>
 	<nav>
-		<section class="brand">
-			<h1>Rowera</h1>
+		<section>
+			<h1><a href='/'>Rowera</a></h1>
 		</section>
 		
-		<section class="auth-nav">
+		<section>
 			<ul>
 				<li aria-current={page.url.pathname === '/login' ? 'page' : undefined}>
 					<a href="/login">Login</a>
@@ -81,73 +81,13 @@
 		width: 100%;
 	}
 
-	.brand h1 {
+	h1 {
 		margin: 0;
 		font-size: 1.5rem;
 		font-weight: bold;
 		color: #495057;
-	}
-
-	.center-nav {
-		display: flex;
-		justify-content: center;
-		flex-grow: 1;
-	}
-
-	.main-nav {
-		display: flex;
-		align-items: center;
-		gap: 2rem;
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-
-	.user-nav ul, .auth-nav ul {
-		display: flex;
-		align-items: center;
-		gap: 1.5rem;
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-
-	.main-nav a, .user-nav a, .auth-nav a {
-		color: #495057;
-		text-decoration: none;
-		font-weight: 500;
-		transition: color 0.2s ease;
-	}
-
-	.main-nav a:hover, .auth-nav a:hover {
-		color: #007bff;
-	}
-
-	.user-nav a {
-		font-size: 0.9rem;
-		font-weight: 400;
-		color: #6c757d;
-	}
-
-	.user-nav a:hover {
-		color: #495057;
-	}
-
-	.preview-btn {
-		background: #007bff;
-		color: white;
-		border: none;
-		padding: 0.5rem 1rem;
-		border-radius: 4px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: background-color 0.2s ease;
-	}
-
-	.preview-btn:hover {
-		background: #0056b3;
-	}
-
+}
+	
 	li[aria-current='page'] a {
 		color: #007bff;
 		font-weight: 600;
