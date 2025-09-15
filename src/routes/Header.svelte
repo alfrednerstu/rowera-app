@@ -1,6 +1,21 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { session, signOut } from '$lib/auth-client'
+	import { onMount } from 'svelte'
+
+	let isAdmin = $state(false)
+
+	onMount(async () => {
+		// Check if user is admin by testing admin endpoints
+		if ($session.data?.user) {
+			try {
+				const response = await fetch('/api/primitives', { method: 'POST', body: '{}' })
+				isAdmin = response.status !== 403
+			} catch {
+				isAdmin = false
+			}
+		}
+	})
 
 	async function handleLogout() {
 		await signOut()
@@ -25,9 +40,11 @@
 				<li aria-current={page.url.pathname === '/pages' ? 'page' : undefined}>
 					<a href="/pages">Pages</a>
 				</li>
-				<li aria-current={page.url.pathname === '/primitives' ? 'page' : undefined}>
-					<a href="/primitives">Primitives</a>
-				</li>
+				{#if isAdmin}
+					<li aria-current={page.url.pathname === '/primitives' ? 'page' : undefined}>
+						<a href="/primitives">Primitives</a>
+					</li>
+				{/if}
 				<li>
 					<button class="preview-btn">Preview</button>
 				</li>
