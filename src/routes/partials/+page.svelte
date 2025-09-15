@@ -1,38 +1,50 @@
 <script>
-	// This will eventually load from the database
-	let partials = []
+	import CrudTable from '$lib/components/CrudTable.svelte'
+	
+	let { data } = $props()
+	
+	const columns = [
+		{ key: 'name', header: 'Partial Name' },
+		{ 
+			key: 'createdAt', 
+			header: 'Created',
+			render: (item) => new Date(item.createdAt).toLocaleDateString()
+		}
+	]
+	
+	async function handleDelete(partial) {
+		if (confirm(`Are you sure you want to delete "${partial.name}"?`)) {
+			try {
+				const response = await fetch(`/api/partials/${partial.id}`, {
+					method: 'DELETE'
+				})
+				
+				if (response.ok) {
+					// Reload the page to refresh the partials list
+					window.location.reload()
+				} else {
+					console.error('Failed to delete partial')
+				}
+			} catch (error) {
+				console.error('Error deleting partial:', error)
+			}
+		}
+	}
 </script>
 
-<header class="page-header">
-	<h1>Partials</h1>
-	<nav class="header-actions">
-		<a href="/partials/new" class="btn btn-primary">New Partial</a>
-		<a href="/elements" class="btn btn-secondary">Element Library</a>
-	</nav>
-</header>
+<svelte:head>
+	<title>Partials - Rowera CMS</title>
+	<meta name="description" content="Manage your reusable partials" />
+</svelte:head>
 
-{#if partials.length === 0}
-	<section class="empty-state">
-		<h2>No partials yet</h2>
-		<p>Create reusable semantic components that can be used across posts and pages.</p>
-		<nav class="empty-actions">
-			<a href="/partials/new" class="btn btn-primary">Create First Partial</a>
-			<a href="/elements" class="btn btn-secondary">Browse Elements</a>
-		</nav>
-	</section>
-{:else}
-	<section class="partials-list">
-		{#each partials as partial}
-			<article class="partial-item">
-				<h3><a href="/partials/{partial.id}">{partial.name}</a></h3>
-				<p class="partial-description">{partial.description}</p>
-				<p class="partial-meta">
-					{partial.elements.length} elements • {partial.updatedAt}
-				</p>
-			</article>
-		{/each}
-	</section>
-{/if}
+<CrudTable 
+	items={data.partials}
+	{columns}
+	title="Partials"
+	createUrl="/partials/new"
+	editUrl={(item) => `/partials/${item.id}/edit`}
+	onDelete={handleDelete}
+/>
 
 <style>
 	.page-header {

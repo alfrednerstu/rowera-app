@@ -2,11 +2,11 @@
 	import CrudTable from '$lib/components/CrudTable.svelte'
 	
 	let { data } = $props()
-	let activeTab = $state('publications')
+	let activeTab = $state('projects')
 	
-	// Publications table configuration
-	const publicationColumns = [
-		{ key: 'name', header: 'Publication Name' },
+	// Projects table configuration
+	const projectColumns = [
+		{ key: 'name', header: 'Project Name' },
 		{ key: 'slug', header: 'Slug' },
 		{ key: 'productName', header: 'Product' },
 		{ 
@@ -16,11 +16,11 @@
 		}
 	]
 	
-	// Posts table configuration
-	const postColumns = [
-		{ key: 'title', header: 'Post Title' },
+	// Pieces table configuration
+	const pieceColumns = [
+		{ key: 'name', header: 'Piece Name' },
 		{ key: 'slug', header: 'Slug' },
-		{ key: 'publicationName', header: 'Publication' },
+		{ key: 'projectName', header: 'Project' },
 		{ key: 'presetName', header: 'Preset' },
 		{ 
 			key: 'createdAt', 
@@ -32,7 +32,7 @@
 	// Presets table configuration
 	const presetColumns = [
 		{ key: 'name', header: 'Preset Name' },
-		{ key: 'publicationName', header: 'Publication' },
+		{ key: 'projectName', header: 'Project' },
 		{ 
 			key: 'createdAt', 
 			header: 'Created',
@@ -40,38 +40,38 @@
 		}
 	]
 	
-	async function handleDeletePublication(publication) {
-		if (confirm(`Are you sure you want to delete "${publication.name}"?`)) {
+	async function handleDeleteProject(project) {
+		if (confirm(`Are you sure you want to delete "${project.name}"?`)) {
 			try {
-				const response = await fetch(`/api/publications/${publication.id}`, {
+				const response = await fetch(`/api/projects/${project.id}`, {
 					method: 'DELETE'
 				})
 				
 				if (response.ok) {
 					window.location.reload()
 				} else {
-					console.error('Failed to delete publication')
+					console.error('Failed to delete project')
 				}
 			} catch (error) {
-				console.error('Error deleting publication:', error)
+				console.error('Error deleting project:', error)
 			}
 		}
 	}
 	
-	async function handleDeletePost(post) {
-		if (confirm(`Are you sure you want to delete "${post.title}"?`)) {
+	async function handleDeletePiece(piece) {
+		if (confirm(`Are you sure you want to delete "${piece.name}"?`)) {
 			try {
-				const response = await fetch(`/api/posts/${post.id}`, {
+				const response = await fetch(`/api/pieces/${piece.id}`, {
 					method: 'DELETE'
 				})
 				
 				if (response.ok) {
 					window.location.reload()
 				} else {
-					console.error('Failed to delete post')
+					console.error('Failed to delete piece')
 				}
 			} catch (error) {
-				console.error('Error deleting post:', error)
+				console.error('Error deleting piece:', error)
 			}
 		}
 	}
@@ -96,51 +96,51 @@
 </script>
 
 <svelte:head>
-	<title>Posts & Publications - Rowera CMS</title>
-	<meta name="description" content="Manage your publications, posts, and presets" />
+	<title>Projects & Pieces - Rowera CMS</title>
+	<meta name="description" content="Manage your projects, pieces, and shared presets" />
 </svelte:head>
 
 <header class="page-header">
-	<h1>Posts & Publications</h1>
+	<h1>Projects & Pieces</h1>
 </header>
 
 <nav class="tabs">
-	<button onclick={() => activeTab = 'publications'} class:active={activeTab === 'publications'}>
-		Publications
+	<button onclick={() => activeTab = 'projects'} class:active={activeTab === 'projects'}>
+		Projects
 	</button>
-	<button onclick={() => activeTab = 'posts'} class:active={activeTab === 'posts'}>
-		Posts
+	<button onclick={() => activeTab = 'pieces'} class:active={activeTab === 'pieces'}>
+		Pieces
 	</button>
 	<button onclick={() => activeTab = 'presets'} class:active={activeTab === 'presets'}>
-		Presets
+		Shared Presets
 	</button>
 </nav>
 
-{#if activeTab === 'publications'}
+{#if activeTab === 'projects'}
 	<CrudTable 
-		items={data.publications}
-		columns={publicationColumns}
-		title="Publications"
-		createUrl="/posts/publications/new"
-		editUrl={(item) => `/posts/publications/${item.id}/edit`}
-		onDelete={handleDeletePublication}
+		items={data.projects}
+		columns={projectColumns}
+		title="Projects"
+		createUrl="/projects/new"
+		editUrl={(item) => `/projects/${item.id}/edit`}
+		onDelete={handleDeleteProject}
 	/>
-{:else if activeTab === 'posts'}
+{:else if activeTab === 'pieces'}
 	<CrudTable 
-		items={data.posts}
-		columns={postColumns}
-		title="Posts"
-		createUrl="/posts/new"
-		editUrl={(item) => `/posts/${item.id}/edit`}
-		onDelete={handleDeletePost}
+		items={data.pieces}
+		columns={pieceColumns}
+		title="Pieces"
+		createUrl="/projects/pieces/new"
+		editUrl={(item) => `/projects/pieces/${item.id}/edit`}
+		onDelete={handleDeletePiece}
 	/>
 {:else if activeTab === 'presets'}
 	<CrudTable 
 		items={data.presets}
 		columns={presetColumns}
-		title="Presets"
-		createUrl="/posts/presets/new"
-		editUrl={(item) => `/posts/presets/${item.id}/edit`}
+		title="Project Presets"
+		createUrl="/projects/presets/new"
+		editUrl={(item) => `/projects/presets/${item.id}/edit`}
 		onDelete={handleDeletePreset}
 	/>
 {/if}
@@ -153,6 +153,11 @@
 		margin-bottom: 1rem;
 		padding-bottom: 1rem;
 		border-bottom: 1px solid #e9ecef;
+	}
+	
+	.page-header h1 {
+		margin: 0;
+		color: #495057;
 	}
 	
 	.tabs {
@@ -181,10 +186,4 @@
 		color: #007bff;
 		border-bottom-color: #007bff;
 	}
-	
-	.page-header h1 {
-		margin: 0;
-		color: #495057;
-	}
-	
 </style>

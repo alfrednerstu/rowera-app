@@ -43,6 +43,7 @@ export const parts = pgTable('parts', {
 export const partials = pgTable('partials', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: varchar('name', { length: 255 }).notNull(),
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
 	createdAt: timestamp('created_at').notNull().defaultNow(),
 	updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
@@ -74,6 +75,7 @@ export const presets = pgTable('presets', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: varchar('name', { length: 255 }).notNull(),
 	publicationId: uuid('publication_id').references(() => publications.id, { onDelete: 'cascade' }),
+	projectId: uuid('project_id').references(() => projects.id, { onDelete: 'cascade' }),
 	createdAt: timestamp('created_at').notNull().defaultNow(),
 	updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
@@ -179,7 +181,8 @@ export const piecePrimitives = pgTable('piece_primitives', {
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
-	products: many(products)
+	products: many(products),
+	partials: many(partials)
 }));
 
 export const productsRelations = relations(products, ({ one, many }) => ({
@@ -210,7 +213,11 @@ export const partsRelations = relations(parts, ({ one, many }) => ({
 	presetParts: many(presetParts)
 }));
 
-export const partialsRelations = relations(partials, ({ many }) => ({
+export const partialsRelations = relations(partials, ({ one, many }) => ({
+	user: one(users, {
+		fields: [partials.userId],
+		references: [users.id]
+	}),
 	partPartials: many(partPartials),
 	partialPrimitives: many(partialPrimitives),
 	postPartials: many(postPartials),
@@ -238,6 +245,10 @@ export const presetsRelations = relations(presets, ({ one, many }) => ({
 		fields: [presets.publicationId],
 		references: [publications.id]
 	}),
+	project: one(projects, {
+		fields: [presets.projectId],
+		references: [projects.id]
+	}),
 	posts: many(posts),
 	pieces: many(pieces),
 	presetParts: many(presetParts)
@@ -261,7 +272,8 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
 		fields: [projects.productId],
 		references: [products.id]
 	}),
-	pieces: many(pieces)
+	pieces: many(pieces),
+	presets: many(presets)
 }));
 
 export const piecesRelations = relations(pieces, ({ one, many }) => ({

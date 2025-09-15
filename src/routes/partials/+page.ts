@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { products } from '$lib/server/db/schema'
+import { partials } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
 import { eq } from 'drizzle-orm'
 
@@ -10,9 +10,10 @@ export async function load({ parent }) {
 		throw redirect(302, '/login')
 	}
 	
-	const userProducts = await db.select().from(products).where(eq(products.userId, session.user.id))
+	// Get user's partials
+	const userPartials = await db.select().from(partials).where(eq(partials.userId, session.user.id))
 	
 	return {
-		products: userProducts
+		partials: userPartials
 	}
 }

@@ -10,6 +10,7 @@ export async function load({ parent }) {
 		throw redirect(302, '/login')
 	}
 	
+	// Get all user's products for the select field
 	const userProducts = await db.select().from(products).where(eq(products.userId, session.user.id))
 	
 	return {
