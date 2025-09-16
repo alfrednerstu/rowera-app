@@ -1,32 +1,49 @@
 <script>
-	// This will eventually load from the database
-	let user = {
-		name: 'John Doe',
-		email: 'john@example.com',
-		avatar: null,
-		createdAt: new Date().toISOString(),
-		stats: {
-			postsCount: 0,
-			pagesCount: 0,
-			partialsCount: 0
-		}
-	}
+	let { data } = $props()
+
+	let user = data.user
 
 	async function handleLogout() {
 		await signOut()
 	}
+
+	async function setupDefaults() {
+		setupLoading = true
+		setupMessage = ''
+		try {
+			const res = await fetch('/api/setup-defaults', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				credentials: 'include'
+			})
+			const data = await res.json()
+			if (!res.ok) {
+				setupMessage = data?.error || 'Failed to setup defaults'
+				return
+			}
+			setupMessage = 'Defaults created'
+		} catch (e) {
+			setupMessage = 'Failed to setup defaults'
+		} finally {
+			setupLoading = false
+		}
+	}
 	
 	let isEditing = false
-	let passwordData = {
+	let passwordData = $state({
 		current: '',
 		new: '',
 		confirm: ''
-	}
+	})
+	let setupLoading = $state(false)
+	let setupMessage = $state('')
 </script>
 
 <header class="page-header">
 	<h1>Profile</h1>
 </header>
+
+
 
 <div class="profile-grid">
 	<section class="profile-info">
@@ -88,23 +105,33 @@
 		
 		<div class="stats-grid">
 			<div class="stat-item">
-				<span class="stat-number">{user.stats.postsCount}</span>
+				<span class="stat-number">0</span>
 				<span class="stat-label">Posts</span>
 			</div>
 			
 			<div class="stat-item">
-				<span class="stat-number">{user.stats.pagesCount}</span>
+				<span class="stat-number">0</span>
 				<span class="stat-label">Pages</span>
 			</div>
 			
 			<div class="stat-item">
-				<span class="stat-number">{user.stats.partialsCount}</span>
+				<span class="stat-number">0</span>
 				<span class="stat-label">Partials</span>
 			</div>
+
+			<button onclick={setupDefaults} disabled={setupLoading}>
+				{setupLoading ? 'Setting up…' : 'Setup defaults'}
+			</button>
+			{#if setupMessage}
+				<p aria-live="polite">{setupMessage}</p>
+			{/if}
 		</div>
 		
 		<p class="member-since">
 			Member since {new Date(user.createdAt).toLocaleDateString()}
+		</p>
+		<p class="member-since">
+			Last login {new Date(data.session.updatedAt).toLocaleDateString()}
 		</p>
 	</section>
 	

@@ -5,11 +5,11 @@ import { eq } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
 export const POST: RequestHandler = async ({ locals }) => {
-	if (!locals.session?.user?.id) {
+	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
-	const userId = locals.session.user.id
+	const userId = locals.user.id
 	
 	try {
 		// Check if user already has products
@@ -21,20 +21,20 @@ export const POST: RequestHandler = async ({ locals }) => {
 
 		// Create default product
 		const [defaultProduct] = await db.insert(product).values({
-			name: 'My First Product',
+			name: 'Default',
 			userId: userId
 		}).returning()
 
 		// Create default publication
 		const [defaultPublication] = await db.insert(publication).values({
-			name: 'Default Publication',
+			name: 'Default publication',
 			slug: 'default',
 			productId: defaultProduct.id
 		}).returning()
 
 		// Create default project  
 		const [defaultProject] = await db.insert(project).values({
-			name: 'Default Project',
+			name: 'Default project',
 			slug: 'default',
 			productId: defaultProduct.id
 		}).returning()

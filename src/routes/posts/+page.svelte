@@ -2,7 +2,7 @@
 	import CrudTable from '$lib/components/CrudTable.svelte'
 	
 	let { data } = $props()
-	let activeTab = $state('publications')
+	let activeTab = $state('posts')
 	
 	// Publications table configuration
 	const publicationColumns = [
@@ -100,16 +100,12 @@
 	<meta name="description" content="Manage your publications, posts, and presets" />
 </svelte:head>
 
-<header class="page-header">
-	<h1>Posts</h1>
-</header>
-
 <nav class="tabs">
-	<button onclick={() => activeTab = 'publications'} class:active={activeTab === 'publications'}>
-		Publications
-	</button>
 	<button onclick={() => activeTab = 'posts'} class:active={activeTab === 'posts'}>
 		Posts
+	</button>
+	<button onclick={() => activeTab = 'publications'} class:active={activeTab === 'publications'}>
+		Publications
 	</button>
 	<button onclick={() => activeTab = 'presets'} class:active={activeTab === 'presets'}>
 		Presets
@@ -146,40 +142,35 @@
 {/if}
 
 <style>
-	.page-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 1rem;
-		padding-bottom: 1rem;
-		border-bottom: 1px solid #e9ecef;
-	}
-	
 	.tabs {
 		display: flex;
-		border-bottom: 1px solid #e9ecef;
-		margin-bottom: 2rem;
+		width: max-content;
+		align-items: flex-start;
+		margin-bottom: 1.5rem;
+		background: var(--surface-color);
+		border-radius: .5rem;
+		border: 1px solid var(--quad-color);
+		overflow: hidden;
+		padding: .25rem;
 	}
 	
 	.tabs button {
-		padding: 1rem 2rem;
-		border: none;
+		padding: .25rem .5rem;	
+		color: var(--secondary-color);
 		background: none;
-		cursor: pointer;
 		font-weight: 500;
-		color: #6c757d;
-		border-bottom: 3px solid transparent;
 		transition: all 0.2s ease;
+		border-radius: .25rem;
 	}
 	
 	.tabs button:hover {
 		color: #495057;
-		background: #f8f9fa;
+		background: var(--surface-color);
 	}
 	
 	.tabs button.active {
-		color: #007bff;
-		border-bottom-color: #007bff;
+		background: var(--accent-color);
+		color: var(--base-color);
 	}
 	
 	.page-header h1 {

@@ -4,7 +4,7 @@ import { product, publication, project } from '$lib/server/db/schema'
 import type { RequestHandler } from './$types'
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.session?.user?.id) {
+	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
@@ -17,19 +17,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		
 		const [newProduct] = await db.insert(product).values({
 			name: name.trim(),
-			userId: locals.session.user.id
+			userId: locals.user.id
 		}).returning()
 
 		// Create default publication
 		const [defaultPublication] = await db.insert(publication).values({
-			name: 'Default Publication',
+			name: 'Default publication',
 			slug: 'default',
 			productId: newProduct.id
 		}).returning()
 
 		// Create default project  
 		const [defaultProject] = await db.insert(project).values({
-			name: 'Default Project',
+			name: 'Default project',
 			slug: 'default',
 			productId: newProduct.id
 		}).returning()

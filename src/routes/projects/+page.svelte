@@ -101,7 +101,7 @@
 </svelte:head>
 
 <header class="page-header">
-	<h1>Projects & Pieces</h1>
+	<h1>Projects</h1>
 </header>
 
 <nav class="tabs">

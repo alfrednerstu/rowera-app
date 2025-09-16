@@ -75,9 +75,9 @@
 	.empty-state {
 		text-align: center;
 		padding: 4rem 2rem;
-		background: white;
+		background: var(--surface-color);
 		border-radius: 8px;
-		border: 1px solid #e9ecef;
+		border: 1px solid var(--quad-color);
 	}
 	
 	.empty-actions {
@@ -89,7 +89,7 @@
 	.items-table {
 		background: var(--surface-color);
 		border-radius: 8px;
-		border: 1px solid #e9ecef;
+		border: 1px solid var(--quad-color);
 		overflow: hidden;
 	}
 	
@@ -101,7 +101,7 @@
 	th, td {
 		padding: 1rem;
 		text-align: left;
-		border-bottom: 1px solid #e9ecef;
+		border-bottom: 1px solid var(--quint-color);
 	}
 	
 	th {

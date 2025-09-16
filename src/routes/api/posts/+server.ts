@@ -5,7 +5,7 @@ import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.session?.user?.id) {
+	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
@@ -25,23 +25,23 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 		
 		// Verify that the publication belongs to the user
-		const publication = await db.select()
+		const publicationRows = await db.select()
 			.from(publication)
 			.innerJoin(product, eq(publication.productId, product.id))
 			.where(
 				and(
 					eq(publication.id, publicationId),
-					eq(product.userId, locals.session.user.id)
+					eq(product.userId, locals.user.id)
 				)
 			)
 			.limit(1)
 		
-		if (!publication.length) {
+		if (!publicationRows.length) {
 			return json({ error: 'Publication not found or access denied' }, { status: 404 })
 		}
 		
 		// Verify that the preset belongs to the publication
-		const preset = await db.select()
+		const presetRows = await db.select()
 			.from(preset)
 			.where(
 				and(
@@ -51,11 +51,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			)
 			.limit(1)
 		
-		if (!preset.length) {
+		if (!presetRows.length) {
 			return json({ error: 'Preset not found or not available for this publication' }, { status: 404 })
 		}
 		
-		const [post] = await db.insert(post).values({
+		const [newPost] = await db.insert(post).values({
 			title: title.trim(),
 			slug: slug?.trim() || null,
 			publicationId,
