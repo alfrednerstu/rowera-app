@@ -1,4 +1,5 @@
 <script>
+	import { crossfade } from 'svelte/transition'
 	import CrudTable from '$lib/components/CrudTable.svelte'
 	
 	let { data } = $props()
@@ -93,6 +94,10 @@
 			}
 		}
 	}
+
+	const [send, receive] = crossfade({
+    duration: 150
+  })
 </script>
 
 <svelte:head>
@@ -101,15 +106,24 @@
 </svelte:head>
 
 <nav class="tabs">
-	<button onclick={() => activeTab = 'posts'} class:active={activeTab === 'posts'}>
-		Posts
-	</button>
-	<button onclick={() => activeTab = 'publications'} class:active={activeTab === 'publications'}>
-		Publications
-	</button>
-	<button onclick={() => activeTab = 'presets'} class:active={activeTab === 'presets'}>
-		Presets
-	</button>
+    <button onclick={() => activeTab = 'posts'} class:active={activeTab === 'posts'}>
+        {#if activeTab === 'posts'}
+          <span class="active-pill" in:receive={{ key: 'tabs-pill' }} out:send={{ key: 'tabs-pill' }} />
+        {/if}
+        Posts
+    </button>
+    <button onclick={() => activeTab = 'publications'} class:active={activeTab === 'publications'}>
+        {#if activeTab === 'publications'}
+          <span class="active-pill" in:receive={{ key: 'tabs-pill' }} out:send={{ key: 'tabs-pill' }} />
+        {/if}
+        Publications
+    </button>
+    <button onclick={() => activeTab = 'presets'} class:active={activeTab === 'presets'}>
+        {#if activeTab === 'presets'}
+          <span class="active-pill" in:receive={{ key: 'tabs-pill' }} out:send={{ key: 'tabs-pill' }} />
+        {/if}
+        Presets
+    </button>
 </nav>
 
 {#if activeTab === 'publications'}
@@ -152,16 +166,19 @@
 		border: 1px solid var(--quad-color);
 		overflow: hidden;
 		padding: .25rem;
+		gap: .25rem;
 	}
 	
 	.tabs button {
-		padding: .25rem .5rem;	
-		color: var(--secondary-color);
-		background: none;
-		font-weight: 500;
-		transition: all 0.2s ease;
-		border-radius: .25rem;
-	}
+    position: relative;
+    z-index: 0;
+    padding: .25rem .5rem;
+    color: var(--secondary-color);
+    background: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-radius: .25rem;
+}
 	
 	.tabs button:hover {
 		color: #495057;
@@ -169,13 +186,22 @@
 	}
 	
 	.tabs button.active {
-		background: var(--accent-color);
-		color: var(--base-color);
-	}
+    background: var(--accent-color);
+    color: var(--base-color);
+}
+
+/* moving active background */
+.active-pill {
+    position: absolute;
+    inset: 0;
+    border-radius: .25rem;
+    background: var(--accent-color);
+    pointer-events: none;
+    z-index: -1;
+}
 	
 	.page-header h1 {
 		margin: 0;
 		color: #495057;
 	}
-	
 </style>

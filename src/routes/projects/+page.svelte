@@ -100,19 +100,16 @@
 	<meta name="description" content="Manage your projects, pieces, and shared presets" />
 </svelte:head>
 
-<header class="page-header">
-	<h1>Projects</h1>
-</header>
-
 <nav class="tabs">
-	<button onclick={() => activeTab = 'projects'} class:active={activeTab === 'projects'}>
-		Projects
-	</button>
 	<button onclick={() => activeTab = 'pieces'} class:active={activeTab === 'pieces'}>
 		Pieces
 	</button>
+	<button onclick={() => activeTab = 'projects'} class:active={activeTab === 'projects'}>
+		Projects
+	</button>
+	
 	<button onclick={() => activeTab = 'presets'} class:active={activeTab === 'presets'}>
-		Shared Presets
+		Presets
 	</button>
 </nav>
 
@@ -138,7 +135,7 @@
 	<CrudTable 
 		items={data.presets}
 		columns={presetColumns}
-		title="Project Presets"
+		title="Presets"
 		createUrl="/projects/presets/new"
 		editUrl={(item) => `/projects/presets/${item.id}/edit`}
 		onDelete={handleDeletePreset}
@@ -146,44 +143,52 @@
 {/if}
 
 <style>
-	.page-header {
+	.tabs {
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 1rem;
-		padding-bottom: 1rem;
-		border-bottom: 1px solid #e9ecef;
+		width: max-content;
+		align-items: flex-start;
+		margin-bottom: 1.5rem;
+		background: var(--surface-color);
+		border-radius: .5rem;
+		border: 1px solid var(--quad-color);
+		overflow: hidden;
+		padding: .25rem;
+		gap: .25rem;
 	}
+	
+	.tabs button {
+    position: relative;
+    z-index: 0;
+    padding: .25rem .5rem;
+    color: var(--secondary-color);
+    background: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-radius: .25rem;
+}
+	
+	.tabs button:hover {
+		color: #495057;
+		background: var(--surface-color);
+	}
+	
+	.tabs button.active {
+    background: var(--accent-color);
+    color: var(--base-color);
+}
+
+/* moving active background */
+.active-pill {
+    position: absolute;
+    inset: 0;
+    border-radius: .25rem;
+    background: var(--accent-color);
+    pointer-events: none;
+    z-index: -1;
+}
 	
 	.page-header h1 {
 		margin: 0;
 		color: #495057;
-	}
-	
-	.tabs {
-		display: flex;
-		border-bottom: 1px solid #e9ecef;
-		margin-bottom: 2rem;
-	}
-	
-	.tabs button {
-		padding: 1rem 2rem;
-		border: none;
-		background: none;
-		cursor: pointer;
-		font-weight: 500;
-		color: #6c757d;
-		border-bottom: 3px solid transparent;
-		transition: all 0.2s ease;
-	}
-	
-	.tabs button:hover {
-		color: #495057;
-		background: #f8f9fa;
-	}
-	
-	.tabs button.active {
-		color: #007bff;
-		border-bottom-color: #007bff;
 	}
 </style>
