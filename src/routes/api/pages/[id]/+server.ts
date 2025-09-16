@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { page, product } from '$lib/server/db/schema'
+import { page, project } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -10,7 +10,7 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 	}
 	
 	try {
-		const { name, slug, productId } = await request.json()
+		const { name, slug, projectId } = await request.json()
 		
 		if (!name?.trim()) {
 			return json({ error: 'Page name is required' }, { status: 400 })
@@ -20,55 +20,55 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 			return json({ error: 'Page slug is required' }, { status: 400 })
 		}
 		
-		if (!productId) {
-			return json({ error: 'Product is required' }, { status: 400 })
+		if (!projectId) {
+			return json({ error: 'Project is required' }, { status: 400 })
 		}
 		
-		// Verify that the new product belongs to the user
-		const product = await db.select()
-			.from(product)
+		// Verify that the new project belongs to the user
+		const projectRows = await db.select()
+			.from(project)
 			.where(
 				and(
-					eq(product.id, productId),
-					eq(product.userId, locals.user.id)
+					eq(project.id, projectId),
+					eq(project.userId, locals.user.id)
 				)
 			)
 			.limit(1)
 		
-		if (!product.length) {
-			return json({ error: 'Product not found or access denied' }, { status: 404 })
+		if (!projectRows.length) {
+			return json({ error: 'Project not found or access denied' }, { status: 404 })
 		}
 		
-		// Update the page with ownership verification through original product
-		const [page] = await db.update(page)
+		// Update the page with ownership verification through original project
+		const [updatedPage] = await db.update(page)
 			.set({ 
 				name: name.trim(),
 				slug: slug.trim(),
-				productId,
+				projectId,
 				updatedAt: new Date()
 			})
-			.from(product)
+			.from(project)
 			.where(
 				and(
 					eq(page.id, params.id),
-					eq(page.productId, product.id),
-					eq(product.userId, locals.user.id)
+					eq(page.projectId, project.id),
+					eq(project.userId, locals.user.id)
 				)
 			)
 			.returning({
 				id: page.id,
 				name: page.name,
 				slug: page.slug,
-				productId: page.productId,
+				projectId: page.projectId,
 				createdAt: page.createdAt,
 				updatedAt: page.updatedAt
 			})
 		
-		if (!page) {
+		if (!updatedPage) {
 			return json({ error: 'Page not found' }, { status: 404 })
 		}
 		
-		return json(page)
+		return json(updatedPage)
 	} catch (error) {
 		console.error('Error updating page:', error)
 		return json({ error: 'Failed to update page' }, { status: 500 })
@@ -81,14 +81,14 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	}
 	
 	try {
-		// First verify ownership through product relationship
+		// First verify ownership through project relationship
 		const pageToDelete = await db.select({ id: page.id })
 			.from(page)
-			.innerJoin(product, eq(page.productId, product.id))
+			.innerJoin(project, eq(page.projectId, project.id))
 			.where(
 				and(
 					eq(page.id, params.id),
-					eq(product.userId, locals.user.id)
+					eq(project.userId, locals.user.id)
 				)
 			)
 			.limit(1)
@@ -98,7 +98,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		}
 		
 		// Delete the page
-		const [page] = await db.delete(page)
+		const [deletedPage] = await db.delete(page)
 			.where(eq(page.id, params.id))
 			.returning()
 		

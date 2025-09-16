@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { publication, product } from '$lib/server/db/schema'
+import { publication, project } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
@@ -15,16 +15,16 @@ export const load = async ({ params, locals }) => {
 		id: publication.id,
 		name: publication.name,
 		slug: publication.slug,
-		productId: publication.productId,
+		projectId: publication.projectId,
 		createdAt: publication.createdAt,
 		updatedAt: publication.updatedAt
 	})
 	.from(publication)
-	.innerJoin(product, eq(publication.productId, product.id))
+	.innerJoin(project, eq(publication.projectId, project.id))
 	.where(
 		and(
 			eq(publication.id, params.id),
-			eq(product.userId, locals.session.user.id)
+			eq(project.userId, locals.session.user.id)
 		)
 	)
 	.limit(1)
@@ -33,11 +33,11 @@ export const load = async ({ params, locals }) => {
 		throw error(404, 'Publication not found')
 	}
 	
-	// Get all user's products for the select field
-	const userProducts = await db.select().from(product).where(eq(product.userId, locals.session.user.id))
+	// Get all user's projects for the select field
+	const userProjects = await db.select().from(project).where(eq(project.userId, locals.session.user.id))
 	
 	return {
 		publication: publication[0],
-		products: userProducts
+		projects: userProjects
 	}
 }

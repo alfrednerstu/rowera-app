@@ -24,8 +24,8 @@ export const user = pgTable('user', {
   index('idx_user_email').on(t.email),
 ]);
 
-// Product - top-level container for content
-export const product = pgTable('product', {
+// Project - top-level container for content
+export const project = pgTable('project', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
@@ -33,22 +33,22 @@ export const product = pgTable('product', {
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
-// Publication - groups posts under a product
+// Publication - groups posts under a project
 export const publication = pgTable('publication', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   slug: varchar('slug', { length: 255 }).notNull(),
-  productId: uuid('product_id').notNull().references(() => product.id, { onDelete: 'cascade' }),
+  projectId: uuid('project_id').notNull().references(() => project.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
-// Project - groups pieces under a product
-export const project = pgTable('project', {
+// Packet - groups pieces under a project
+export const packet = pgTable('packet', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   slug: varchar('slug', { length: 255 }).notNull(),
-  productId: uuid('product_id').notNull().references(() => product.id, { onDelete: 'cascade' }),
+  projectId: uuid('project_id').notNull().references(() => project.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
@@ -58,17 +58,17 @@ export const preset = pgTable('preset', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   publicationId: uuid('publication_id').references(() => publication.id, { onDelete: 'cascade' }),
-  projectId: uuid('project_id').references(() => project.id, { onDelete: 'cascade' }),
+  packetId: uuid('packet_id').references(() => packet.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
-// Piece - belongs to project, can use preset
+// Piece - belongs to packet, can use preset
 export const piece = pgTable('piece', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   slug: varchar('slug', { length: 255 }).notNull(),
-  projectId: uuid('project_id').notNull().references(() => project.id, { onDelete: 'cascade' }),
+  packetId: uuid('packet_id').notNull().references(() => packet.id, { onDelete: 'cascade' }),
   presetId: uuid('preset_id').references(() => preset.id, { onDelete: 'restrict' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
@@ -143,7 +143,7 @@ export const page = pgTable('page', {
   isPublished: boolean('is_published').notNull().default(false),
   publishedAt: timestamp('published_at'),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-  productId: uuid('product_id').references(() => product.id, { onDelete: 'cascade' }),
+  projectId: uuid('project_id').references(() => project.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
@@ -168,7 +168,7 @@ export const presentation = pgTable('presentation', {
   cssVariables: json('css_variables'), // CSS custom properties
   globalStyles: text('global_styles'), // Global CSS rules
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-  productId: uuid('product_id').references(() => product.id, { onDelete: 'cascade' }),
+  projectId: uuid('project_id').references(() => project.id, { onDelete: 'cascade' }),
   isActive: boolean('is_active').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
@@ -293,14 +293,14 @@ export const userRelations = relations(user, ({ many }) => ({
   teamMemberships: many(teamMember),
 }));
 
-export const productRelations = relations(product, ({ one, many }) => ({
+export const projectRelations = relations(project, ({ one, many }) => ({
   owner: one(user, {
-    fields: [product.userId],
+    fields: [project.userId],
     references: [user.id]
   }),
   pages: many(page),
   publications: many(publication),
-  projects: many(project)
+  packets: many(packet)
 }));
 
 export const postRelations = relations(post, ({ one }) => ({
@@ -323,9 +323,9 @@ export const pageRelations = relations(page, ({ one }) => ({
     fields: [page.userId],
     references: [user.id]
   }),
-  product: one(product, {
-    fields: [page.productId!],
-    references: [product.id]
+  project: one(project, {
+    fields: [page.projectId!],
+    references: [project.id]
   })
 }));
 
@@ -341,16 +341,16 @@ export const presentationRelations = relations(presentation, ({ one }) => ({
     fields: [presentation.userId],
     references: [user.id]
   }),
-  product: one(product, {
-    fields: [presentation.productId!],
-    references: [product.id]
+  project: one(project, {
+    fields: [presentation.projectId!],
+    references: [project.id]
   })
 }));
 
 export const publicationRelations = relations(publication, ({ one, many }) => ({
-  product: one(product, {
-    fields: [publication.productId],
-    references: [product.id]
+  project: one(project, {
+    fields: [publication.projectId],
+    references: [project.id]
   }),
   posts: many(post),
   presets: many(preset)
@@ -361,27 +361,27 @@ export const presetRelations = relations(preset, ({ one, many }) => ({
     fields: [preset.publicationId],
     references: [publication.id]
   }),
-  project: one(project, {
-    fields: [preset.projectId!],
-    references: [project.id]
+  packet: one(packet, {
+    fields: [preset.packetId!],
+    references: [packet.id]
   }),
   posts: many(post),
   pieces: many(piece)
 }));
 
-export const projectRelations = relations(project, ({ one, many }) => ({
-  product: one(product, {
-    fields: [project.productId],
-    references: [product.id]
+export const packetRelations = relations(packet, ({ one, many }) => ({
+  project: one(project, {
+    fields: [packet.projectId],
+    references: [project.id]
   }),
   pieces: many(piece),
   presets: many(preset)
 }));
 
 export const pieceRelations = relations(piece, ({ one, many }) => ({
-  project: one(project, {
-    fields: [piece.projectId],
-    references: [project.id]
+  packet: one(packet, {
+    fields: [piece.packetId],
+    references: [packet.id]
   }),
   preset: one(preset, {
     fields: [piece.presetId!],

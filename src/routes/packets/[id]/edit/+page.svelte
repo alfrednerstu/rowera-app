@@ -7,16 +7,16 @@
 	const fields = [
 		{
 			name: 'name',
-			label: 'Publication Name',
+			label: 'Packet Name',
 			type: 'text',
-			placeholder: 'Enter publication name',
+			placeholder: 'Enter packet name',
 			required: true
 		},
 		{
 			name: 'slug',
 			label: 'Slug',
 			type: 'text',
-			placeholder: 'publication-url-slug',
+			placeholder: 'packet-slug',
 			required: true
 		},
 		{
@@ -24,36 +24,34 @@
 			label: 'Project',
 			type: 'select',
 			required: true,
-			options: data.projects.map(project => ({
-				value: project.id,
-				label: project.name
-			}))
+			options: data.projects.map(p => ({ value: p.id, label: p.name }))
 		}
 	]
 	
 	async function handleSubmit(formData) {
 		try {
-			const response = await fetch('/api/publications', {
-				method: 'POST',
+			const response = await fetch(`/api/packets/${data.packet.id}`, {
+				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(formData)
 			})
 			
 			if (response.ok) {
-				goto('/posts')
+				goto('/packets')
 			} else {
-				console.error('Failed to create publication')
+				console.error('Failed to update packet')
 			}
 		} catch (error) {
-			console.error('Error creating publication:', error)
+			console.error('Error updating packet:', error)
 		}
 	}
 </script>
 
 <CrudForm 
-	title="Create Publication"
+	title="Edit Packet"
 	{fields}
-	submitLabel="Create Publication"
-	cancelUrl="/posts"
+	item={data.packet}
+	submitLabel="Update Packet"
+	cancelUrl="/packets"
 	onSubmit={handleSubmit}
 />

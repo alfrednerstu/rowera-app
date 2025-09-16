@@ -50,6 +50,13 @@
       "when": 1757948080407,
       "tag": "0006_perpetual_hellfire_club",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1758058064152,
+      "tag": "0007_rename_product_to_project_and_project_to_packet",
+      "breakpoints": true
     }
   ]
 }

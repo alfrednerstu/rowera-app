@@ -11,20 +11,6 @@
 			type: 'text',
 			placeholder: 'Enter project name',
 			required: true
-		},
-		{
-			name: 'slug',
-			label: 'Slug',
-			type: 'text',
-			placeholder: 'project-slug',
-			required: true
-		},
-		{
-			name: 'productId',
-			label: 'Product',
-			type: 'select',
-			required: true,
-			options: data.products.map(p => ({ value: p.id, label: p.name }))
 		}
 	]
 	
@@ -37,7 +23,7 @@
 			})
 			
 			if (response.ok) {
-				goto('/projects')
+				goto('/')
 			} else {
 				console.error('Failed to update project')
 			}
@@ -52,6 +38,6 @@
 	{fields}
 	item={data.project}
 	submitLabel="Update Project"
-	cancelUrl="/projects"
+	cancelUrl="/"
 	onSubmit={handleSubmit}
 />

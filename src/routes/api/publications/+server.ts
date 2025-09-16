@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { publication, product } from '$lib/server/db/schema'
+import { publication, project } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 	
 	try {
-		const { name, slug, productId } = await request.json()
+		const { name, slug, projectId } = await request.json()
 		
 		if (!name?.trim()) {
 			return json({ error: 'Publication name is required' }, { status: 400 })
@@ -20,32 +20,32 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ error: 'Publication slug is required' }, { status: 400 })
 		}
 		
-		if (!productId) {
-			return json({ error: 'Product is required' }, { status: 400 })
+		if (!projectId) {
+			return json({ error: 'Project is required' }, { status: 400 })
 		}
 		
-		// Verify that the product belongs to the user
-		const product = await db.select()
-			.from(product)
+		// Verify that the project belongs to the user
+		const projectRows = await db.select()
+			.from(project)
 			.where(
 				and(
-					eq(product.id, productId),
-					eq(product.userId, locals.session.user.id)
+					eq(project.id, projectId),
+					eq(project.userId, locals.session.user.id)
 				)
 			)
 			.limit(1)
 		
-		if (!product.length) {
-			return json({ error: 'Product not found or access denied' }, { status: 404 })
+		if (!projectRows.length) {
+			return json({ error: 'Project not found or access denied' }, { status: 404 })
 		}
 		
-		const [publication] = await db.insert(publication).values({
+		const [newPublication] = await db.insert(publication).values({
 			name: name.trim(),
 			slug: slug.trim(),
-			productId
+			projectId
 		}).returning()
 		
-		return json(publication)
+		return json(newPublication)
 	} catch (error) {
 		console.error('Error creating publication:', error)
 		return json({ error: 'Failed to create publication' }, { status: 500 })

@@ -15,8 +15,8 @@
 	--accent-secondary-color: #809FFF80;
 	--accent-tertiary-color: #809FFF40;
 	--tag-color: var(--quad-color);
-	--palette-one: #C2CBD6; // #9AAABC; 
-	--palette-two: #D1CBC7; // #B3A9A2;
+	--palette-one: #C2CBD6; /* #9AAABC; */
+	--palette-two: #D1CBC7; /* #B3A9A2; */
 }
 
 @media (prefers-color-scheme: dark) {

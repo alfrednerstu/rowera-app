@@ -13,21 +13,21 @@
 		}
 	]
 	
-	async function handleDelete(product) {
-		if (confirm(`Are you sure you want to delete "${product.name}"?`)) {
+	async function handleDelete(project) {
+		if (confirm(`Are you sure you want to delete "${project.name}"?`)) {
 			try {
-				const response = await fetch(`/api/products/${product.id}`, {
+				const response = await fetch(`/api/projects/${project.id}`, {
 					method: 'DELETE'
 				})
 				
 				if (response.ok) {
-					// Reload the page to refresh the products list
+					// Reload the page to refresh the projects list
 					window.location.reload()
 				} else {
-					console.error('Failed to delete product')
+					console.error('Failed to delete project')
 				}
 			} catch (error) {
-				console.error('Error deleting product:', error)
+				console.error('Error deleting project:', error)
 			}
 		}
 	}
@@ -42,11 +42,11 @@
 		<h1>Hello <span>{$session.data?.user.username}</span></h1>
 
 		<CrudTable 
-			items={data.products}
+			items={data.projects}
 			{columns}
-			title="Products"
-			createUrl="/products/new"
-			editUrl={(item) => `/products/${item.id}/edit`}
+			title="Projects"
+			createUrl="/projects/new"
+			editUrl={(item) => `/projects/${item.id}/edit`}
 			onDelete={handleDelete}
 		/>
 	{:else}

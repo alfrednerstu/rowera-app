@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { page, product } from '$lib/server/db/schema'
+import { page, project } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
@@ -15,22 +15,22 @@ export async function load({ parent }) {
       id: page.id,
       name: page.title,
       slug: page.slug,
-      productId: page.productId,
-      productName: product.name,
+      projectId: page.projectId,
+      projectName: project.name,
       createdAt: page.createdAt,
       updatedAt: page.updatedAt
     })
     .from(page)
-    .innerJoin(product, eq(page.productId, product.id))
-    .where(eq(product.userId, user.id))
+    .innerJoin(project, eq(page.projectId, project.id))
+    .where(eq(project.userId, user.id))
 
-  const userProducts = await db
+  const userProjects = await db
     .select()
-    .from(product)
-    .where(eq(product.userId, user.id))
+    .from(project)
+    .where(eq(project.userId, user.id))
 
   return {
     pages: userPages,
-    products: userProducts
+    projects: userProjects
   }
 }

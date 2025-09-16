@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { preset, publication, product } from '$lib/server/db/schema'
+import { preset, publication, project } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
@@ -20,11 +20,11 @@ export const load = async ({ params, locals }) => {
 	})
 	.from(preset)
 	.innerJoin(publication, eq(preset.publicationId, publication.id))
-	.innerJoin(product, eq(publication.productId, product.id))
+	.innerJoin(project, eq(publication.projectId, project.id))
 	.where(
 		and(
 			eq(preset.id, params.id),
-			eq(product.userId, locals.session.user.id)
+			eq(project.userId, locals.session.user.id)
 		)
 	)
 	.limit(1)
@@ -33,15 +33,15 @@ export const load = async ({ params, locals }) => {
 		throw error(404, 'Preset not found')
 	}
 	
-	// Get all publications that belong to the user's products
+	// Get all publications that belong to the user's projects
 	const userPublications = await db.select({
 		id: publication.id,
 		name: publication.name,
-		productId: publication.productId
+		projectId: publication.projectId
 	})
 	.from(publication)
-	.innerJoin(product, eq(publication.productId, product.id))
-	.where(eq(product.userId, locals.session.user.id))
+	.innerJoin(project, eq(publication.projectId, project.id))
+	.where(eq(project.userId, locals.session.user.id))
 	
 	return {
 		preset: preset[0],

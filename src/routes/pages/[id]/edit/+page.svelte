@@ -20,13 +20,13 @@
 			required: true
 		},
 		{
-			name: 'productId',
-			label: 'Product',
+			name: 'projectId',
+			label: 'Project',
 			type: 'select',
 			required: true,
-			options: data.products.map(product => ({
-				value: product.id,
-				label: product.name
+			options: data.projects.map(project => ({
+				value: project.id,
+				label: project.name
 			}))
 		}
 	]

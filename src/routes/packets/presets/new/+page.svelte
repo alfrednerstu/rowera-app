@@ -13,13 +13,13 @@
 			required: true
 		},
 		{
-			name: 'projectId',
-			label: 'Project',
+			name: 'packetId',
+			label: 'Packet',
 			type: 'select',
 			required: true,
-			options: data.projects.map(project => ({
-				value: project.id,
-				label: `${project.name} (${project.productName})`
+			options: data.packets.map(packet => ({
+				value: packet.id,
+				label: `${packet.name} (${packet.projectName})`
 			}))
 		}
 	]
@@ -33,7 +33,7 @@
 			})
 			
 			if (response.ok) {
-				goto('/projects')
+				goto('/packets')
 			} else {
 				console.error('Failed to create preset')
 			}
@@ -44,9 +44,9 @@
 </script>
 
 <CrudForm 
-	title="Create Project Preset"
+	title="Create Packet Preset"
 	{fields}
 	submitLabel="Create Preset"
-	cancelUrl="/projects"
+	cancelUrl="/packets"
 	onSubmit={handleSubmit}
 />

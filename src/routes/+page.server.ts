@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { product } from '$lib/server/db/schema'
+import { project } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
 import { eq } from 'drizzle-orm'
 
@@ -10,12 +10,12 @@ export async function load({ parent }) {
     throw redirect(302, '/login')
   }
 
-  const userProducts = await db
+  const userProjects = await db
     .select()
-    .from(product)
-    .where(eq(product.userId, user.id))
+    .from(project)
+    .where(eq(project.userId, user.id))
 
   return {
-    products: userProducts
+    projects: userProjects
   }
 }

@@ -6,7 +6,7 @@ import { sveltekitCookies } from "better-auth/svelte-kit";
 import { getRequestEvent } from "$app/server";
 import { db } from "./db";
 import * as schema from "./db/schema";
-import { product, publication, project } from "./db/schema";
+import { project, publication, packet } from "./db/schema";
 import { env } from '$env/dynamic/private';
 
 export const auth = betterAuth({
@@ -40,7 +40,7 @@ export const auth = betterAuth({
             if (!userId) return
 
             try {
-                const [defaultProduct] = await db.insert(product).values({
+                const [defaultProject] = await db.insert(project).values({
                     name: 'Default',
                     userId
                 }).returning()
@@ -48,13 +48,13 @@ export const auth = betterAuth({
                 await db.insert(publication).values({
                     name: 'Default publication',
                     slug: 'default',
-                    productId: defaultProduct.id
+                    projectId: defaultProject.id
                 })
 
-                await db.insert(project).values({
-                    name: 'Default project',
+                await db.insert(packet).values({
+                    name: 'Default packet',
                     slug: 'default',
-                    productId: defaultProduct.id
+                    projectId: defaultProject.id
                 })
             } catch (error) {
                 console.error('Error creating default entities for user:', userId, error)

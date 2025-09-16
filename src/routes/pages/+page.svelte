@@ -6,7 +6,7 @@
 	const columns = [
 		{ key: 'name', header: 'Page Name' },
 		{ key: 'slug', header: 'Slug' },
-		{ key: 'productName', header: 'Product' },
+		{ key: 'projectName', header: 'Project' },
 		{ 
 			key: 'createdAt', 
 			header: 'Created',

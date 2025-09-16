@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { post, publication, preset, product } from '$lib/server/db/schema'
+import { post, publication, preset, project } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -27,11 +27,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// Verify that the publication belongs to the user
 		const publicationRows = await db.select()
 			.from(publication)
-			.innerJoin(product, eq(publication.productId, product.id))
+			.innerJoin(project, eq(publication.projectId, project.id))
 			.where(
 				and(
 					eq(publication.id, publicationId),
-					eq(product.userId, locals.user.id)
+					eq(project.userId, locals.user.id)
 				)
 			)
 			.limit(1)
