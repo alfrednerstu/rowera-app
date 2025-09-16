@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { presets, publications, products, projects } from '$lib/server/db/schema'
+import { preset, publication, product, project } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -28,12 +28,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// If publicationId is provided, verify it belongs to the user
 		if (publicationId) {
 			const publication = await db.select()
-				.from(publications)
-				.innerJoin(products, eq(publications.productId, products.id))
+				.from(publication)
+				.innerJoin(product, eq(publication.productId, product.id))
 				.where(
 					and(
-						eq(publications.id, publicationId),
-						eq(products.userId, locals.session.user.id)
+						eq(publication.id, publicationId),
+						eq(product.userId, locals.session.user.id)
 					)
 				)
 				.limit(1)
@@ -46,12 +46,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// If projectId is provided, verify it belongs to the user
 		if (projectId) {
 			const project = await db.select()
-				.from(projects)
-				.innerJoin(products, eq(projects.productId, products.id))
+				.from(project)
+				.innerJoin(product, eq(project.productId, product.id))
 				.where(
 					and(
-						eq(projects.id, projectId),
-						eq(products.userId, locals.session.user.id)
+						eq(project.id, projectId),
+						eq(product.userId, locals.session.user.id)
 					)
 				)
 				.limit(1)
@@ -61,7 +61,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			}
 		}
 		
-		const [preset] = await db.insert(presets).values({
+		const [preset] = await db.insert(preset).values({
 			name: name.trim(),
 			publicationId: publicationId || null,
 			projectId: projectId || null

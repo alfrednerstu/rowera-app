@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { pages, products } from '$lib/server/db/schema'
+import { page, product } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -26,11 +26,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		
 		// Verify that the product belongs to the user
 		const product = await db.select()
-			.from(products)
+			.from(product)
 			.where(
 				and(
-					eq(products.id, productId),
-					eq(products.userId, locals.session.user.id)
+					eq(product.id, productId),
+					eq(product.userId, locals.session.user.id)
 				)
 			)
 			.limit(1)
@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ error: 'Product not found or access denied' }, { status: 404 })
 		}
 		
-		const [page] = await db.insert(pages).values({
+		const [page] = await db.insert(page).values({
 			name: name.trim(),
 			slug: slug.trim(),
 			productId

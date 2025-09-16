@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db'
 import { page, product } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
 export async function load({ parent }) {
   const { user } = await parent()

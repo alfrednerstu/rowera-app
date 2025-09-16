@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { primitives } from '$lib/server/db/schema'
+import { primitive } from '$lib/server/db/schema'
 import { auth } from '$lib/server/auth'
 import type { RequestHandler } from './$types'
 
@@ -21,18 +21,18 @@ export const GET: RequestHandler = async ({ locals }) => {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
-	// Only admins can access the primitives admin interface
+	// Only admins can access the primitive admin interface
 	const userIsAdmin = await isUserAdmin(locals.session.user.id)
 	if (!userIsAdmin) {
 		return json({ error: 'Admin access required' }, { status: 403 })
 	}
 	
 	try {
-		const allPrimitives = await db.select().from(primitives).orderBy(primitives.createdAt)
+		const allPrimitives = await db.select().from(primitive).orderBy(primitive.createdAt)
 		return json(allPrimitives)
 	} catch (error) {
-		console.error('Error fetching primitives:', error)
-		return json({ error: 'Failed to fetch primitives' }, { status: 500 })
+		console.error('Error fetching primitive:', error)
+		return json({ error: 'Failed to fetch primitive' }, { status: 500 })
 	}
 }
 
@@ -41,7 +41,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
-	// Only admins can create primitives
+	// Only admins can create primitive
 	const userIsAdmin = await isUserAdmin(locals.session.user.id)
 	if (!userIsAdmin) {
 		return json({ error: 'Admin access required' }, { status: 403 })
@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ error: 'Name and tagName are required' }, { status: 400 })
 		}
 		
-		const [primitive] = await db.insert(primitives).values({
+		const [primitive] = await db.insert(primitive).values({
 			name: name.trim(),
 			tagName: tagName.trim(),
 			attributes: attributes || {},

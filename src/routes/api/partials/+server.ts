@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { partials } from '$lib/server/db/schema'
+import { partial } from '$lib/server/db/schema'
 import type { RequestHandler } from './$types'
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -15,12 +15,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ error: 'Partial name is required' }, { status: 400 })
 		}
 		
-		const [partial] = await db.insert(partials).values({
+		const [result] = await db.insert(partial).values({
 			name: name.trim(),
 			userId: locals.session.user.id
 		}).returning()
 		
-		return json(partial)
+		return json(result)
 	} catch (error) {
 		console.error('Error creating partial:', error)
 		return json({ error: 'Failed to create partial' }, { status: 500 })

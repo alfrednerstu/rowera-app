@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { posts, publications, presets, products } from '$lib/server/db/schema'
+import { post, publication, preset, product } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -26,12 +26,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		
 		// Verify that the publication belongs to the user
 		const publication = await db.select()
-			.from(publications)
-			.innerJoin(products, eq(publications.productId, products.id))
+			.from(publication)
+			.innerJoin(product, eq(publication.productId, product.id))
 			.where(
 				and(
-					eq(publications.id, publicationId),
-					eq(products.userId, locals.session.user.id)
+					eq(publication.id, publicationId),
+					eq(product.userId, locals.session.user.id)
 				)
 			)
 			.limit(1)
@@ -42,11 +42,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		
 		// Verify that the preset belongs to the publication
 		const preset = await db.select()
-			.from(presets)
+			.from(preset)
 			.where(
 				and(
-					eq(presets.id, presetId),
-					eq(presets.publicationId, publicationId)
+					eq(preset.id, presetId),
+					eq(preset.publicationId, publicationId)
 				)
 			)
 			.limit(1)
@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ error: 'Preset not found or not available for this publication' }, { status: 404 })
 		}
 		
-		const [post] = await db.insert(posts).values({
+		const [post] = await db.insert(post).values({
 			title: title.trim(),
 			slug: slug?.trim() || null,
 			publicationId,

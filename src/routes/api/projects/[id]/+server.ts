@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { projects, products } from '$lib/server/db/schema'
+import { project, product } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -17,10 +17,10 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		}
 		
 		// Verify the product belongs to the user
-		const product = await db.select().from(products).where(
+		const product = await db.select().from(product).where(
 			and(
-				eq(products.id, productId),
-				eq(products.userId, locals.session.user.id)
+				eq(product.id, productId),
+				eq(product.userId, locals.session.user.id)
 			)
 		).limit(1)
 		
@@ -28,14 +28,14 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 			return json({ error: 'Product not found' }, { status: 404 })
 		}
 		
-		const [project] = await db.update(projects)
+		const [project] = await db.update(project)
 			.set({ 
 				name: name.trim(),
 				slug: slug.trim(),
 				productId,
 				updatedAt: new Date()
 			})
-			.where(eq(projects.id, params.id))
+			.where(eq(project.id, params.id))
 			.returning()
 		
 		if (!project) {
@@ -55,8 +55,8 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	}
 	
 	try {
-		const [project] = await db.delete(projects)
-			.where(eq(projects.id, params.id))
+		const [project] = await db.delete(project)
+			.where(eq(project.id, params.id))
 			.returning()
 		
 		if (!project) {
