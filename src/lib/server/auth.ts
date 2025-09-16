@@ -10,10 +10,10 @@ import { env } from '$env/dynamic/private';
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: "pg",
-		usePlural: true,
 		schema: {
 			...schema,
 		},
+		usePlural: false,
 	}),
 	secret: env.BETTER_AUTH_SECRET || "fallback-secret-key",
 	emailAndPassword: {

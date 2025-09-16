@@ -1,26 +1,31 @@
 <script>
 	import Header from './Header.svelte'
+
+	//import '@fontsource-variable/schibsted-grotesk';
+	import '@fontsource/schibsted-grotesk/500.css';
+	// Supports weights 300-900
+	import '@fontsource-variable/tiktok-sans';
+
+	import '../app.css'
+
 	let { children } = $props()
 </script>
 
-<div class="app-layout">
-	<Header />
-	<main class="content">
+<Header />
+
+<main>
 		{@render children()}
-	</main>
-</div>
+</main>
+
 
 <style>
-	.app-layout {
+	main {
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
-	}
-	
-	.content {
 		flex: 1;
 		padding: 2rem;
-		max-width: 1200px;
+		max-width: 48rem;
 		margin: 0 auto;
 		width: 100%;
 	}

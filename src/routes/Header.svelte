@@ -1,20 +1,22 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { session, signOut } from '$lib/auth-client'
-	import { onMount } from 'svelte'
+	import { session, signOut, authClient } from '$lib/auth-client'
 
 	let isAdmin = $state(false)
 
-	onMount(async () => {
-		// Check if user is admin by testing admin endpoints
-		if ($session.data?.user) {
-			try {
-				const response = await fetch('/api/primitives', { method: 'POST', body: '{}' })
-				isAdmin = response.status !== 403
-			} catch {
-				isAdmin = false
-			}
+	$effect(async () => {
+		const uid = $session.data?.user?.id
+		if (!uid) {
+			isAdmin = false
+			return
 		}
+		// Check permissions using Better Auth admin client
+		const { data, error } = await authClient.admin.hasPermission({
+			userId: uid,
+			permission: { "user": ["create"] }
+		})
+
+		isAdmin = data?.success && !error
 	})
 
 	async function handleLogout() {
@@ -30,15 +32,18 @@
 		</section>
 		
 		<section>
-			<ul class="main-nav">
-				<li aria-current={page.url.pathname === '/' ? 'page' : undefined}>
-					<a href="/">Projects</a>
+			<ul>				
+				<li aria-current={page.url.pathname === '/pages' ? 'page' : undefined}>
+					<a href="/pages">Pages</a>
 				</li>
 				<li aria-current={page.url.pathname === '/posts' ? 'page' : undefined}>
 					<a href="/posts">Posts</a>
 				</li>
-				<li aria-current={page.url.pathname === '/pages' ? 'page' : undefined}>
-					<a href="/pages">Pages</a>
+				<li aria-current={page.url.pathname === '/projects' ? 'page' : undefined}>
+					<a href="/projects">Projects</a>
+				</li>
+				<li aria-current={page.url.pathname === '/partials' ? 'page' : undefined}>
+					<a href="/partials">Partials</a>
 				</li>
 				{#if isAdmin}
 					<li aria-current={page.url.pathname === '/primitives' ? 'page' : undefined}>
@@ -89,27 +94,105 @@
 
 <style>
 	header {
-		background: #fff;
-		border-bottom: 1px solid #e9ecef;
-		padding: 1rem 2rem;
+		padding: 1.125rem 2rem;
+	}
+
+	h1 {
+		font-family: 'Schibsted Grotesk', sans-serif;
+		text-transform: uppercase;
+		font-weight: 500;
+		font-size: 1.5rem;
+		letter-spacing: .05em;
+		display: inline;
+		line-height: 1;
 	}
 
 	nav {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: space-around;
+		flex-wrap: wrap;
 		width: 100%;
 	}
 
-	h1 {
-		margin: 0;
-		font-size: 1.5rem;
-		font-weight: bold;
-		color: #495057;
+	nav > section:first-child,
+	nav > section:last-child {
+		flex: 1 1 0;
+		min-width: 0;
+	}
+
+	nav > section:nth-child(2) {
+  	flex: 0 0 auto;
+  	margin-inline: auto;
+  	display: flex;
+  	justify-content: center;
+	}
+
+	@media (max-width: 64rem) {
+  nav {
+    row-gap: .75rem;
+  }
+
+  /* Put the middle section on its own row, centered */
+  nav > section:nth-child(2) {
+    order: 3;
+    flex-basis: 100%;
+    margin-inline: 0;
+    justify-content: center;
+  }
+
+  /* Let side sections share the first row */
+  nav > section:nth-child(1),
+  nav > section:nth-child(3) {
+    flex: 1 1 50%;
+  }
 }
-	
+
+	ul {
+		list-style: none;
+		display: flex;
+		align-items: baseline;
+		gap: .5rem;
+		font-weight: 500;
+	}
+
+	li {
+		padding: .125em .5em;
+		border-radius: .25em;
+		transition: all .2s ease;
+		line-height: 1.5;
+	}
+
+	li:has(button) {
+		padding: 0;
+	}
+
+	li:hover {
+		background-color: var(--surface-color);
+	}
+
+	li:has(button):hover {
+		background-color: transparent;
+	}
+
+	section:first-child span {
+		position: relative;
+		top: -.5em;
+		left: -.25em;
+		opacity: .5;
+	}
+
+	section:last-child {
+		font-size: .875rem;
+		opacity: .75;
+	}
+
+	section:last-child ul {
+		justify-content: right;
+	}
+
 	li[aria-current='page'] a {
-		color: #007bff;
+		color: var(--accent-color);
 		font-weight: 600;
 	}
 </style>

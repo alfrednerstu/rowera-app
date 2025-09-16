@@ -11,6 +11,10 @@
 			partialsCount: 0
 		}
 	}
+
+	async function handleLogout() {
+		await signOut()
+	}
 	
 	let isEditing = false
 	let passwordData = {

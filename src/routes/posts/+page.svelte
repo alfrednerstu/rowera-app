@@ -96,12 +96,12 @@
 </script>
 
 <svelte:head>
-	<title>Posts & Publications - Rowera CMS</title>
+	<title>Posts - Rowera CMS</title>
 	<meta name="description" content="Manage your publications, posts, and presets" />
 </svelte:head>
 
 <header class="page-header">
-	<h1>Posts & Publications</h1>
+	<h1>Posts</h1>
 </header>
 
 <nav class="tabs">

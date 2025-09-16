@@ -1,0 +1,152 @@
+/* ----- */
+
+:root {
+	color-scheme: light dark;
+  	--primary-color: #305050;
+  	--secondary-color: #30505080;
+	--tertiary-color: #30505040;
+	--quad-color: #30505020;
+	--quint-color: #30505015;
+	--base-color: #F5F2EF;
+	--surface-color: #30505020;
+	--tint-color: #172626;
+	--accent-color: #809FFF;
+	--accent-base-color: #302060;
+	--accent-secondary-color: #809FFF80;
+	--accent-tertiary-color: #809FFF40;
+	--tag-color: var(--quad-color);
+	--palette-one: #C2CBD6; // #9AAABC; 
+	--palette-two: #D1CBC7; // #B3A9A2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		color-scheme: light dark;
+		--primary-color: #fff;
+	  	--secondary-color: #ffffff80;
+		--tertiary-color: #ffffff40;
+		--quad-color: #ffffff20;
+		--quint-color: ffffff10;
+		--base-color: #353540;
+		--surface-color: #254040;
+		--tint-color: #172626;
+		--accent-color: #809FFF;
+		--accent-base-color: #302060;
+		--accent-secondary-color: #809FFF80;
+		--accent-tertiary-color: #809FFF40;
+		--tag-color: var(--quad-color);
+		--palette-one: #435365;
+		--palette-two: #5D534C;
+	}
+}
+
+/* ----- */
+
+*:where(:not(iframe, canvas, img, svg, video):not(svg *, symbol *)) {
+	all: unset;
+	display: revert;
+}
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+a {
+	cursor: revert;
+}
+html,
+body {
+	min-height: 100%;
+}
+body {
+	-webkit-font-smoothing: antialiased;
+}
+img,
+picture,
+video,
+canvas {
+	display: block;
+	max-width: 100%;
+}
+input,
+button,
+textarea,
+select {
+	font: inherit;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	overflow-wrap: break-word;
+}
+textarea {
+	white-space: revert;
+}
+#root,
+#__next {
+	isolation: isolate;
+}
+:where([contenteditable]) {
+	-moz-user-modify: read-write;
+	-webkit-user-modify: read-write;
+	overflow-wrap: break-word;
+	-webkit-line-break: after-white-space;
+}
+:where([draggable='true']) {
+	-webkit-user-drag: element;
+}
+
+/* ----- */
+
+html {
+	font-family: 'TikTok Sans Variable', sans-serif;
+	font-optical-sizing: auto;
+	line-height: 1.5;
+	color: var(--primary-color);
+	background: var(--base-color);
+}
+
+::selection {
+	color: var(--accent-color);
+}
+
+main {
+	margin: 0 5vw 5vw;
+}
+
+h1 {
+	font-size: 2rem;
+	font-weight: 600;
+}
+
+h2 {
+	font-size: 1.25rem;
+	font-weight: 600;
+}
+
+p {
+	margin-bottom: .5em;
+	opacity: .75;
+}
+
+button {
+	background: var(--accent-color);
+	padding: .125em .5em;
+	border-radius: .25em;
+	transition: all .2s ease;
+	color: var(--base-color);
+	font-weight: 500;
+	text-transform: lowercase;
+}
+
+button:first-letter {
+	text-transform: uppercase;
+}
+
+button:hover {
+	background-color: var(--surface-color);
+}

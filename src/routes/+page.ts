@@ -1,18 +1,1 @@
-import { db } from '$lib/server/db'
-import { products } from '$lib/server/db/schema'
-import { redirect } from '@sveltejs/kit'
-import { eq } from 'drizzle-orm'
-
-export async function load({ parent }) {
-	const { session } = await parent()
-	
-	if (!session?.user?.id) {
-		throw redirect(302, '/login')
-	}
-	
-	const userProducts = await db.select().from(products).where(eq(products.userId, session.user.id))
-	
-	return {
-		products: userProducts
-	}
-}
+// Server-only load moved to +page.server.ts to avoid importing server modules in a universal load

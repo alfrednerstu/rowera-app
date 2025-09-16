@@ -4,6 +4,9 @@
     "": {
       "name": "rowera",
       "dependencies": {
+        "@fontsource-variable/schibsted-grotesk": "^5.2.7",
+        "@fontsource-variable/tiktok-sans": "^5.2.2",
+        "@fontsource/schibsted-grotesk": "^5.2.7",
         "better-auth": "^1.3.9",
         "postgres": "^3.4.5",
       },
@@ -126,7 +129,13 @@
 
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.3.5", "", { "dependencies": { "@eslint/core": "^0.15.2", "levn": "^0.4.1" } }, "sha512-Z5kJ+wU3oA7MMIqVR9tyZRtjYPr4OC004Q4Rw7pgOKUOKkJfZ3O24nz3WYfGRpMDNmcOi3TwQOmgm7B7Tpii0w=="],
 
+    "@fontsource-variable/schibsted-grotesk": ["@fontsource-variable/schibsted-grotesk@5.2.7", "", {}, "sha512-r77cQm+dx5rclis3BxLBwuYb5xDRVRYzPgmqhAshXKG87R2tlMMVIDriiHUHugiFt4pi3b26jWeWOurlOZdQHQ=="],
+
+    "@fontsource-variable/tiktok-sans": ["@fontsource-variable/tiktok-sans@5.2.2", "", {}, "sha512-Hv27LfB7dh+Qqyt9p15nceT2fb1MZBQOrd4tClbCZFTRlfoSWy33ylZvHy1Y13I0uPrqeyeFRrtQlNbjxF0lFQ=="],
+
     "@fontsource/fira-mono": ["@fontsource/fira-mono@5.2.6", "", {}, "sha512-6pyiGeFH+5DP5sICSwx5wu+9BlTEMTKki7bTppsEqXJysi1MiK82n6oSUaYkQWRLH51+DK7zv2JJsi82cOIS3g=="],
+
+    "@fontsource/schibsted-grotesk": ["@fontsource/schibsted-grotesk@5.2.7", "", {}, "sha512-MB/sqFvDLdVRMsfrrd23hxn16aq9DyXyeVHOrOnk+1Na10tojZS+U2tcmu6uZvt7IGQktNUwKxe6GimIw6icdg=="],
 
     "@hexagon/base64": ["@hexagon/base64@1.1.28", "", {}, "sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw=="],
 

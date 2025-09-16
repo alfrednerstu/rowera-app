@@ -1,12 +1,8 @@
 <script lang="ts">
-	import { session, signOut } from '$lib/auth-client'
+	import { session } from '$lib/auth-client'
 	import CrudTable from '$lib/components/CrudTable.svelte'
 	
 	let { data } = $props()
-
-	async function handleLogout() {
-		await signOut()
-	}
 	
 	const columns = [
 		{ key: 'name', header: 'Name' },
@@ -38,14 +34,13 @@
 </script>
 
 <svelte:head>
-	<title>Rowera CMS</title>
+	<title>Rowera – Semantic CMS</title>
 	<meta name="description" content="Rowera - Semantic CMS" />
 </svelte:head>
-
-<h1>Rowera CMS</h1>
-
-<main>
+	
 	{#if $session.data?.user}
+		<h1>Hello <span>{$session.data?.user.username}</span></h1>
+
 		<CrudTable 
 			items={data.products}
 			{columns}
@@ -60,4 +55,10 @@
 			<a href="/signup">Sign Up</a>
 		</nav>
 	{/if}
-</main>
+
+	<style>
+		span {
+			display: inline;
+			text-transform: capitalize;
+		}
+	</style>

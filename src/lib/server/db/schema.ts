@@ -13,6 +13,11 @@ export const user = pgTable('user', {
   // Username plugin fields
   username: varchar('username', { length: 255 }).unique(),
   displayUsername: varchar('display_username', { length: 255 }),
+  // Admin plugin fields
+  role: varchar('role', { length: 50 }).notNull().default('user'),
+  banned: boolean('banned').notNull().default(false),
+  banReason: text('ban_reason'),
+  banExpires: timestamp('ban_expires'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 }, (t) => [
@@ -114,7 +119,7 @@ export const piecePartial = pgTable('piece_partial', {
   createdAt: timestamp('created_at').notNull().defaultNow()
 });
 
-// Posts - content items that can be added to feeds
+// Posts - content items that can be added to publications
 export const post = pgTable('post', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: varchar('title', { length: 500 }).notNull(),
@@ -180,6 +185,8 @@ export const session = pgTable('session', {
   // Organization plugin session fields
   activeOrganizationId: text('active_organization_id'),
   activeTeamId: text('active_team_id'),
+  // Admin plugin session field
+  impersonatedBy: text('impersonated_by'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 }, (t) => [
@@ -190,13 +197,16 @@ export const session = pgTable('session', {
 export const account = pgTable('account', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-  provider: varchar('provider', { length: 50 }).notNull(),
-  providerAccountId: varchar('provider_account_id', { length: 255 }).notNull(),
+  // Better Auth expected fields
+  accountId: text('account_id').notNull(),
+  providerId: text('provider_id').notNull(),
   accessToken: text('access_token'),
   refreshToken: text('refresh_token'),
-  expiresAt: timestamp('expires_at').notNull(),
+  accessTokenExpiresAt: timestamp('access_token_expires_at'),
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
   scope: text('scope'),
-  tokenType: varchar('token_type', { length: 50 }),
+  idToken: text('id_token'),
+  password: text('password'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 }, (t) => [

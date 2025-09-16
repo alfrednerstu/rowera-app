@@ -96,7 +96,7 @@
 </script>
 
 <svelte:head>
-	<title>Projects & Pieces - Rowera CMS</title>
+	<title>Projects - Rowera CMS</title>
 	<meta name="description" content="Manage your projects, pieces, and shared presets" />
 </svelte:head>
 
