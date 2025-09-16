@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { preset, project, product } from '$lib/server/db/schema'
+import { preset, project, project } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
@@ -20,11 +20,11 @@ export const load = async ({ params, locals }) => {
 	})
 	.from(preset)
 	.innerJoin(project, eq(preset.projectId, project.id))
-	.innerJoin(product, eq(project.productId, product.id))
+	.innerJoin(project, eq(project.projectId, project.id))
 	.where(
 		and(
 			eq(preset.id, params.id),
-			eq(product.userId, locals.session.user.id)
+			eq(project.userId, locals.session.user.id)
 		)
 	)
 	.limit(1)
@@ -37,11 +37,11 @@ export const load = async ({ params, locals }) => {
 	const userProjects = await db.select({
 		id: project.id,
 		name: project.name,
-		productName: product.name
+		projectName: project.name
 	})
 	.from(project)
-	.innerJoin(product, eq(project.productId, product.id))
-	.where(eq(product.userId, locals.session.user.id))
+	.innerJoin(project, eq(project.projectId, project.id))
+	.where(eq(project.userId, locals.session.user.id))
 	
 	return {
 		preset: preset[0],

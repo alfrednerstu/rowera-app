@@ -20,11 +20,11 @@
 			required: true
 		},
 		{
-			name: 'projectId',
-			label: 'Project',
+			name: 'packetId',
+			label: 'Packet',
 			type: 'select',
 			required: true,
-			options: data.projects.map(p => ({ value: p.id, label: `${p.name} (${p.productName})` }))
+			options: data.packets.map(p => ({ value: p.id, label: `${p.name} (${p.projectName})` }))
 		},
 		{
 			name: 'presetId',
@@ -37,28 +37,27 @@
 	
 	async function handleSubmit(formData) {
 		try {
-			const response = await fetch(`/api/pieces/${data.piece.id}`, {
-				method: 'PUT',
+			const response = await fetch('/api/pieces', {
+				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(formData)
 			})
 			
 			if (response.ok) {
-				goto('/projects')
+				goto('/packets')
 			} else {
-				console.error('Failed to update piece')
+				console.error('Failed to create piece')
 			}
 		} catch (error) {
-			console.error('Error updating piece:', error)
+			console.error('Error creating piece:', error)
 		}
 	}
 </script>
 
 <CrudForm 
-	title="Edit Piece"
+	title="Create Piece"
 	{fields}
-	item={data.piece}
-	submitLabel="Update Piece"
-	cancelUrl="/projects"
+	submitLabel="Create Piece"
+	cancelUrl="/packets"
 	onSubmit={handleSubmit}
 />

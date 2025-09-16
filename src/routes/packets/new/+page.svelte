@@ -7,16 +7,16 @@
 	const fields = [
 		{
 			name: 'name',
-			label: 'Piece Name',
+			label: 'Packet Name',
 			type: 'text',
-			placeholder: 'Enter piece name',
+			placeholder: 'Enter packet name',
 			required: true
 		},
 		{
 			name: 'slug',
 			label: 'Slug',
 			type: 'text',
-			placeholder: 'piece-slug',
+			placeholder: 'packet-url-slug',
 			required: true
 		},
 		{
@@ -24,40 +24,36 @@
 			label: 'Project',
 			type: 'select',
 			required: true,
-			options: data.projects.map(p => ({ value: p.id, label: `${p.name} (${p.productName})` }))
-		},
-		{
-			name: 'presetId',
-			label: 'Preset',
-			type: 'select',
-			required: true,
-			options: data.presets.map(p => ({ value: p.id, label: `${p.name} (${p.publicationName})` }))
+			options: data.projects.map(project => ({
+				value: project.id,
+				label: project.name
+			}))
 		}
 	]
 	
 	async function handleSubmit(formData) {
 		try {
-			const response = await fetch('/api/pieces', {
+			const response = await fetch('/api/packets', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(formData)
 			})
 			
 			if (response.ok) {
-				goto('/projects')
+				goto('/packets')
 			} else {
-				console.error('Failed to create piece')
+				console.error('Failed to create packet')
 			}
 		} catch (error) {
-			console.error('Error creating piece:', error)
+			console.error('Error creating packet:', error)
 		}
 	}
 </script>
 
 <CrudForm 
-	title="Create Piece"
+	title="Create Packet"
 	{fields}
-	submitLabel="Create Piece"
-	cancelUrl="/projects"
+	submitLabel="Create Packet"
+	cancelUrl="/packets"
 	onSubmit={handleSubmit}
 />

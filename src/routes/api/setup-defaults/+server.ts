@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { product, publication, project } from '$lib/server/db/schema'
+import { project, publication, packet } from '$lib/server/db/schema'
 import { eq } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -12,15 +12,15 @@ export const POST: RequestHandler = async ({ locals }) => {
 	const userId = locals.user.id
 	
 	try {
-		// Check if user already has products
-		const existingProducts = await db.select().from(product).where(eq(product.userId, userId)).limit(1)
+		// Check if user already has projects
+		const existingProjects = await db.select().from(project).where(eq(project.userId, userId)).limit(1)
 		
-		if (existingProducts.length > 0) {
+		if (existingProjects.length > 0) {
 			return json({ message: 'User already has default entities' })
 		}
 
-		// Create default product
-		const [defaultProduct] = await db.insert(product).values({
+		// Create default project
+		const [defaultProject] = await db.insert(project).values({
 			name: 'Default',
 			userId: userId
 		}).returning()
@@ -29,20 +29,20 @@ export const POST: RequestHandler = async ({ locals }) => {
 		const [defaultPublication] = await db.insert(publication).values({
 			name: 'Default publication',
 			slug: 'default',
-			productId: defaultProduct.id
+			projectId: defaultProject.id
 		}).returning()
 
-		// Create default project  
-		const [defaultProject] = await db.insert(project).values({
-			name: 'Default project',
+		// Create default packet
+		const [defaultPacket] = await db.insert(packet).values({
+			name: 'Default packet',
 			slug: 'default',
-			productId: defaultProduct.id
+			projectId: defaultProject.id
 		}).returning()
 		
 		return json({ 
-			product: defaultProduct,
+			project: defaultProject,
 			publication: defaultPublication, 
-			project: defaultProject
+			packet: defaultPacket
 		})
 	} catch (error) {
 		console.error('Error setting up default entities:', error)

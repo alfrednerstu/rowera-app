@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { preset, publication, product, project } from '$lib/server/db/schema'
+import { preset, publication, packet, project } from '$lib/server/db/schema'
 import { eq, and, or, isNull } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -10,38 +10,38 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 	}
 	
 	try {
-		const { name, publicationId, projectId } = await request.json()
+		const { name, publicationId, packetId } = await request.json()
 		
 		if (!name?.trim()) {
 			return json({ error: 'Preset name is required' }, { status: 400 })
 		}
 		
-		// Must belong to either a publication or a project, but not both
-		if (!publicationId && !projectId) {
-			return json({ error: 'Either publication or project is required' }, { status: 400 })
+		// Must belong to either a publication or a packet, but not both
+		if (!publicationId && !packetId) {
+			return json({ error: 'Either publication or packet is required' }, { status: 400 })
 		}
 		
-		if (publicationId && projectId) {
-			return json({ error: 'Preset cannot belong to both publication and project' }, { status: 400 })
+		if (publicationId && packetId) {
+			return json({ error: 'Preset cannot belong to both publication and packet' }, { status: 400 })
 		}
 		
 		// First, verify the existing preset belongs to the user
 		const existingPresetRows = await db.select({ 
 			id: preset.id,
 			publicationId: preset.publicationId,
-			projectId: preset.projectId
+			packetId: preset.packetId
 		})
 		.from(preset)
 		.leftJoin(publication, eq(preset.publicationId, publication.id))
-		.leftJoin(product, or(
-			eq(publication.productId, product.id),
-			eq(preset.projectId, project.id)
+		.leftJoin(packet, eq(preset.packetId, packet.id))
+		.leftJoin(project, or(
+			eq(publication.projectId, project.id),
+			eq(packet.projectId, project.id)
 		))
-		.leftJoin(project, eq(preset.projectId, project.id))
 		.where(
 			and(
 				eq(preset.id, params.id),
-				eq(product.userId, locals.user.id)
+				eq(project.userId, locals.user.id)
 			)
 		)
 		.limit(1)
@@ -54,11 +54,11 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		if (publicationId) {
 			const publicationRows = await db.select()
 				.from(publication)
-				.innerJoin(product, eq(publication.productId, product.id))
+				.innerJoin(project, eq(publication.projectId, project.id))
 				.where(
 					and(
 						eq(publication.id, publicationId),
-						eq(product.userId, locals.user.id)
+						eq(project.userId, locals.user.id)
 					)
 				)
 				.limit(1)
@@ -72,11 +72,11 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		if (projectId) {
 			const projectRows = await db.select()
 				.from(project)
-				.innerJoin(product, eq(project.productId, product.id))
+				.innerJoin(project, eq(project.projectId, project.id))
 				.where(
 					and(
 						eq(project.id, projectId),
-						eq(product.userId, locals.user.id)
+						eq(project.userId, locals.user.id)
 					)
 				)
 				.limit(1)
@@ -119,14 +119,14 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 			.from(preset)
 			.leftJoin(publication, eq(preset.publicationId, publication.id))
 			.leftJoin(project, eq(preset.projectId, project.id))
-			.innerJoin(product, or(
-				eq(publication.productId, product.id),
-				eq(project.productId, product.id)
+			.innerJoin(project, or(
+				eq(publication.projectId, project.id),
+				eq(project.projectId, project.id)
 			))
 			.where(
 				and(
 					eq(preset.id, params.id),
-					eq(product.userId, locals.user.id)
+					eq(project.userId, locals.user.id)
 				)
 			)
 			.limit(1)

@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { publication, preset, product } from '$lib/server/db/schema'
+import { publication, preset, project } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
 import { eq } from 'drizzle-orm'
 
@@ -10,16 +10,16 @@ export async function load({ parent }) {
     throw redirect(302, '/login')
   }
 
-  // Publications that belong to the user's products
+  // Publications that belong to the user's projects
   const userPublications = await db
     .select({
       id: publication.id,
       name: publication.name,
-      productId: publication.productId
+      projectId: publication.projectId
     })
     .from(publication)
-    .innerJoin(product, eq(publication.productId, product.id))
-    .where(eq(product.userId, user.id))
+    .innerJoin(project, eq(publication.projectId, project.id))
+    .where(eq(project.userId, user.id))
 
   // Presets that belong to user's publications
   const userPresets = await db
@@ -30,8 +30,8 @@ export async function load({ parent }) {
     })
     .from(preset)
     .innerJoin(publication, eq(preset.publicationId, publication.id))
-    .innerJoin(product, eq(publication.productId, product.id))
-    .where(eq(product.userId, user.id))
+    .innerJoin(project, eq(publication.projectId, project.id))
+    .where(eq(project.userId, user.id))
 
   return {
     publications: userPublications,

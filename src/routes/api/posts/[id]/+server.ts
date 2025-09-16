@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { post, publication, preset, product } from '$lib/server/db/schema'
+import { post, publication, preset, project } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -27,11 +27,11 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		// Verify that the publication belongs to the user
 		const publication = await db.select()
 			.from(publication)
-			.innerJoin(product, eq(publication.productId, product.id))
+			.innerJoin(project, eq(publication.projectId, project.id))
 			.where(
 				and(
 					eq(publication.id, publicationId),
-					eq(product.userId, locals.user.id)
+					eq(project.userId, locals.user.id)
 				)
 			)
 			.limit(1)
@@ -64,13 +64,13 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 				presetId,
 				updatedAt: new Date()
 			})
-			.from(publication, product)
+			.from(publication, project)
 			.where(
 				and(
 					eq(post.id, params.id),
 					eq(post.publicationId, publication.id),
-					eq(publication.productId, product.id),
-					eq(product.userId, locals.user.id)
+					eq(publication.projectId, project.id),
+					eq(project.userId, locals.user.id)
 				)
 			)
 			.returning({
@@ -105,11 +105,11 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		const postToDelete = await db.select({ id: post.id })
 			.from(post)
 			.innerJoin(publication, eq(post.publicationId, publication.id))
-			.innerJoin(product, eq(publication.productId, product.id))
+			.innerJoin(project, eq(publication.projectId, project.id))
 			.where(
 				and(
 					eq(post.id, params.id),
-					eq(product.userId, locals.user.id)
+					eq(project.userId, locals.user.id)
 				)
 			)
 			.limit(1)

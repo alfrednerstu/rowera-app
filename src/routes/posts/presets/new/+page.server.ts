@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { publication, product } from '$lib/server/db/schema'
+import { publication, project } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
 import { eq } from 'drizzle-orm'
 
@@ -10,15 +10,15 @@ export const load = async ({ locals }) => {
 		throw redirect(302, '/login')
 	}
 	
-	// Get all publications that belong to the user's products
+	// Get all publications that belong to the user's projects
 	const userPublications = await db.select({
 		id: publication.id,
 		name: publication.name,
-		productId: publication.productId
+		projectId: publication.projectId
 	})
 	.from(publication)
-	.innerJoin(product, eq(publication.productId, product.id))
-	.where(eq(product.userId, locals.session.user.id))
+	.innerJoin(project, eq(publication.projectId, project.id))
+	.where(eq(project.userId, locals.session.user.id))
 	
 	return {
 		publications: userPublications

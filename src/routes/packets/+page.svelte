@@ -2,13 +2,13 @@
 	import CrudTable from '$lib/components/CrudTable.svelte'
 	
 	let { data } = $props()
-	let activeTab = $state('projects')
+	let activeTab = $state('packets')
 	
-	// Projects table configuration
-	const projectColumns = [
-		{ key: 'name', header: 'Project Name' },
+	// Packets table configuration
+	const packetColumns = [
+		{ key: 'name', header: 'Packet Name' },
 		{ key: 'slug', header: 'Slug' },
-		{ key: 'productName', header: 'Product' },
+		{ key: 'packetName', header: 'Packet' },
 		{ 
 			key: 'createdAt', 
 			header: 'Created',
@@ -20,7 +20,7 @@
 	const pieceColumns = [
 		{ key: 'name', header: 'Piece Name' },
 		{ key: 'slug', header: 'Slug' },
-		{ key: 'projectName', header: 'Project' },
+		{ key: 'packetName', header: 'Packet' },
 		{ key: 'presetName', header: 'Preset' },
 		{ 
 			key: 'createdAt', 
@@ -32,7 +32,7 @@
 	// Presets table configuration
 	const presetColumns = [
 		{ key: 'name', header: 'Preset Name' },
-		{ key: 'projectName', header: 'Project' },
+		{ key: 'packetName', header: 'Packet' },
 		{ 
 			key: 'createdAt', 
 			header: 'Created',
@@ -40,20 +40,20 @@
 		}
 	]
 	
-	async function handleDeleteProject(project) {
-		if (confirm(`Are you sure you want to delete "${project.name}"?`)) {
+	async function handleDeletePacket(packet) {
+		if (confirm(`Are you sure you want to delete "${packet.name}"?`)) {
 			try {
-				const response = await fetch(`/api/projects/${project.id}`, {
+				const response = await fetch(`/api/packets/${packet.id}`, {
 					method: 'DELETE'
 				})
 				
 				if (response.ok) {
 					window.location.reload()
 				} else {
-					console.error('Failed to delete project')
+					console.error('Failed to delete packet')
 				}
 			} catch (error) {
-				console.error('Error deleting project:', error)
+				console.error('Error deleting packet:', error)
 			}
 		}
 	}
@@ -96,16 +96,16 @@
 </script>
 
 <svelte:head>
-	<title>Projects - Rowera CMS</title>
-	<meta name="description" content="Manage your projects, pieces, and shared presets" />
+	<title>Packets - Rowera CMS</title>
+	<meta name="description" content="Manage your packets, pieces, and shared presets" />
 </svelte:head>
 
 <nav class="tabs">
 	<button onclick={() => activeTab = 'pieces'} class:active={activeTab === 'pieces'}>
 		Pieces
 	</button>
-	<button onclick={() => activeTab = 'projects'} class:active={activeTab === 'projects'}>
-		Projects
+	<button onclick={() => activeTab = 'packets'} class:active={activeTab === 'packets'}>
+		Packets
 	</button>
 	
 	<button onclick={() => activeTab = 'presets'} class:active={activeTab === 'presets'}>
@@ -113,22 +113,22 @@
 	</button>
 </nav>
 
-{#if activeTab === 'projects'}
+{#if activeTab === 'packets'}
 	<CrudTable 
-		items={data.projects}
-		columns={projectColumns}
-		title="Projects"
-		createUrl="/projects/new"
-		editUrl={(item) => `/projects/${item.id}/edit`}
-		onDelete={handleDeleteProject}
+		items={data.packets}
+		columns={packetColumns}
+		title="Packets"
+		createUrl="/packets/new"
+		editUrl={(item) => `/packets/${item.id}/edit`}
+		onDelete={handleDeletePacket}
 	/>
 {:else if activeTab === 'pieces'}
 	<CrudTable 
 		items={data.pieces}
 		columns={pieceColumns}
 		title="Pieces"
-		createUrl="/projects/pieces/new"
-		editUrl={(item) => `/projects/pieces/${item.id}/edit`}
+		createUrl="/packets/pieces/new"
+		editUrl={(item) => `/packets/pieces/${item.id}/edit`}
 		onDelete={handleDeletePiece}
 	/>
 {:else if activeTab === 'presets'}
@@ -136,8 +136,8 @@
 		items={data.presets}
 		columns={presetColumns}
 		title="Presets"
-		createUrl="/projects/presets/new"
-		editUrl={(item) => `/projects/presets/${item.id}/edit`}
+		createUrl="/packets/presets/new"
+		editUrl={(item) => `/packets/presets/${item.id}/edit`}
 		onDelete={handleDeletePreset}
 	/>
 {/if}

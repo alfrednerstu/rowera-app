@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { project, product } from '$lib/server/db/schema'
+import { project } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -10,39 +10,30 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 	}
 	
 	try {
-		const { name, slug, productId } = await request.json()
+		const { name } = await request.json()
 		
-		if (!name?.trim() || !slug?.trim() || !productId) {
-			return json({ error: 'Name, slug, and product are required' }, { status: 400 })
+		if (!name?.trim()) {
+			return json({ error: 'Project name is required' }, { status: 400 })
 		}
 		
-		// Verify the product belongs to the user
-		const product = await db.select().from(product).where(
-			and(
-				eq(product.id, productId),
-				eq(product.userId, locals.session.user.id)
-			)
-		).limit(1)
-		
-		if (!product.length) {
-			return json({ error: 'Product not found' }, { status: 404 })
-		}
-		
-		const [project] = await db.update(project)
+		const [updatedProject] = await db.update(project)
 			.set({ 
 				name: name.trim(),
-				slug: slug.trim(),
-				productId,
 				updatedAt: new Date()
 			})
-			.where(eq(project.id, params.id))
+			.where(
+				and(
+					eq(project.id, params.id),
+					eq(project.userId, locals.session.user.id)
+				)
+			)
 			.returning()
 		
-		if (!project) {
+		if (!updatedProject) {
 			return json({ error: 'Project not found' }, { status: 404 })
 		}
 		
-		return json(project)
+		return json(updatedProject)
 	} catch (error) {
 		console.error('Error updating project:', error)
 		return json({ error: 'Failed to update project' }, { status: 500 })
@@ -55,11 +46,16 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	}
 	
 	try {
-		const [project] = await db.delete(project)
-			.where(eq(project.id, params.id))
+		const [deletedProject] = await db.delete(project)
+			.where(
+				and(
+					eq(project.id, params.id),
+					eq(project.userId, locals.session.user.id)
+				)
+			)
 			.returning()
 		
-		if (!project) {
+		if (!deletedProject) {
 			return json({ error: 'Project not found' }, { status: 404 })
 		}
 		

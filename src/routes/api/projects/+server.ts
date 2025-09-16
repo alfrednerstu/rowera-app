@@ -1,51 +1,44 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { project, product } from '$lib/server/db/schema'
-import { eq, and } from 'drizzle-orm'
+import { project, publication, packet } from '$lib/server/db/schema'
 import type { RequestHandler } from './$types'
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.session?.user?.id) {
+	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
 	try {
-		const { name, slug, productId } = await request.json()
+		const { name } = await request.json()
 		
 		if (!name?.trim()) {
 			return json({ error: 'Project name is required' }, { status: 400 })
 		}
 		
-		if (!slug?.trim()) {
-			return json({ error: 'Project slug is required' }, { status: 400 })
-		}
-		
-		if (!productId) {
-			return json({ error: 'Product is required' }, { status: 400 })
-		}
-		
-		// Verify that the product belongs to the user
-		const product = await db.select()
-			.from(product)
-			.where(
-				and(
-					eq(product.id, productId),
-					eq(product.userId, locals.session.user.id)
-				)
-			)
-			.limit(1)
-		
-		if (!product.length) {
-			return json({ error: 'Product not found or access denied' }, { status: 404 })
-		}
-		
-		const [project] = await db.insert(project).values({
+		const [newProject] = await db.insert(project).values({
 			name: name.trim(),
-			slug: slug.trim(),
-			productId
+			userId: locals.user.id
+		}).returning()
+
+		// Create default publication
+		const [defaultPublication] = await db.insert(publication).values({
+			name: 'Default publication',
+			slug: 'default',
+			projectId: newProject.id
+		}).returning()
+
+		// Create default packet
+		const [defaultPacket] = await db.insert(packet).values({
+			name: 'Default packet',
+			slug: 'default',
+			projectId: newProject.id
 		}).returning()
 		
-		return json(project)
+		return json({ 
+			project: newProject, 
+			defaultPublication, 
+			defaultPacket 
+		})
 	} catch (error) {
 		console.error('Error creating project:', error)
 		return json({ error: 'Failed to create project' }, { status: 500 })

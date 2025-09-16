@@ -33,14 +33,17 @@
 		
 		<section>
 			<ul>				
+				<li aria-current={page.url.pathname === '/projects' ? 'page' : undefined}>
+					<a href="/projects">Projects</a>
+				</li>
 				<li aria-current={page.url.pathname === '/pages' ? 'page' : undefined}>
 					<a href="/pages">Pages</a>
 				</li>
 				<li aria-current={page.url.pathname === '/posts' ? 'page' : undefined}>
 					<a href="/posts">Posts</a>
 				</li>
-				<li aria-current={page.url.pathname === '/projects' ? 'page' : undefined}>
-					<a href="/projects">Projects</a>
+				<li aria-current={page.url.pathname === '/packets' ? 'page' : undefined}>
+					<a href="/packets">Packets</a>
 				</li>
 				<li aria-current={page.url.pathname === '/partials' ? 'page' : undefined}>
 					<a href="/partials">Partials</a>
