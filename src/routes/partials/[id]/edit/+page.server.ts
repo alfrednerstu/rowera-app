@@ -1,19 +1,19 @@
 import { db } from '$lib/server/db'
-import { partials } from '$lib/server/db/schema'
+import { partial } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
-export async function load({ params, parent }) {
-	const { session } = await parent()
+export const load = async ({ params, locals }) => {
 	
-	if (!session?.user?.id) {
+	
+	if (!locals.session?.user?.id) {
 		throw redirect(302, '/login')
 	}
 	
-	const partial = await db.select().from(partials).where(
+	const partial = await db.select().from(partial).where(
 		and(
-			eq(partials.id, params.id),
-			eq(partials.userId, session.user.id)
+			eq(partial.id, params.id),
+			eq(partial.userId, locals.session.user.id)
 		)
 	).limit(1)
 	

@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { primitives } from '$lib/server/db/schema'
+import { primitive } from '$lib/server/db/schema'
 import { auth } from '$lib/server/auth'
 import { eq } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
@@ -22,14 +22,14 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
-	// Only admins can access the primitives admin interface
+	// Only admins can access the primitive admin interface
 	const userIsAdmin = await isUserAdmin(locals.session.user.id)
 	if (!userIsAdmin) {
 		return json({ error: 'Admin access required' }, { status: 403 })
 	}
 	
 	try {
-		const [primitive] = await db.select().from(primitives).where(eq(primitives.id, params.id)).limit(1)
+		const [primitive] = await db.select().from(primitive).where(eq(primitive.id, params.id)).limit(1)
 		
 		if (!primitive) {
 			return json({ error: 'Primitive not found' }, { status: 404 })
@@ -47,7 +47,7 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
-	// Only admins can update primitives
+	// Only admins can update primitive
 	const userIsAdmin = await isUserAdmin(locals.session.user.id)
 	if (!userIsAdmin) {
 		return json({ error: 'Admin access required' }, { status: 403 })
@@ -60,7 +60,7 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 			return json({ error: 'Name and tagName are required' }, { status: 400 })
 		}
 		
-		const [primitive] = await db.update(primitives)
+		const [primitive] = await db.update(primitive)
 			.set({ 
 				name: name.trim(),
 				tagName: tagName.trim(),
@@ -69,7 +69,7 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 				cssStyles: cssStyles?.trim() || null,
 				updatedAt: new Date()
 			})
-			.where(eq(primitives.id, params.id))
+			.where(eq(primitive.id, params.id))
 			.returning()
 		
 		if (!primitive) {
@@ -88,15 +88,15 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
-	// Only admins can delete primitives
+	// Only admins can delete primitive
 	const userIsAdmin = await isUserAdmin(locals.session.user.id)
 	if (!userIsAdmin) {
 		return json({ error: 'Admin access required' }, { status: 403 })
 	}
 	
 	try {
-		const [primitive] = await db.delete(primitives)
-			.where(eq(primitives.id, params.id))
+		const [primitive] = await db.delete(primitive)
+			.where(eq(primitive.id, params.id))
 			.returning()
 		
 		if (!primitive) {

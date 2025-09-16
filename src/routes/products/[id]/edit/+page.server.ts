@@ -1,19 +1,19 @@
 import { db } from '$lib/server/db'
-import { products } from '$lib/server/db/schema'
+import { product } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
-export async function load({ params, parent }) {
-	const { session } = await parent()
+export const load = async ({ params, locals }) => {
 	
-	if (!session?.user?.id) {
+	
+	if (!locals.session?.user?.id) {
 		throw redirect(302, '/login')
 	}
 	
-	const product = await db.select().from(products).where(
+	const product = await db.select().from(product).where(
 		and(
-			eq(products.id, params.id),
-			eq(products.userId, session.user.id)
+			eq(product.id, params.id),
+			eq(product.userId, locals.session.user.id)
 		)
 	).limit(1)
 	

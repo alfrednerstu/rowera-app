@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { pieces, projects, products, presets, publications } from '$lib/server/db/schema'
+import { piece, project, product, preset, publication } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -18,12 +18,12 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		
 		// Verify the project belongs to the user
 		const project = await db.select()
-		.from(projects)
-		.innerJoin(products, eq(projects.productId, products.id))
+		.from(project)
+		.innerJoin(product, eq(project.productId, product.id))
 		.where(
 			and(
-				eq(projects.id, projectId),
-				eq(products.userId, locals.session.user.id)
+				eq(project.id, projectId),
+				eq(product.userId, locals.session.user.id)
 			)
 		)
 		.limit(1)
@@ -34,13 +34,13 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		
 		// Verify the preset belongs to the user
 		const preset = await db.select()
-		.from(presets)
-		.innerJoin(publications, eq(presets.publicationId, publications.id))
-		.innerJoin(products, eq(publications.productId, products.id))
+		.from(preset)
+		.innerJoin(publication, eq(preset.publicationId, publication.id))
+		.innerJoin(product, eq(publication.productId, product.id))
 		.where(
 			and(
-				eq(presets.id, presetId),
-				eq(products.userId, locals.session.user.id)
+				eq(preset.id, presetId),
+				eq(product.userId, locals.session.user.id)
 			)
 		)
 		.limit(1)
@@ -49,7 +49,7 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 			return json({ error: 'Preset not found' }, { status: 404 })
 		}
 		
-		const [piece] = await db.update(pieces)
+		const [piece] = await db.update(piece)
 			.set({ 
 				name: name.trim(),
 				slug: slug.trim(),
@@ -57,7 +57,7 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 				presetId,
 				updatedAt: new Date()
 			})
-			.where(eq(pieces.id, params.id))
+			.where(eq(piece.id, params.id))
 			.returning()
 		
 		if (!piece) {
@@ -77,8 +77,8 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	}
 	
 	try {
-		const [piece] = await db.delete(pieces)
-			.where(eq(pieces.id, params.id))
+		const [piece] = await db.delete(piece)
+			.where(eq(piece.id, params.id))
 			.returning()
 		
 		if (!piece) {

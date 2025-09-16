@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { publications, products } from '$lib/server/db/schema'
+import { publication, product } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -26,11 +26,11 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		
 		// Verify that the new product belongs to the user
 		const product = await db.select()
-			.from(products)
+			.from(product)
 			.where(
 				and(
-					eq(products.id, productId),
-					eq(products.userId, locals.session.user.id)
+					eq(product.id, productId),
+					eq(product.userId, locals.session.user.id)
 				)
 			)
 			.limit(1)
@@ -40,28 +40,28 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		}
 		
 		// Update the publication with ownership verification through original product
-		const [publication] = await db.update(publications)
+		const [publication] = await db.update(publication)
 			.set({ 
 				name: name.trim(),
 				slug: slug.trim(),
 				productId,
 				updatedAt: new Date()
 			})
-			.from(products)
+			.from(product)
 			.where(
 				and(
-					eq(publications.id, params.id),
-					eq(publications.productId, products.id),
-					eq(products.userId, locals.session.user.id)
+					eq(publication.id, params.id),
+					eq(publication.productId, product.id),
+					eq(product.userId, locals.session.user.id)
 				)
 			)
 			.returning({
-				id: publications.id,
-				name: publications.name,
-				slug: publications.slug,
-				productId: publications.productId,
-				createdAt: publications.createdAt,
-				updatedAt: publications.updatedAt
+				id: publication.id,
+				name: publication.name,
+				slug: publication.slug,
+				productId: publication.productId,
+				createdAt: publication.createdAt,
+				updatedAt: publication.updatedAt
 			})
 		
 		if (!publication) {
@@ -82,13 +82,13 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	
 	try {
 		// First verify ownership through product relationship
-		const publicationToDelete = await db.select({ id: publications.id })
-			.from(publications)
-			.innerJoin(products, eq(publications.productId, products.id))
+		const publicationToDelete = await db.select({ id: publication.id })
+			.from(publication)
+			.innerJoin(product, eq(publication.productId, product.id))
 			.where(
 				and(
-					eq(publications.id, params.id),
-					eq(products.userId, locals.session.user.id)
+					eq(publication.id, params.id),
+					eq(product.userId, locals.session.user.id)
 				)
 			)
 			.limit(1)
@@ -98,8 +98,8 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		}
 		
 		// Delete the publication
-		const [publication] = await db.delete(publications)
-			.where(eq(publications.id, params.id))
+		const [publication] = await db.delete(publication)
+			.where(eq(publication.id, params.id))
 			.returning()
 		
 		return json({ success: true })

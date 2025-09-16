@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { partials } from '$lib/server/db/schema'
+import { partial } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -16,15 +16,15 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 			return json({ error: 'Partial name is required' }, { status: 400 })
 		}
 		
-		const [partial] = await db.update(partials)
+		const [partial] = await db.update(partial)
 			.set({ 
 				name: name.trim(),
 				updatedAt: new Date()
 			})
 			.where(
 				and(
-					eq(partials.id, params.id),
-					eq(partials.userId, locals.session.user.id)
+					eq(partial.id, params.id),
+					eq(partial.userId, locals.session.user.id)
 				)
 			)
 			.returning()
@@ -46,11 +46,11 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	}
 	
 	try {
-		const [partial] = await db.delete(partials)
+		const [partial] = await db.delete(partial)
 			.where(
 				and(
-					eq(partials.id, params.id),
-					eq(partials.userId, locals.session.user.id)
+					eq(partial.id, params.id),
+					eq(partial.userId, locals.session.user.id)
 				)
 			)
 			.returning()
