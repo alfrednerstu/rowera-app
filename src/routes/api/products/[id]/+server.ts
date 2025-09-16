@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { products } from '$lib/server/db/schema'
+import { product } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -16,15 +16,15 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 			return json({ error: 'Product name is required' }, { status: 400 })
 		}
 		
-		const [product] = await db.update(products)
+		const [product] = await db.update(product)
 			.set({ 
 				name: name.trim(),
 				updatedAt: new Date()
 			})
 			.where(
 				and(
-					eq(products.id, params.id),
-					eq(products.userId, locals.session.user.id)
+					eq(product.id, params.id),
+					eq(product.userId, locals.session.user.id)
 				)
 			)
 			.returning()
@@ -46,11 +46,11 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	}
 	
 	try {
-		const [product] = await db.delete(products)
+		const [product] = await db.delete(product)
 			.where(
 				and(
-					eq(products.id, params.id),
-					eq(products.userId, locals.session.user.id)
+					eq(product.id, params.id),
+					eq(product.userId, locals.session.user.id)
 				)
 			)
 			.returning()

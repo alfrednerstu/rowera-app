@@ -1,6 +1,6 @@
 import { redirect, error } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { primitives } from '$lib/server/db/schema'
+import { primitive } from '$lib/server/db/schema'
 import { auth } from '$lib/server/auth'
 import { eq } from 'drizzle-orm'
 import type { PageServerLoad } from './$types'
@@ -23,14 +23,14 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		throw redirect(302, '/login')
 	}
 	
-	// Only admins can access the primitives admin interface
+	// Only admins can access the primitive admin interface
 	const userIsAdmin = await isUserAdmin(locals.session.user.id)
 	if (!userIsAdmin) {
 		throw error(403, 'Admin access required')
 	}
 	
 	try {
-		const [primitive] = await db.select().from(primitives).where(eq(primitives.id, params.id)).limit(1)
+		const [primitive] = await db.select().from(primitive).where(eq(primitive.id, params.id)).limit(1)
 		
 		if (!primitive) {
 			throw error(404, 'Primitive not found')

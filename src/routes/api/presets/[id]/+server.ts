@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { presets, publications, products, projects } from '$lib/server/db/schema'
+import { preset, publication, product, project } from '$lib/server/db/schema'
 import { eq, and, or, isNull } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -27,21 +27,21 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		
 		// First, verify the existing preset belongs to the user
 		const existingPreset = await db.select({ 
-			id: presets.id,
-			publicationId: presets.publicationId,
-			projectId: presets.projectId
+			id: preset.id,
+			publicationId: preset.publicationId,
+			projectId: preset.projectId
 		})
-		.from(presets)
-		.leftJoin(publications, eq(presets.publicationId, publications.id))
-		.leftJoin(products, or(
-			eq(publications.productId, products.id),
-			eq(presets.projectId, projects.id)
+		.from(preset)
+		.leftJoin(publication, eq(preset.publicationId, publication.id))
+		.leftJoin(product, or(
+			eq(publication.productId, product.id),
+			eq(preset.projectId, project.id)
 		))
-		.leftJoin(projects, eq(presets.projectId, projects.id))
+		.leftJoin(project, eq(preset.projectId, project.id))
 		.where(
 			and(
-				eq(presets.id, params.id),
-				eq(products.userId, locals.session.user.id)
+				eq(preset.id, params.id),
+				eq(product.userId, locals.session.user.id)
 			)
 		)
 		.limit(1)
@@ -53,12 +53,12 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		// If publicationId is provided, verify it belongs to the user
 		if (publicationId) {
 			const publication = await db.select()
-				.from(publications)
-				.innerJoin(products, eq(publications.productId, products.id))
+				.from(publication)
+				.innerJoin(product, eq(publication.productId, product.id))
 				.where(
 					and(
-						eq(publications.id, publicationId),
-						eq(products.userId, locals.session.user.id)
+						eq(publication.id, publicationId),
+						eq(product.userId, locals.session.user.id)
 					)
 				)
 				.limit(1)
@@ -71,12 +71,12 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		// If projectId is provided, verify it belongs to the user
 		if (projectId) {
 			const project = await db.select()
-				.from(projects)
-				.innerJoin(products, eq(projects.productId, products.id))
+				.from(project)
+				.innerJoin(product, eq(project.productId, product.id))
 				.where(
 					and(
-						eq(projects.id, projectId),
-						eq(products.userId, locals.session.user.id)
+						eq(project.id, projectId),
+						eq(product.userId, locals.session.user.id)
 					)
 				)
 				.limit(1)
@@ -87,14 +87,14 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		}
 		
 		// Update the preset
-		const [preset] = await db.update(presets)
+		const [preset] = await db.update(preset)
 			.set({ 
 				name: name.trim(),
 				publicationId: publicationId || null,
 				projectId: projectId || null,
 				updatedAt: new Date()
 			})
-			.where(eq(presets.id, params.id))
+			.where(eq(preset.id, params.id))
 			.returning()
 		
 		if (!preset) {
@@ -115,18 +115,18 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	
 	try {
 		// Verify ownership through either publication or project relationship
-		const presetToDelete = await db.select({ id: presets.id })
-			.from(presets)
-			.leftJoin(publications, eq(presets.publicationId, publications.id))
-			.leftJoin(projects, eq(presets.projectId, projects.id))
-			.innerJoin(products, or(
-				eq(publications.productId, products.id),
-				eq(projects.productId, products.id)
+		const presetToDelete = await db.select({ id: preset.id })
+			.from(preset)
+			.leftJoin(publication, eq(preset.publicationId, publication.id))
+			.leftJoin(project, eq(preset.projectId, project.id))
+			.innerJoin(product, or(
+				eq(publication.productId, product.id),
+				eq(project.productId, product.id)
 			))
 			.where(
 				and(
-					eq(presets.id, params.id),
-					eq(products.userId, locals.session.user.id)
+					eq(preset.id, params.id),
+					eq(product.userId, locals.session.user.id)
 				)
 			)
 			.limit(1)
@@ -136,8 +136,8 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		}
 		
 		// Delete the preset
-		const [preset] = await db.delete(presets)
-			.where(eq(presets.id, params.id))
+		const [preset] = await db.delete(preset)
+			.where(eq(preset.id, params.id))
 			.returning()
 		
 		return json({ success: true })

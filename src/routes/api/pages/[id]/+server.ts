@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { pages, products } from '$lib/server/db/schema'
+import { page, product } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -26,11 +26,11 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		
 		// Verify that the new product belongs to the user
 		const product = await db.select()
-			.from(products)
+			.from(product)
 			.where(
 				and(
-					eq(products.id, productId),
-					eq(products.userId, locals.session.user.id)
+					eq(product.id, productId),
+					eq(product.userId, locals.session.user.id)
 				)
 			)
 			.limit(1)
@@ -40,28 +40,28 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		}
 		
 		// Update the page with ownership verification through original product
-		const [page] = await db.update(pages)
+		const [page] = await db.update(page)
 			.set({ 
 				name: name.trim(),
 				slug: slug.trim(),
 				productId,
 				updatedAt: new Date()
 			})
-			.from(products)
+			.from(product)
 			.where(
 				and(
-					eq(pages.id, params.id),
-					eq(pages.productId, products.id),
-					eq(products.userId, locals.session.user.id)
+					eq(page.id, params.id),
+					eq(page.productId, product.id),
+					eq(product.userId, locals.session.user.id)
 				)
 			)
 			.returning({
-				id: pages.id,
-				name: pages.name,
-				slug: pages.slug,
-				productId: pages.productId,
-				createdAt: pages.createdAt,
-				updatedAt: pages.updatedAt
+				id: page.id,
+				name: page.name,
+				slug: page.slug,
+				productId: page.productId,
+				createdAt: page.createdAt,
+				updatedAt: page.updatedAt
 			})
 		
 		if (!page) {
@@ -82,13 +82,13 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	
 	try {
 		// First verify ownership through product relationship
-		const pageToDelete = await db.select({ id: pages.id })
-			.from(pages)
-			.innerJoin(products, eq(pages.productId, products.id))
+		const pageToDelete = await db.select({ id: page.id })
+			.from(page)
+			.innerJoin(product, eq(page.productId, product.id))
 			.where(
 				and(
-					eq(pages.id, params.id),
-					eq(products.userId, locals.session.user.id)
+					eq(page.id, params.id),
+					eq(product.userId, locals.session.user.id)
 				)
 			)
 			.limit(1)
@@ -98,8 +98,8 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		}
 		
 		// Delete the page
-		const [page] = await db.delete(pages)
-			.where(eq(pages.id, params.id))
+		const [page] = await db.delete(page)
+			.where(eq(page.id, params.id))
 			.returning()
 		
 		return json({ success: true })
