@@ -39,11 +39,11 @@
 				<li aria-current={page.url.pathname === '/pages' ? 'page' : undefined}>
 					<a href="/pages">Pages</a>
 				</li>
-				<li aria-current={page.url.pathname === '/posts' ? 'page' : undefined}>
+				<li aria-current={page.url.pathname.startsWith('/posts') ? 'page' : undefined}>
 					<a href="/posts">Posts</a>
 				</li>
-				<li aria-current={page.url.pathname === '/packets' ? 'page' : undefined}>
-					<a href="/packets">Packets</a>
+				<li aria-current={page.url.pathname.startsWith('/pieces') ? 'page' : undefined}>
+					<a href="/pieces">Pieces</a>
 				</li>
 				<li aria-current={page.url.pathname === '/partials' ? 'page' : undefined}>
 					<a href="/partials">Partials</a>
