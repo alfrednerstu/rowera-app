@@ -11,7 +11,7 @@ export async function load({ params, parent }) {
 	}
 	
 	// Get the publication with ownership verification through product
-	const publication = await db.select({
+	const publicationResult = await db.select({
 		id: publication.id,
 		name: publication.name,
 		slug: publication.slug,
@@ -29,7 +29,7 @@ export async function load({ params, parent }) {
 	)
 	.limit(1)
 	
-	if (!publication.length) {
+	if (!publicationResult.length) {
 		throw error(404, 'Publication not found')
 	}
 	
@@ -37,7 +37,7 @@ export async function load({ params, parent }) {
 	const userProjects = await db.select().from(project).where(eq(project.userId, user.id))
 	
 	return {
-		publication: publication[0],
+		publication: publicationResult[0],
 		projects: userProjects
 	}
 }
