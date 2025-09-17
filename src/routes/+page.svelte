@@ -3,6 +3,12 @@
 	import CrudTable from '$lib/components/CrudTable.svelte'
 	
 	let { data } = $props()
+	let projects = $state(data.projects)
+	
+	// Update projects when data changes (e.g., navigating back to page)
+	$effect(() => {
+		projects = data.projects
+	})
 	
 	const columns = [
 		{ key: 'name', header: 'Name' },
@@ -40,8 +46,8 @@
 				})
 				
 				if (response.ok) {
-					// Reload the page to refresh the projects list
-					window.location.reload()
+					// Remove the project from the list without page reload
+					projects = projects.filter(p => p.id !== project.id)
 				} else {
 					console.error('Failed to delete project')
 				}
@@ -61,7 +67,7 @@
 		<h1>{getTimeBasedGreeting()} <span>{$session.data?.user.username}</span></h1>
 
 		<CrudTable 
-			items={data.projects}
+			items={projects}
 			{columns}
 			title="Projects"
 			createUrl="/projects/new"
