@@ -25,50 +25,7 @@ export async function load({ parent }) {
     .innerJoin(project, eq(packet.projectId, project.id))
     .where(eq(project.userId, user.id))
 
-  // Pieces with packet and preset information
-  const userPieces = await db
-    .select({
-      id: piece.id,
-      name: piece.name,
-      slug: piece.slug,
-      packetId: piece.packetId,
-      packetName: packet.name,
-      presetId: piece.presetId,
-      presetName: preset.name,
-      createdAt: piece.createdAt,
-      updatedAt: piece.updatedAt
-    })
-    .from(piece)
-    .innerJoin(packet, eq(piece.packetId, packet.id))
-    .innerJoin(project, eq(packet.projectId, project.id))
-    .innerJoin(preset, eq(piece.presetId, preset.id))
-    .where(eq(project.userId, user.id))
-
-  // Presets that belong to user's packets
-  const userPresets = await db
-    .select({
-      id: preset.id,
-      name: preset.name,
-      packetId: preset.packetId,
-      packetName: packet.name,
-      createdAt: preset.createdAt,
-      updatedAt: preset.updatedAt
-    })
-    .from(preset)
-    .innerJoin(packet, eq(preset.packetId, packet.id))
-    .innerJoin(project, eq(packet.projectId, project.id))
-    .where(eq(project.userId, user.id))
-
-  // User's projects for forms
-  const userProjects = await db
-    .select()
-    .from(project)
-    .where(eq(project.userId, user.id))
-
   return {
-    packets: userPackets,
-    pieces: userPieces,
-    presets: userPresets,
-    projects: userProjects
+    packets: userPackets
   }
 }

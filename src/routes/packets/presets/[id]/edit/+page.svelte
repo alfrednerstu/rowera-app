@@ -33,7 +33,7 @@
 			})
 			
 			if (response.ok) {
-				goto('/packets')
+				goto('/packets/presets')
 			} else {
 				console.error('Failed to update preset')
 			}
@@ -48,6 +48,6 @@
 	{fields}
 	item={data.preset}
 	submitLabel="Update Preset"
-	cancelUrl="/packets"
+	cancelUrl="/packets/presets"
 	onSubmit={handleSubmit}
 />

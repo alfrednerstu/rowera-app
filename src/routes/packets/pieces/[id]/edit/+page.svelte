@@ -44,7 +44,7 @@
 			})
 			
 			if (response.ok) {
-				goto('/packets')
+				goto('/packets/pieces')
 			} else {
 				console.error('Failed to update piece')
 			}
@@ -59,6 +59,6 @@
 	{fields}
 	item={data.piece}
 	submitLabel="Update Piece"
-	cancelUrl="/packets"
+	cancelUrl="/packets/pieces"
 	onSubmit={handleSubmit}
 />
