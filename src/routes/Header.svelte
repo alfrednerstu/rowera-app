@@ -59,9 +59,6 @@
 		
 		<section>
 			<ul>				
-				<li aria-current={page.url.pathname === '/projects' ? 'page' : undefined}>
-					<a href="/projects">Projects</a>
-				</li>
 				<li aria-current={page.url.pathname === '/pages' ? 'page' : undefined}>
 					<a href="/pages">Pages</a>
 				</li>
