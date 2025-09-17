@@ -42,10 +42,28 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 
 export const DELETE: RequestHandler = async ({ params, locals }) => {
 	if (!locals.session?.user?.id) {
+		console.error('Delete project: No session or user ID')
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
 	try {
+		console.log('Attempting to delete project:', params.id, 'for user:', locals.session.user.id)
+		
+		// First check if the project exists and belongs to the user
+		const existingProject = await db.select().from(project).where(
+			and(
+				eq(project.id, params.id),
+				eq(project.userId, locals.session.user.id)
+			)
+		).limit(1)
+		
+		if (!existingProject.length) {
+			console.error('Project not found or access denied:', params.id)
+			return json({ error: 'Project not found' }, { status: 404 })
+		}
+		
+		console.log('Found project to delete:', existingProject[0])
+		
 		const [deletedProject] = await db.delete(project)
 			.where(
 				and(
@@ -55,8 +73,10 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 			)
 			.returning()
 		
+		console.log('Deleted project:', deletedProject)
+		
 		if (!deletedProject) {
-			return json({ error: 'Project not found' }, { status: 404 })
+			return json({ error: 'Failed to delete project' }, { status: 500 })
 		}
 		
 		return json({ success: true })
