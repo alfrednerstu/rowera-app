@@ -14,7 +14,11 @@
 	const pieceColumns = [
 		{ key: 'name', header: 'Piece Name' },
 		{ key: 'slug', header: 'Slug' },
-		{ key: 'packetName', header: 'Packet' },
+		{ 
+			key: 'packetName', 
+			header: 'Packet',
+			render: (item) => `<a href="/packets/${item.packetId}/edit?return=/packets/pieces" class="link">${item.packetName}</a>`
+		},
 		{ key: 'presetName', header: 'Preset' },
 		{ 
 			key: 'createdAt', 
@@ -58,3 +62,14 @@
 	editUrl={(item) => `/packets/pieces/${item.id}/edit`}
 	onDelete={handleDeletePiece}
 />
+
+<style>
+	:global(.link) {
+		color: var(--accent-color);
+		text-decoration: none;
+	}
+	
+	:global(.link:hover) {
+		text-decoration: underline;
+	}
+</style>
