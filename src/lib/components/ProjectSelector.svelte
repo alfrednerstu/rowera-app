@@ -1,38 +1,41 @@
 <script lang="ts">
-	import { activeProject, type Project } from '$lib/stores/active-project'
-	import { session } from '$lib/auth-client'
+	import { activeProject, type Project } from '$lib/stores/active-project';
+	import { session } from '$lib/auth-client';
+	import { invalidateAll } from '$app/navigation';
 
 	interface Props {
-		onSelectProject: (project: Project) => void
-		onCreateNew: () => void
+		onSelectProject: (project: Project) => void;
+		onCreateNew: () => void;
 	}
 
-	let { onSelectProject, onCreateNew }: Props = $props()
+	let { onSelectProject, onCreateNew }: Props = $props();
 
-	let projects: Project[] = $state([])
-	let loading = $state(true)
-	let error = $state('')
+	let projects: Project[] = $state([]);
+	let loading = $state(true);
+	let error = $state('');
 
 	$effect(async () => {
-		if (!$session.data?.user?.id) return
-		
-		try {
-			const response = await fetch('/api/projects')
-			if (!response.ok) {
-				throw new Error('Failed to fetch projects')
-			}
-			const data = await response.json()
-			projects = data.projects || []
-		} catch (err) {
-			error = err instanceof Error ? err.message : 'Failed to load projects'
-		} finally {
-			loading = false
-		}
-	})
+		if (!$session.data?.user?.id) return;
 
-	function handleSelectProject(project: Project) {
-		activeProject.setActive(project)
-		onSelectProject(project)
+		try {
+			const response = await fetch('/api/projects');
+			if (!response.ok) {
+				throw new Error('Failed to fetch projects');
+			}
+			const data = await response.json();
+			projects = data.projects || [];
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'Failed to load projects';
+		} finally {
+			loading = false;
+		}
+	});
+
+	async function handleSelectProject(project: Project) {
+		activeProject.setActive(project);
+		onSelectProject(project);
+		// Invalidate all cached data to refresh content for the new project
+		await invalidateAll();
 	}
 </script>
 
@@ -44,8 +47,8 @@
 	{:else}
 		<div class="project-list">
 			{#each projects as project (project.id)}
-				<button 
-					class="project-item" 
+				<button
+					class="project-item"
 					class:active={$activeProject.id === project.id}
 					onclick={() => handleSelectProject(project)}
 				>
@@ -55,7 +58,7 @@
 					</div>
 				</button>
 			{/each}
-			
+
 			{#if projects.length === 0}
 				<div class="empty-state">
 					<p>No projects found</p>
@@ -63,11 +66,9 @@
 				</div>
 			{/if}
 		</div>
-		
+
 		<div class="actions">
-			<button class="create-button" onclick={onCreateNew}>
-				+ Create New Project
-			</button>
+			<button class="create-button" onclick={onCreateNew}> + Create New Project </button>
 		</div>
 	{/if}
 </div>
@@ -77,7 +78,8 @@
 		min-height: 200px;
 	}
 
-	.loading, .error {
+	.loading,
+	.error {
 		text-align: center;
 		padding: 2rem;
 		color: var(--text-muted, #666);
