@@ -1,7 +1,10 @@
 <script>
+	import { signOut, updateUser, changePassword } from '$lib/auth-client'
+
 	let { data } = $props()
 
-	let user = data.user
+	let user = $state({ ...data.user })
+	let originalUser = { ...data.user }
 
 	async function handleLogout() {
 		await signOut()
@@ -29,14 +32,104 @@
 		}
 	}
 	
-	let isEditing = false
+	let isEditing = $state(false)
+	let isSaving = $state(false)
+	let saveMessage = $state('')
 	let passwordData = $state({
 		current: '',
 		new: '',
 		confirm: ''
 	})
+	let isChangingPassword = $state(false)
+	let passwordMessage = $state('')
 	let setupLoading = $state(false)
 	let setupMessage = $state('')
+
+	async function saveProfile(event: Event) {
+		event.preventDefault()
+		isSaving = true
+		saveMessage = ''
+
+		try {
+			// Update using Better Auth client for name and username
+			const { data: updatedData, error } = await updateUser({
+				name: user.name,
+				username: user.username
+			})
+
+			if (error) {
+				saveMessage = error.message || 'Failed to update profile'
+				return
+			}
+
+			// Update the original user data
+			originalUser = { ...user }
+			isEditing = false
+			saveMessage = 'Profile updated successfully'
+			
+			// Clear success message after 3 seconds
+			setTimeout(() => {
+				saveMessage = ''
+			}, 3000)
+		} catch (e) {
+			console.error('Error updating profile:', e)
+			saveMessage = 'Failed to update profile'
+		} finally {
+			isSaving = false
+		}
+	}
+
+	function cancelEditing() {
+		user = { ...originalUser }
+		isEditing = false
+		saveMessage = ''
+	}
+
+	async function changeUserPassword(event: Event) {
+		event.preventDefault()
+		isChangingPassword = true
+		passwordMessage = ''
+
+		// Basic validation
+		if (passwordData.new !== passwordData.confirm) {
+			passwordMessage = 'New passwords do not match'
+			isChangingPassword = false
+			return
+		}
+
+		if (passwordData.new.length < 6) {
+			passwordMessage = 'Password must be at least 6 characters long'
+			isChangingPassword = false
+			return
+		}
+
+		try {
+			const { error } = await changePassword({
+				currentPassword: passwordData.current,
+				newPassword: passwordData.new,
+				revokeOtherSessions: true
+			})
+
+			if (error) {
+				passwordMessage = error.message || 'Failed to change password'
+				return
+			}
+
+			// Clear password form
+			passwordData = { current: '', new: '', confirm: '' }
+			passwordMessage = 'Password changed successfully'
+			
+			// Clear success message after 3 seconds
+			setTimeout(() => {
+				passwordMessage = ''
+			}, 3000)
+		} catch (e) {
+			console.error('Error changing password:', e)
+			passwordMessage = 'Failed to change password'
+		} finally {
+			isChangingPassword = false
+		}
+	}
 </script>
 
 <header class="page-header">
@@ -49,12 +142,22 @@
 	<section class="profile-info">
 		<header class="section-header">
 			<h2>Profile Information</h2>
-			<button 
-				class="btn btn-secondary btn-sm" 
-				onclick={() => isEditing = !isEditing}
-			>
-				{isEditing ? 'Cancel' : 'Edit'}
-			</button>
+			{#if isEditing}
+				<button 
+					class="btn btn-secondary btn-sm" 
+					onclick={cancelEditing}
+					disabled={isSaving}
+				>
+					Cancel
+				</button>
+			{:else}
+				<button 
+					class="btn btn-secondary btn-sm" 
+					onclick={() => isEditing = true}
+				>
+					Edit
+				</button>
+			{/if}
 		</header>
 		
 		<div class="avatar-section">
@@ -71,14 +174,26 @@
 			{/if}
 		</div>
 		
-		<form class="profile-form">
+		<form class="profile-form" onsubmit={saveProfile}>
 			<div class="form-group">
 				<label for="name">Name</label>
 				<input 
 					id="name" 
 					type="text" 
 					bind:value={user.name} 
-					disabled={!isEditing}
+					disabled={!isEditing || isSaving}
+					required
+				>
+			</div>
+			
+			<div class="form-group">
+				<label for="username">Username</label>
+				<input 
+					id="username" 
+					type="text" 
+					bind:value={user.username} 
+					disabled={!isEditing || isSaving}
+					placeholder="Enter username"
 				>
 			</div>
 			
@@ -87,14 +202,24 @@
 				<input 
 					id="email" 
 					type="email" 
-					bind:value={user.email} 
-					disabled={!isEditing}
+					value={user.email} 
+					disabled
+					title="Email changes are not currently supported"
 				>
+				<small class="help-text">Email changes are not currently supported</small>
 			</div>
 			
 			{#if isEditing}
 				<div class="form-actions">
-					<button type="submit" class="btn btn-primary">Save Changes</button>
+					<button type="submit" class="btn btn-primary" disabled={isSaving}>
+						{isSaving ? 'Saving...' : 'Save Changes'}
+					</button>
+				</div>
+			{/if}
+			
+			{#if saveMessage}
+				<div class="message {saveMessage.includes('successfully') ? 'success' : 'error'}" aria-live="polite">
+					{saveMessage}
 				</div>
 			{/if}
 		</form>
@@ -131,14 +256,14 @@
 			Member since {new Date(user.createdAt).toLocaleDateString()}
 		</p>
 		<p class="member-since">
-			Last login {new Date(data.session.updatedAt).toLocaleDateString()}
+			Last login {data.session ? new Date(data.session.updatedAt).toLocaleDateString() : 'Unknown'}
 		</p>
 	</section>
 	
 	<section class="password-section">
 		<h2>Change Password</h2>
 		
-		<form class="password-form">
+		<form class="password-form" onsubmit={changeUserPassword}>
 			<div class="form-group">
 				<label for="current-password">Current Password</label>
 				<input 
@@ -146,6 +271,8 @@
 					type="password" 
 					bind:value={passwordData.current}
 					placeholder="Enter current password"
+					disabled={isChangingPassword}
+					required
 				>
 			</div>
 			
@@ -156,6 +283,9 @@
 					type="password" 
 					bind:value={passwordData.new}
 					placeholder="Enter new password"
+					disabled={isChangingPassword}
+					required
+					minlength="6"
 				>
 			</div>
 			
@@ -166,12 +296,23 @@
 					type="password" 
 					bind:value={passwordData.confirm}
 					placeholder="Confirm new password"
+					disabled={isChangingPassword}
+					required
+					minlength="6"
 				>
 			</div>
 			
 			<div class="form-actions">
-				<button type="submit" class="btn btn-primary">Update Password</button>
+				<button type="submit" class="btn btn-primary" disabled={isChangingPassword}>
+					{isChangingPassword ? 'Updating...' : 'Update Password'}
+				</button>
 			</div>
+			
+			{#if passwordMessage}
+				<div class="message {passwordMessage.includes('successfully') ? 'success' : 'error'}" aria-live="polite">
+					{passwordMessage}
+				</div>
+			{/if}
 		</form>
 	</section>
 </div>
@@ -374,5 +515,36 @@
 	.btn-sm {
 		padding: 0.5rem 1rem;
 		font-size: 0.8rem;
+	}
+	
+	.message {
+		margin-top: 1rem;
+		padding: 0.75rem;
+		border-radius: 4px;
+		font-size: 0.9rem;
+	}
+	
+	.message.success {
+		background: #d4edda;
+		color: #155724;
+		border: 1px solid #c3e6cb;
+	}
+	
+	.message.error {
+		background: #f8d7da;
+		color: #721c24;
+		border: 1px solid #f5c6cb;
+	}
+	
+	.help-text {
+		font-size: 0.8rem;
+		color: #6c757d;
+		margin-top: 0.25rem;
+		display: block;
+	}
+	
+	.btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
 	}
 </style>

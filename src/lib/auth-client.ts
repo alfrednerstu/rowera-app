@@ -13,3 +13,5 @@ export const session = authClient.useSession();
 export const signIn = authClient.signIn;
 export const signUp = authClient.signUp;
 export const signOut = authClient.signOut;
+export const updateUser = authClient.updateUser;
+export const changePassword = authClient.changePassword;
