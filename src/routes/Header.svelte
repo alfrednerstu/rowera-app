@@ -119,6 +119,7 @@
 		</section>
 	</nav>
 </header>
+{/if}
 
 <Overlay isOpen={showProjectOverlay} onClose={closeProjectOverlay} title="Select Project">
 	{#snippet children()}
@@ -128,7 +129,6 @@
 		/>
 	{/snippet}
 </Overlay>
-{/if}
 
 <style>
 	header {
