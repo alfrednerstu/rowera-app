@@ -83,6 +83,7 @@
 			onclick={handleBackdropClick}
 			onkeydown={handleKeydown}
 			role="dialog"
+			tabindex="-1"
 			aria-modal="true"
 			aria-labelledby={title ? 'overlay-title' : undefined}
 		>
@@ -104,18 +105,13 @@
 			bind:this={overlayContent}
 			onkeydown={handleKeydown}
 			role="dialog"
+			tabindex="-1"
 			aria-modal="true"
 			aria-labelledby={title ? 'overlay-title' : undefined}
 		>
-			{#if title}
-				<header class="overlay-header">
-					<h2 id="overlay-title">{title}</h2>
-					<button class="close-button" onclick={onClose} aria-label="Close overlay">×</button>
-				</header>
-			{/if}
-			<div class="overlay-body">
+			
 				{@render children()}
-			</div>
+			
 		</div>
 	{/if}
 {/if}
@@ -127,7 +123,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background-color: rgba(0, 0, 0, 0.5);
+		background-color: var(--quint-color);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -136,9 +132,11 @@
 	}
 
 	.overlay-content {
-		background-color: var(--background-color, white);
-		border-radius: 0.5rem;
-		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+		background-color: var(--surface-color);
+		border: 1px solid var(--quad-color);
+		border-radius: .5rem;
+		box-shadow: 0 .5rem 1.5rem var(--tertiary-color);
+		padding: 1rem;
 		max-width: 32rem;
 		width: 90vw;
 		max-height: 80vh;

@@ -50,9 +50,7 @@
 					onclick={() => handleSelectProject(project)}
 				>
 					<div class="project-name">{project.name}</div>
-					<div class="project-date">
-						Updated {new Date(project.updatedAt).toLocaleDateString()}
-					</div>
+					<!--Updated {new Date(project.updatedAt).toLocaleDateString()} -->
 				</button>
 			{/each}
 			
@@ -66,7 +64,7 @@
 		
 		<div class="actions">
 			<button class="create-button" onclick={onCreateNew}>
-				+ Create New Project
+				Create new project
 			</button>
 		</div>
 	{/if}
@@ -94,11 +92,10 @@
 	}
 
 	.project-item {
+		background: var(--surface-color);
+		color: var(--primary-color);
 		width: 100%;
 		padding: 0.75rem;
-		border: 1px solid var(--border-color, #e5e5e5);
-		border-radius: 0.375rem;
-		background: var(--background-color, white);
 		cursor: pointer;
 		transition: all 0.2s ease;
 		margin-bottom: 0.5rem;
@@ -111,8 +108,9 @@
 	}
 
 	.project-item.active {
-		background: var(--accent-color-light, #f0f9ff);
-		border-color: var(--accent-color, #3b82f6);
+		background: unset;
+		color: var(--accent-color);
+		
 	}
 
 	.project-name {
@@ -136,24 +134,4 @@
 		margin-top: 0.5rem;
 	}
 
-	.actions {
-		border-top: 1px solid var(--border-color, #e5e5e5);
-		padding-top: 1rem;
-	}
-
-	.create-button {
-		width: 100%;
-		padding: 0.75rem;
-		background: var(--accent-color, #3b82f6);
-		color: white;
-		border: none;
-		border-radius: 0.375rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: background-color 0.2s ease;
-	}
-
-	.create-button:hover {
-		background: var(--accent-color-hover, #2563eb);
-	}
 </style>
