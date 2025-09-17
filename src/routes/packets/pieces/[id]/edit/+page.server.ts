@@ -3,10 +3,10 @@ import { piece, packet, project, preset, publication } from '$lib/server/db/sche
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
-export const load = async ({ params, locals }) => {
+export async function load({ params, parent }) {
+	const { user } = await parent()
 	
-	
-	if (!locals.session?.userId) {
+	if (!user?.id) {
 		throw redirect(302, '/login')
 	}
 	
@@ -25,7 +25,7 @@ export const load = async ({ params, locals }) => {
 	.where(
 		and(
 			eq(piece.id, params.id),
-			eq(project.userId, locals.session.userId)
+			eq(project.userId, user.id)
 		)
 	)
 	.limit(1)
@@ -42,7 +42,7 @@ export const load = async ({ params, locals }) => {
 	})
 	.from(packet)
 	.innerJoin(project, eq(packet.projectId, project.id))
-	.where(eq(project.userId, locals.session.userId))
+	.where(eq(project.userId, user.id))
 	
 	// Get user's presets (from packets)
 	const userPresets = await db.select({
@@ -53,7 +53,7 @@ export const load = async ({ params, locals }) => {
 	.from(preset)
 	.innerJoin(packet, eq(preset.packetId, packet.id))
 	.innerJoin(project, eq(packet.projectId, project.id))
-	.where(eq(project.userId, locals.session.userId))
+	.where(eq(project.userId, user.id))
 	
 	return {
 		piece: pieceQuery[0],

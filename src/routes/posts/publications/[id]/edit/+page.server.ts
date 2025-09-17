@@ -3,10 +3,10 @@ import { publication, project } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
-export const load = async ({ params, locals }) => {
+export async function load({ params, parent }) {
+	const { user } = await parent()
 	
-	
-	if (!locals.session?.user?.id) {
+	if (!user?.id) {
 		throw redirect(302, '/login')
 	}
 	
@@ -24,7 +24,7 @@ export const load = async ({ params, locals }) => {
 	.where(
 		and(
 			eq(publication.id, params.id),
-			eq(project.userId, locals.session.user.id)
+			eq(project.userId, user.id)
 		)
 	)
 	.limit(1)
@@ -34,7 +34,7 @@ export const load = async ({ params, locals }) => {
 	}
 	
 	// Get all user's projects for the select field
-	const userProjects = await db.select().from(project).where(eq(project.userId, locals.session.user.id))
+	const userProjects = await db.select().from(project).where(eq(project.userId, user.id))
 	
 	return {
 		publication: publication[0],

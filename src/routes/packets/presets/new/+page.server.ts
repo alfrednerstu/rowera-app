@@ -3,10 +3,10 @@ import { project, project } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
 import { eq } from 'drizzle-orm'
 
-export const load = async ({ locals }) => {
+export async function load({ parent }) {
+	const { user } = await parent()
 	
-	
-	if (!locals.session?.user?.id) {
+	if (!user?.id) {
 		throw redirect(302, '/login')
 	}
 	
@@ -18,7 +18,7 @@ export const load = async ({ locals }) => {
 	})
 	.from(project)
 	.innerJoin(project, eq(project.projectId, project.id))
-	.where(eq(project.userId, locals.session.user.id))
+	.where(eq(project.userId, user.id))
 	
 	return {
 		projects: userProjects
