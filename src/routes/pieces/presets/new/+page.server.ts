@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { project, project } from '$lib/server/db/schema'
+import { project } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
 import { eq } from 'drizzle-orm'
 
@@ -17,7 +17,6 @@ export async function load({ parent }) {
 		projectName: project.name
 	})
 	.from(project)
-	.innerJoin(project, eq(project.projectId, project.id))
 	.where(eq(project.userId, user.id))
 	
 	return {
