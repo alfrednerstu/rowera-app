@@ -35,26 +35,35 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 			)
 			.limit(1)
 		
-		if (!project.length) {
+		if (!projectResult.length) {
 			return json({ error: 'Project not found or access denied' }, { status: 404 })
 		}
 		
-		// Update the publication with ownership verification through original product
-		const [publication] = await db.update(publication)
+		// First verify ownership of the publication through its current project
+		const currentPublication = await db.select({ id: publication.id })
+			.from(publication)
+			.innerJoin(project, eq(publication.projectId, project.id))
+			.where(
+				and(
+					eq(publication.id, params.id),
+					eq(project.userId, locals.user.id)
+				)
+			)
+			.limit(1)
+		
+		if (!currentPublication.length) {
+			return json({ error: 'Publication not found or access denied' }, { status: 404 })
+		}
+		
+		// Update the publication
+		const updatedPublication = await db.update(publication)
 			.set({ 
 				name: name.trim(),
 				slug: slug.trim(),
 				projectId,
 				updatedAt: new Date()
 			})
-			.from(project)
-			.where(
-				and(
-					eq(publication.id, params.id),
-					eq(publication.projectId, project.id),
-					eq(project.userId, locals.user.id)
-				)
-			)
+			.where(eq(publication.id, params.id))
 			.returning({
 				id: publication.id,
 				name: publication.name,
@@ -64,11 +73,11 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 				updatedAt: publication.updatedAt
 			})
 		
-		if (!publication) {
+		if (!updatedPublication.length) {
 			return json({ error: 'Publication not found' }, { status: 404 })
 		}
 		
-		return json(publication)
+		return json(updatedPublication[0])
 	} catch (error) {
 		console.error('Error updating publication:', error)
 		return json({ error: 'Failed to update publication' }, { status: 500 })
@@ -98,7 +107,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		}
 		
 		// Delete the publication
-		const [publication] = await db.delete(publication)
+		const deletedPublication = await db.delete(publication)
 			.where(eq(publication.id, params.id))
 			.returning()
 		
