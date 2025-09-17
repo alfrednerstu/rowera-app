@@ -1,7 +1,23 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
 import { project, publication, packet } from '$lib/server/db/schema'
+import { eq } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
+
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) {
+		return json({ error: 'Unauthorized' }, { status: 401 })
+	}
+	
+	try {
+		const projects = await db.select().from(project).where(eq(project.userId, locals.user.id))
+		
+		return json({ projects })
+	} catch (error) {
+		console.error('Error fetching projects:', error)
+		return json({ error: 'Failed to fetch projects' }, { status: 500 })
+	}
+}
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) {
