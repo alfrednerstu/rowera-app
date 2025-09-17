@@ -2,8 +2,9 @@
 
 :root {
 	color-scheme: light dark;
-  	--primary-color: #305050;
-  	--secondary-color: #30505080;
+  --primary-color: #305050;
+	--primary-75-color: #30505075;
+  --secondary-color: #30505080;
 	--tertiary-color: #30505040;
 	--quad-color: #30505020;
 	--quint-color: #30505015;
@@ -23,7 +24,8 @@
 	:root {
 		color-scheme: light dark;
 		--primary-color: #fff;
-	  	--secondary-color: #ffffff80;
+		--primary-75-color: #ffffff75;
+	  --secondary-color: #ffffff80;
 		--tertiary-color: #ffffff40;
 		--quad-color: #ffffff20;
 		--quint-color: #ffffff10;

@@ -10,7 +10,7 @@ export interface Project {
 
 const defaultProject: Project = {
 	id: 'default',
-	name: 'Default Project',
+	name: 'Default project',
 	userId: '',
 	createdAt: new Date(),
 	updatedAt: new Date()

@@ -29,7 +29,7 @@
 	}
 
 	function openProjectSelector() {
-		showProjectOverlay = true
+		showProjectOverlay = !showProjectOverlay
 	}
 
 	function closeProjectOverlay() {
@@ -238,30 +238,37 @@
 		font-weight: 600;
 	}
 
+	nav > section:first-child {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
 	.project-selector {
-		background: var(--surface-color, #f5f5f5);
-		border: 1px solid var(--border-color, #e5e5e5);
-		border-radius: 0.375rem;
-		padding: 0.5rem 0.75rem;
+		background: var(--base-color);
+		color: var(--primary-color);
+		border: 1px solid var(--quad-color);
+		padding: .125em .5em;
+		border-radius: .25em;
+		font-size: .875rem;
 		margin-left: 1rem;
-		font-size: 0.875rem;
 		font-weight: 500;
 		cursor: pointer;
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		transition: all 0.2s ease;
+		align-items: flex-end;
+		gap: .5rem;
+		transition: all .2s ease;
+		text-transform: unset;
 	}
 
 	.project-selector:hover {
-		background: var(--surface-color-hover, #e5e5e5);
-		border-color: var(--border-color-hover, #d5d5d5);
+		background: var(--surface-color);
 	}
 
 	.chevron {
-		font-size: 0.75rem;
-		opacity: 0.7;
-		transition: transform 0.2s ease;
+		font-size: .5rem;
+		opacity: .75;
+		transition: transform .2s ease;
 	}
 
 	.project-selector:hover .chevron {
