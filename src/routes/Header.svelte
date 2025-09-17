@@ -1,8 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { session, signOut, authClient } from '$lib/auth-client'
+	import { activeProject, type Project } from '$lib/stores/active-project'
+	import Overlay from '$lib/components/Overlay.svelte'
+	import ProjectSelector from '$lib/components/ProjectSelector.svelte'
 
 	let isAdmin = $state(false)
+	let showProjectOverlay = $state(false)
 
 	$effect(async () => {
 		const uid = $session.data?.user?.id
@@ -22,6 +26,24 @@
 	async function handleLogout() {
 		await signOut()
 	}
+
+	function openProjectSelector() {
+		showProjectOverlay = true
+	}
+
+	function closeProjectOverlay() {
+		showProjectOverlay = false
+	}
+
+	function handleSelectProject(project: Project) {
+		closeProjectOverlay()
+	}
+
+	function handleCreateNew() {
+		closeProjectOverlay()
+		// Navigate to create new project page
+		window.location.href = '/projects/new'
+	}
 </script>
 
 {#if $session.data?.user}
@@ -29,6 +51,10 @@
 	<nav>
 		<section>
 			<h1><a href='/'>Rowera</a></h1>
+			<button class="project-selector" onclick={openProjectSelector}>
+				{$activeProject.name}
+				<span class="chevron">▼</span>
+			</button>
 		</section>
 		
 		<section>
@@ -93,6 +119,15 @@
 		</section>
 	</nav>
 </header>
+
+<Overlay isOpen={showProjectOverlay} onClose={closeProjectOverlay} title="Select Project">
+	{#snippet children()}
+		<ProjectSelector 
+			onSelectProject={handleSelectProject}
+			onCreateNew={handleCreateNew}
+		/>
+	{/snippet}
+</Overlay>
 {/if}
 
 <style>
@@ -197,5 +232,35 @@
 	li[aria-current='page'] a {
 		color: var(--accent-color);
 		font-weight: 600;
+	}
+
+	.project-selector {
+		background: var(--surface-color, #f5f5f5);
+		border: 1px solid var(--border-color, #e5e5e5);
+		border-radius: 0.375rem;
+		padding: 0.5rem 0.75rem;
+		margin-left: 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		transition: all 0.2s ease;
+	}
+
+	.project-selector:hover {
+		background: var(--surface-color-hover, #e5e5e5);
+		border-color: var(--border-color-hover, #d5d5d5);
+	}
+
+	.chevron {
+		font-size: 0.75rem;
+		opacity: 0.7;
+		transition: transform 0.2s ease;
+	}
+
+	.project-selector:hover .chevron {
+		opacity: 1;
 	}
 </style>
