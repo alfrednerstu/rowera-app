@@ -7,6 +7,7 @@
 
 	let isAdmin = $state(false)
 	let showProjectOverlay = $state(false)
+	let projectButton: HTMLButtonElement
 
 	$effect(async () => {
 		const uid = $session.data?.user?.id
@@ -51,7 +52,7 @@
 	<nav>
 		<section>
 			<h1><a href='/'>Rowera</a></h1>
-			<button class="project-selector" onclick={openProjectSelector}>
+			<button class="project-selector" bind:this={projectButton} onclick={openProjectSelector}>
 				{$activeProject.name}
 				<span class="chevron">▼</span>
 			</button>
@@ -121,7 +122,13 @@
 </header>
 {/if}
 
-<Overlay isOpen={showProjectOverlay} onClose={closeProjectOverlay} title="Select Project">
+<Overlay 
+	isOpen={showProjectOverlay} 
+	onClose={closeProjectOverlay} 
+	title="Select Project"
+	showBackdrop={false}
+	anchorElement={projectButton}
+>
 	{#snippet children()}
 		<ProjectSelector 
 			onSelectProject={handleSelectProject}
