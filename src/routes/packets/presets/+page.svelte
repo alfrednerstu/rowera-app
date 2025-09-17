@@ -3,6 +3,12 @@
 	import PacketsNavigation from '$lib/components/PacketsNavigation.svelte'
 	
 	let { data } = $props()
+	let presets = $state(data.presets)
+	
+	// Update presets when data changes
+	$effect(() => {
+		presets = data.presets
+	})
 	
 	// Presets table configuration
 	const presetColumns = [
@@ -23,7 +29,8 @@
 				})
 				
 				if (response.ok) {
-					window.location.reload()
+					// Remove from local state without page reload
+					presets = presets.filter(p => p.id !== preset.id)
 				} else {
 					console.error('Failed to delete preset')
 				}
@@ -42,7 +49,7 @@
 <PacketsNavigation activeRoute="/packets/presets" />
 
 <CrudTable 
-	items={data.presets}
+	items={presets}
 	columns={presetColumns}
 	title="Presets"
 	createUrl="/packets/presets/new"

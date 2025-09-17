@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import { session, signOut, authClient } from '$lib/auth-client'
 	import { activeProject, type Project } from '$lib/stores/active-project'
 	import Overlay from '$lib/components/Overlay.svelte'
@@ -43,7 +44,7 @@
 	function handleCreateNew() {
 		closeProjectOverlay()
 		// Navigate to create new project page
-		window.location.href = '/projects/new'
+		goto('/projects/new')
 	}
 </script>
 

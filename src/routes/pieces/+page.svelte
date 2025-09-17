@@ -5,6 +5,18 @@
 	let { data } = $props()
 	let activeTab = $state('pieces')
 	
+	// Reactive state for each tab's data
+	let packets = $state(data.packets)
+	let pieces = $state(data.pieces)
+	let presets = $state(data.presets)
+	
+	// Update data when props change
+	$effect(() => {
+		packets = data.packets
+		pieces = data.pieces
+		presets = data.presets
+	})
+	
 	// Packets table configuration
 	const packetColumns = [
 		{ key: 'name', header: 'Packet Name' },
@@ -49,7 +61,8 @@
 				})
 				
 				if (response.ok) {
-					window.location.reload()
+					// Remove from local state without page reload
+					packets = packets.filter(p => p.id !== packet.id)
 				} else {
 					console.error('Failed to delete packet')
 				}
@@ -67,7 +80,8 @@
 				})
 				
 				if (response.ok) {
-					window.location.reload()
+					// Remove from local state without page reload
+					pieces = pieces.filter(p => p.id !== piece.id)
 				} else {
 					console.error('Failed to delete piece')
 				}
@@ -85,7 +99,8 @@
 				})
 				
 				if (response.ok) {
-					window.location.reload()
+					// Remove from local state without page reload
+					presets = presets.filter(p => p.id !== preset.id)
 				} else {
 					console.error('Failed to delete preset')
 				}
@@ -128,7 +143,7 @@
 
 {#if activeTab === 'packets'}
 	<CrudTable 
-		items={data.packets}
+		items={packets}
 		columns={packetColumns}
 		title="Packets"
 		createUrl="/pieces/packets/new"
@@ -137,7 +152,7 @@
 	/>
 {:else if activeTab === 'pieces'}
 	<CrudTable 
-		items={data.pieces}
+		items={pieces}
 		columns={pieceColumns}
 		title="Pieces"
 		createUrl="/pieces/new"
@@ -146,7 +161,7 @@
 	/>
 {:else if activeTab === 'presets'}
 	<CrudTable 
-		items={data.presets}
+		items={presets}
 		columns={presetColumns}
 		title="Presets"
 		createUrl="/pieces/presets/new"

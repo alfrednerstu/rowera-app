@@ -5,6 +5,18 @@
 	let { data } = $props()
 	let activeTab = $state('posts')
 	
+	// Reactive state for each tab's data
+	let publications = $state(data.publications)
+	let posts = $state(data.posts)
+	let presets = $state(data.presets)
+	
+	// Update data when props change
+	$effect(() => {
+		publications = data.publications
+		posts = data.posts
+		presets = data.presets
+	})
+	
 	// Publications table configuration
 	const publicationColumns = [
 		{ key: 'name', header: 'Publication Name' },
@@ -49,7 +61,8 @@
 				})
 				
 				if (response.ok) {
-					window.location.reload()
+					// Remove from local state without page reload
+					publications = publications.filter(p => p.id !== publication.id)
 				} else {
 					console.error('Failed to delete publication')
 				}
@@ -67,7 +80,8 @@
 				})
 				
 				if (response.ok) {
-					window.location.reload()
+					// Remove from local state without page reload
+					posts = posts.filter(p => p.id !== post.id)
 				} else {
 					console.error('Failed to delete post')
 				}
@@ -85,7 +99,8 @@
 				})
 				
 				if (response.ok) {
-					window.location.reload()
+					// Remove from local state without page reload
+					presets = presets.filter(p => p.id !== preset.id)
 				} else {
 					console.error('Failed to delete preset')
 				}
@@ -128,7 +143,7 @@
 
 {#if activeTab === 'publications'}
 	<CrudTable 
-		items={data.publications}
+		items={publications}
 		columns={publicationColumns}
 		title="Publications"
 		createUrl="/posts/publications/new"
@@ -137,7 +152,7 @@
 	/>
 {:else if activeTab === 'posts'}
 	<CrudTable 
-		items={data.posts}
+		items={posts}
 		columns={postColumns}
 		title="Posts"
 		createUrl="/posts/new"
@@ -146,7 +161,7 @@
 	/>
 {:else if activeTab === 'presets'}
 	<CrudTable 
-		items={data.presets}
+		items={presets}
 		columns={presetColumns}
 		title="Presets"
 		createUrl="/posts/presets/new"

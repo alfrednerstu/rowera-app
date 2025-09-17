@@ -2,6 +2,12 @@
 	import CrudTable from '$lib/components/CrudTable.svelte'
 	
 	let { data } = $props()
+	let partials = $state(data.partials)
+	
+	// Update partials when data changes
+	$effect(() => {
+		partials = data.partials
+	})
 	
 	const columns = [
 		{ key: 'name', header: 'Partial Name' },
@@ -20,8 +26,8 @@
 				})
 				
 				if (response.ok) {
-					// Reload the page to refresh the partials list
-					window.location.reload()
+					// Remove from local state without page reload
+					partials = partials.filter(p => p.id !== partial.id)
 				} else {
 					console.error('Failed to delete partial')
 				}
@@ -38,7 +44,7 @@
 </svelte:head>
 
 <CrudTable 
-	items={data.partials}
+	items={partials}
 	{columns}
 	title="Partials"
 	createUrl="/partials/new"
