@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { project, project } from '$lib/server/db/schema'
+import { project, packet } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
 import { eq } from 'drizzle-orm'
 

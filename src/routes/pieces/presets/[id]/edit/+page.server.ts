@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { preset, project, project } from '$lib/server/db/schema'
+import { preset, project, publication } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
