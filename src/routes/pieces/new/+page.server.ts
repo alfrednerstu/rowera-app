@@ -3,8 +3,10 @@ import { project, packet, preset } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
 import { eq } from 'drizzle-orm'
 
-export const load = async ({ locals }) => {
-	if (!locals.session?.user?.id) {
+export async function load({ parent }) {
+	const { user } = await parent()
+
+	if (!user?.id) {
 		throw redirect(302, '/login')
 	}
 	
@@ -16,7 +18,7 @@ export const load = async ({ locals }) => {
 	})
 	.from(packet)
 	.innerJoin(project, eq(packet.projectId, project.id))
-	.where(eq(project.userId, locals.session.user.id))
+	.where(eq(project.userId, user.id))
 	
 	// Get user's presets (from their packets)
 	const userPresets = await db.select({
@@ -27,7 +29,7 @@ export const load = async ({ locals }) => {
 	.from(preset)
 	.innerJoin(packet, eq(preset.packetId, packet.id))
 	.innerJoin(project, eq(packet.projectId, project.id))
-	.where(eq(project.userId, locals.session.user.id))
+	.where(eq(project.userId, user.id))
 	
 	return {
 		packets: userPackets,

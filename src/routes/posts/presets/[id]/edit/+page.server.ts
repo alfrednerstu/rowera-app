@@ -3,10 +3,10 @@ import { preset, publication, project } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
-export const load = async ({ params, locals }) => {
+export async function load({ params, parent }) {
+	const { user } = await parent()
 	
-	
-	if (!locals.session?.user?.id) {
+	if (!user?.id) {
 		throw redirect(302, '/login')
 	}
 	
@@ -24,7 +24,7 @@ export const load = async ({ params, locals }) => {
 	.where(
 		and(
 			eq(preset.id, params.id),
-			eq(project.userId, locals.session.user.id)
+			eq(project.userId, user.id)
 		)
 	)
 	.limit(1)
@@ -41,7 +41,7 @@ export const load = async ({ params, locals }) => {
 	})
 	.from(publication)
 	.innerJoin(project, eq(publication.projectId, project.id))
-	.where(eq(project.userId, locals.session.user.id))
+	.where(eq(project.userId, user.id))
 	
 	return {
 		preset: preset[0],

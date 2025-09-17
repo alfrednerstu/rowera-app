@@ -3,10 +3,10 @@ import { packet, project } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
-export const load = async ({ params, locals }) => {
+export async function load({ params, parent }) {
+	const { user } = await parent()
 	
-	
-	if (!locals.session?.userId) {
+	if (!user?.id) {
 		throw redirect(302, '/login')
 	}
 	
@@ -23,7 +23,7 @@ export const load = async ({ params, locals }) => {
 	.where(
 		and(
 			eq(packet.id, params.id),
-			eq(project.userId, locals.session.userId)
+			eq(project.userId, user.id)
 		)
 	)
 	.limit(1)
@@ -33,7 +33,7 @@ export const load = async ({ params, locals }) => {
 	}
 	
 	// Get user's projects for the form
-	const userProjects = await db.select().from(project).where(eq(project.userId, locals.session.userId))
+	const userProjects = await db.select().from(project).where(eq(project.userId, user.id))
 	
 	return {
 		packet: packetQuery[0],
