@@ -44,7 +44,7 @@
 			})
 			
 			if (response.ok) {
-				goto('/packets')
+				goto('/packets/pieces')
 			} else {
 				console.error('Failed to create piece')
 			}
@@ -58,6 +58,6 @@
 	title="Create Piece"
 	{fields}
 	submitLabel="Create Piece"
-	cancelUrl="/packets"
+	cancelUrl="/packets/pieces"
 	onSubmit={handleSubmit}
 />

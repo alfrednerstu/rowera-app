@@ -33,7 +33,7 @@
 			})
 			
 			if (response.ok) {
-				goto('/packets')
+				goto('/packets/presets')
 			} else {
 				console.error('Failed to create preset')
 			}
@@ -47,6 +47,6 @@
 	title="Create Packet Preset"
 	{fields}
 	submitLabel="Create Preset"
-	cancelUrl="/packets"
+	cancelUrl="/packets/presets"
 	onSubmit={handleSubmit}
 />
