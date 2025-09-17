@@ -5,7 +5,7 @@ import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.session?.user?.id) {
+	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			.where(
 				and(
 					eq(project.id, projectId),
-					eq(project.userId, locals.session.userId)
+					eq(project.userId, locals.user.id)
 				)
 			)
 			.limit(1)

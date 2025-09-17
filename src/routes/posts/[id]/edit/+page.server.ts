@@ -6,7 +6,7 @@ import { eq, and } from 'drizzle-orm'
 export const load = async ({ params, locals }) => {
 	
 	
-	if (!locals.session?.user?.id) {
+	if (!locals.user?.id) {
 		throw redirect(302, '/login')
 	}
 	
@@ -27,7 +27,7 @@ export const load = async ({ params, locals }) => {
 	.where(
 		and(
 			eq(post.id, params.id),
-			eq(project.userId, locals.session.user.id)
+			eq(project.userId, locals.user.id)
 		)
 	)
 	.limit(1)
@@ -44,7 +44,7 @@ export const load = async ({ params, locals }) => {
 	})
 	.from(publication)
 	.innerJoin(project, eq(publication.projectId, project.id))
-	.where(eq(project.userId, locals.session.user.id))
+	.where(eq(project.userId, locals.user.id))
 	
 	// Get all presets that belong to user's publications
 	const userPresets = await db.select({
@@ -55,7 +55,7 @@ export const load = async ({ params, locals }) => {
 	.from(preset)
 	.innerJoin(publication, eq(preset.publicationId, publication.id))
 	.innerJoin(project, eq(publication.projectId, project.id))
-	.where(eq(project.userId, locals.session.user.id))
+	.where(eq(project.userId, locals.user.id))
 	
 	return {
 		post: post[0],
