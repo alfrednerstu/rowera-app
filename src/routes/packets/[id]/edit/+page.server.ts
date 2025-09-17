@@ -6,7 +6,7 @@ import { eq, and } from 'drizzle-orm'
 export const load = async ({ params, locals }) => {
 	
 	
-	if (!locals.session?.userId) {
+	if (!locals.session?.user?.id) {
 		throw redirect(302, '/login')
 	}
 	
@@ -23,7 +23,7 @@ export const load = async ({ params, locals }) => {
 	.where(
 		and(
 			eq(packet.id, params.id),
-			eq(project.userId, locals.session.userId)
+			eq(project.userId, locals.session.user.id)
 		)
 	)
 	.limit(1)
@@ -33,7 +33,7 @@ export const load = async ({ params, locals }) => {
 	}
 	
 	// Get user's projects for the form
-	const userProjects = await db.select().from(project).where(eq(project.userId, locals.session.userId))
+	const userProjects = await db.select().from(project).where(eq(project.userId, locals.session.user.id))
 	
 	return {
 		packet: packetQuery[0],
