@@ -3,6 +3,12 @@
 	import PacketsNavigation from '$lib/components/PacketsNavigation.svelte'
 	
 	let { data } = $props()
+	let packets = $state(data.packets)
+	
+	// Update packets when data changes
+	$effect(() => {
+		packets = data.packets
+	})
 	
 	// Packets table configuration
 	const packetColumns = [
@@ -25,7 +31,8 @@
 				})
 				
 				if (response.ok) {
-					window.location.reload()
+					// Remove from local state without page reload
+					packets = packets.filter(p => p.id !== packet.id)
 				} else {
 					console.error('Failed to delete packet')
 				}
@@ -44,7 +51,7 @@
 <PacketsNavigation activeRoute="/packets" />
 
 <CrudTable 
-	items={data.packets}
+	items={packets}
 	columns={packetColumns}
 	title="Packets"
 	createUrl="/packets/new"

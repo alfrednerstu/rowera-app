@@ -3,6 +3,12 @@
 	
 	let { data } = $props()
 	// If we reach this page, user is already confirmed as admin by the page loader
+	let primitives = $state(data.primitives)
+	
+	// Update primitives when data changes
+	$effect(() => {
+		primitives = data.primitives
+	})
 	
 	const columns = [
 		{ key: 'name', header: 'Primitive Name' },
@@ -27,7 +33,8 @@
 				})
 				
 				if (response.ok) {
-					window.location.reload()
+					// Remove from local state without page reload
+					primitives = primitives.filter(p => p.id !== primitive.id)
 				} else {
 					const error = await response.json()
 					alert(error.error || 'Failed to delete primitive')
@@ -46,7 +53,7 @@
 </svelte:head>
 
 <CrudTable 
-	items={data.primitives}
+	items={primitives}
 	{columns}
 	title="Primitives"
 	createLabel="New Primitive"

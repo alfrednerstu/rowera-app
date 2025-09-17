@@ -2,6 +2,12 @@
 	import CrudTable from '$lib/components/CrudTable.svelte'
 	
 	let { data } = $props()
+	let pages = $state(data.pages)
+	
+	// Update pages when data changes
+	$effect(() => {
+		pages = data.pages
+	})
 	
 	const columns = [
 		{ key: 'name', header: 'Page Name' },
@@ -22,8 +28,8 @@
 				})
 				
 				if (response.ok) {
-					// Reload the page to refresh the pages list
-					window.location.reload()
+					// Remove from local state without page reload
+					pages = pages.filter(p => p.id !== page.id)
 				} else {
 					console.error('Failed to delete page')
 				}
@@ -40,7 +46,7 @@
 </svelte:head>
 
 <CrudTable 
-	items={data.pages}
+	items={pages}
 	{columns}
 	title="Pages"
 	createUrl="/pages/new"
