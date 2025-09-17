@@ -45,7 +45,7 @@
 	let setupLoading = $state(false)
 	let setupMessage = $state('')
 
-	async function saveProfile(event: Event) {
+	async function saveProfile(event) {
 		event.preventDefault()
 		isSaving = true
 		saveMessage = ''
@@ -85,7 +85,7 @@
 		saveMessage = ''
 	}
 
-	async function changeUserPassword(event: Event) {
+	async function changeUserPassword(event) {
 		event.preventDefault()
 		isChangingPassword = true
 		passwordMessage = ''
