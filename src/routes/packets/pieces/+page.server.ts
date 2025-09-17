@@ -1,14 +1,22 @@
 import { db } from '$lib/server/db'
 import { project, packet, piece, preset } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
-export async function load({ parent }) {
+export async function load({ parent, cookies }) {
   const { user } = await parent()
 
   if (!user?.id) {
     throw redirect(302, '/login')
   }
+
+  const activeProjectId = cookies.get('activeProjectId')
+
+  // Build base conditions
+  const userCondition = eq(project.userId, user.id)
+  const projectCondition = activeProjectId && activeProjectId !== 'default' 
+    ? and(userCondition, eq(project.id, activeProjectId))
+    : userCondition
 
   // Pieces with packet and preset information
   const userPieces = await db
@@ -27,7 +35,7 @@ export async function load({ parent }) {
     .innerJoin(packet, eq(piece.packetId, packet.id))
     .innerJoin(project, eq(packet.projectId, project.id))
     .innerJoin(preset, eq(piece.presetId, preset.id))
-    .where(eq(project.userId, user.id))
+    .where(projectCondition)
 
   return {
     pieces: userPieces
