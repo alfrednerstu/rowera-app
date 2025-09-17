@@ -17,12 +17,12 @@ async function isUserAdmin(userId: string): Promise<boolean> {
 }
 
 export const GET: RequestHandler = async ({ locals }) => {
-	if (!locals.session?.user?.id) {
+	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
 	// Only admins can access the primitive admin interface
-	const userIsAdmin = await isUserAdmin(locals.session.user.id)
+	const userIsAdmin = await isUserAdmin(locals.user.id)
 	if (!userIsAdmin) {
 		return json({ error: 'Admin access required' }, { status: 403 })
 	}
@@ -37,12 +37,12 @@ export const GET: RequestHandler = async ({ locals }) => {
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.session?.user?.id) {
+	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
 	// Only admins can create primitive
-	const userIsAdmin = await isUserAdmin(locals.session.user.id)
+	const userIsAdmin = await isUserAdmin(locals.user.id)
 	if (!userIsAdmin) {
 		return json({ error: 'Admin access required' }, { status: 403 })
 	}

@@ -6,14 +6,14 @@ import { eq, and } from 'drizzle-orm'
 export const load = async ({ params, locals }) => {
 	
 	
-	if (!locals.session?.user?.id) {
+	if (!locals.user?.id) {
 		throw redirect(302, '/login')
 	}
 	
 	const partial = await db.select().from(partial).where(
 		and(
 			eq(partial.id, params.id),
-			eq(partial.userId, locals.session.user.id)
+			eq(partial.userId, locals.user.id)
 		)
 	).limit(1)
 	

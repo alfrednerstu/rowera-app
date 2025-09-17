@@ -1,16 +1,24 @@
 import { db } from '$lib/server/db'
 import { publication, post, preset, project } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
-export async function load({ parent }) {
+export async function load({ parent, cookies }) {
   const { user } = await parent()
 
   if (!user?.id) {
     throw redirect(302, '/login')
   }
 
-  // Publications belonging to the user's projects
+  const activeProjectId = cookies.get('activeProjectId')
+
+  // Build base conditions
+  const userCondition = eq(project.userId, user.id)
+  const projectCondition = activeProjectId && activeProjectId !== 'default' 
+    ? and(userCondition, eq(project.id, activeProjectId))
+    : userCondition
+
+  // Publications belonging to the user's projects (filtered by active project if specified)
   const userPublications = await db
     .select({
       id: publication.id,
@@ -23,7 +31,7 @@ export async function load({ parent }) {
     })
     .from(publication)
     .innerJoin(project, eq(publication.projectId, project.id))
-    .where(eq(project.userId, user.id))
+    .where(projectCondition)
 
   // Posts with publication and preset information
   const userPosts = await db
@@ -42,7 +50,7 @@ export async function load({ parent }) {
     .innerJoin(publication, eq(post.publicationId, publication.id))
     .innerJoin(project, eq(publication.projectId, project.id))
     .innerJoin(preset, eq(post.presetId, preset.id))
-    .where(eq(project.userId, user.id))
+    .where(projectCondition)
 
   // Presets that belong to user's publications
   const userPresets = await db
@@ -57,7 +65,7 @@ export async function load({ parent }) {
     .from(preset)
     .innerJoin(publication, eq(preset.publicationId, publication.id))
     .innerJoin(project, eq(publication.projectId, project.id))
-    .where(eq(project.userId, user.id))
+    .where(projectCondition)
 
   // User's projects for forms
   const userProjects = await db
