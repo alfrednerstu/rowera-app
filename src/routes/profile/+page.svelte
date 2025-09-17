@@ -247,6 +247,9 @@
 			<button onclick={setupDefaults} disabled={setupLoading}>
 				{setupLoading ? 'Setting up…' : 'Setup defaults'}
 			</button>
+			<button onclick={handleLogout}>
+				Sign out
+			</button>
 			{#if setupMessage}
 				<p aria-live="polite">{setupMessage}</p>
 			{/if}
