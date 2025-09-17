@@ -5,7 +5,7 @@ import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
 export const PUT: RequestHandler = async ({ request, params, locals }) => {
-	if (!locals.session?.user?.id) {
+	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
@@ -30,7 +30,7 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 			.where(
 				and(
 					eq(project.id, projectId),
-					eq(project.userId, locals.session.user.id)
+					eq(project.userId, locals.user.id)
 				)
 			)
 			.limit(1)
@@ -52,7 +52,7 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 				and(
 					eq(publication.id, params.id),
 					eq(publication.projectId, project.id),
-					eq(project.userId, locals.session.user.id)
+					eq(project.userId, locals.user.id)
 				)
 			)
 			.returning({
@@ -76,7 +76,7 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 }
 
 export const DELETE: RequestHandler = async ({ params, locals }) => {
-	if (!locals.session?.user?.id) {
+	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
@@ -88,7 +88,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 			.where(
 				and(
 					eq(publication.id, params.id),
-					eq(project.userId, locals.session.user.id)
+					eq(project.userId, locals.user.id)
 				)
 			)
 			.limit(1)

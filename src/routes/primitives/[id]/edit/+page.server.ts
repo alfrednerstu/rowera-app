@@ -19,12 +19,12 @@ async function isUserAdmin(userId: string): Promise<boolean> {
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	// Check if user is authenticated
-	if (!locals.session?.user?.id) {
+	if (!locals.user?.id) {
 		throw redirect(302, '/login')
 	}
 	
 	// Only admins can access the primitive admin interface
-	const userIsAdmin = await isUserAdmin(locals.session.user.id)
+	const userIsAdmin = await isUserAdmin(locals.user.id)
 	if (!userIsAdmin) {
 		throw error(403, 'Admin access required')
 	}
