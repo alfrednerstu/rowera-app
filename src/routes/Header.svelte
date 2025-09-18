@@ -77,6 +77,7 @@
 					<li aria-current={page.url.pathname === '/primitives' ? 'page' : undefined}>
 						<a href="/primitives">Primitives</a>
 					</li>
+				{/if}
 				</ul>
 			</section>
 

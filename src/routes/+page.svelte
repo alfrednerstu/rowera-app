@@ -86,4 +86,8 @@
 			display: inline;
 			text-transform: capitalize;
 		}
+
+		h1 {
+			margin-bottom: 1em;
+		}
 	</style>
