@@ -19,7 +19,7 @@
 			required: true,
 			options: data.packets.map(packet => ({
 				value: packet.id,
-				label: `${packet.name} (${packet.projectName})`
+				label: packet.name
 			}))
 		}
 	]
@@ -33,7 +33,7 @@
 			})
 			
 			if (response.ok) {
-				goto('/pieces')
+				goto('/packets/pieces')
 			} else {
 				console.error('Failed to update preset')
 			}
@@ -48,6 +48,6 @@
 	{fields}
 	item={data.preset}
 	submitLabel="Update Preset"
-	cancelUrl="/pieces"
+	cancelUrl="/packets/pieces"
 	onSubmit={handleSubmit}
 />

@@ -1,26 +1,29 @@
 import { db } from '$lib/server/db'
-import { preset, project, publication } from '$lib/server/db/schema'
+import { preset, project, packet } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
-export async function load({ params, parent }) {
+export async function load({ params, parent, cookies }) {
 	const { user } = await parent()
 	
 	if (!user?.id) {
 		throw redirect(302, '/login')
 	}
 	
+	// Get active project from cookie
+	const activeProjectId = cookies.get('activeProjectId')
+	
 	// Get the preset with ownership verification
-	const preset = await db.select({
+	const presetResult = await db.select({
 		id: preset.id,
 		name: preset.name,
-		projectId: preset.projectId,
+		packetId: preset.packetId,
 		createdAt: preset.createdAt,
 		updatedAt: preset.updatedAt
 	})
 	.from(preset)
-	.innerJoin(project, eq(preset.projectId, project.id))
-	.innerJoin(project, eq(project.projectId, project.id))
+	.innerJoin(packet, eq(preset.packetId, packet.id))
+	.innerJoin(project, eq(packet.projectId, project.id))
 	.where(
 		and(
 			eq(preset.id, params.id),
@@ -29,22 +32,26 @@ export async function load({ params, parent }) {
 	)
 	.limit(1)
 	
-	if (!preset.length) {
+	if (!presetResult.length) {
 		throw error(404, 'Preset not found')
 	}
 	
-	// Get user's projects for the form
-	const userProjects = await db.select({
-		id: project.id,
-		name: project.name,
+	// Get packets for the active project only
+	const userPackets = await db.select({
+		id: packet.id,
+		name: packet.name,
 		projectName: project.name
 	})
-	.from(project)
-	.innerJoin(project, eq(project.projectId, project.id))
-	.where(eq(project.userId, user.id))
+	.from(packet)
+	.innerJoin(project, eq(packet.projectId, project.id))
+	.where(
+		activeProjectId 
+			? eq(packet.projectId, activeProjectId)
+			: eq(project.userId, user.id)
+	)
 	
 	return {
-		preset: preset[0],
-		projects: userProjects
+		preset: presetResult[0],
+		packets: userPackets
 	}
 }

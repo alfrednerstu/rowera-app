@@ -3,24 +3,31 @@ import { project, packet } from '$lib/server/db/schema'
 import { redirect } from '@sveltejs/kit'
 import { eq } from 'drizzle-orm'
 
-export async function load({ parent }) {
+export async function load({ parent, cookies }) {
 	const { user } = await parent()
 	
 	if (!user?.id) {
 		throw redirect(302, '/login')
 	}
 	
-	// Get user's projects for the form
-	const userProjects = await db.select({
-		id: project.id,
-		name: project.name,
+	// Get active project from cookie
+	const activeProjectId = cookies.get('activeProjectId')
+	
+	// Get packets for the active project only
+	const userPackets = await db.select({
+		id: packet.id,
+		name: packet.name,
 		projectName: project.name
 	})
-	.from(project)
-	.innerJoin(project, eq(project.projectId, project.id))
-	.where(eq(project.userId, user.id))
+	.from(packet)
+	.innerJoin(project, eq(packet.projectId, project.id))
+	.where(
+		activeProjectId 
+			? eq(packet.projectId, activeProjectId)
+			: eq(project.userId, user.id)
+	)
 	
 	return {
-		projects: userProjects
+		packets: userPackets
 	}
 }
