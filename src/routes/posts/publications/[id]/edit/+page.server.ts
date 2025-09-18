@@ -33,11 +33,7 @@ export async function load({ params, parent }) {
 		throw error(404, 'Publication not found')
 	}
 	
-	// Get all user's projects for the select field
-	const userProjects = await db.select().from(project).where(eq(project.userId, user.id))
-	
 	return {
-		publication: publicationResult[0],
-		projects: userProjects
+		publication: publicationResult[0]
 	}
 }
