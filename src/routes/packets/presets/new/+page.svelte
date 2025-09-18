@@ -19,7 +19,7 @@
 			required: true,
 			options: data.packets.map(packet => ({
 				value: packet.id,
-				label: `${packet.name} (${packet.projectName})`
+				label: packet.name
 			}))
 		}
 	]

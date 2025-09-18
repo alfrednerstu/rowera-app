@@ -19,7 +19,7 @@
 			required: true,
 			options: data.packets.map(packet => ({
 				value: packet.id,
-				label: `${packet.name} (${packet.projectName})`
+				label: packet.name
 			}))
 		}
 	]
@@ -33,7 +33,7 @@
 			})
 			
 			if (response.ok) {
-				goto('/pieces')
+				goto('/packets/pieces')
 			} else {
 				console.error('Failed to create preset')
 			}
@@ -47,6 +47,6 @@
 	title="Create Packet Preset"
 	{fields}
 	submitLabel="Create Preset"
-	cancelUrl="/pieces"
+	cancelUrl="/packets/pieces"
 	onSubmit={handleSubmit}
 />

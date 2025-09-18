@@ -18,25 +18,21 @@
 			type: 'text',
 			placeholder: 'publication-url-slug',
 			required: true
-		},
-		{
-			name: 'projectId',
-			label: 'Project',
-			type: 'select',
-			required: true,
-			options: data.projects.map(project => ({
-				value: project.id,
-				label: project.name
-			}))
 		}
 	]
 	
 	async function handleSubmit(formData) {
 		try {
+			// Add the active project ID to the form data
+			const formDataWithProject = {
+				...formData,
+				projectId: data.activeProject?.id
+			}
+			
 			const response = await fetch('/api/publications', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(formData)
+				body: JSON.stringify(formDataWithProject)
 			})
 			
 			if (response.ok) {
