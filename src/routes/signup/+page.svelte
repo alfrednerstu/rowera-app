@@ -5,18 +5,12 @@
 	let username = ''
 	let email = ''
 	let password = ''
-	let confirmPassword = ''
 	let error = ''
 	let loading = false
 
 	async function handleSignup() {
-		if (!username || !email || !password || !confirmPassword) {
+		if (!username || !email || !password) {
 			error = 'Please fill in all fields'
-			return
-		}
-
-		if (password !== confirmPassword) {
-			error = 'Passwords do not match'
 			return
 		}
 
@@ -50,10 +44,10 @@
 
 <main>
 	<h1>Sign Up</h1>
-	
+
 	<form onsubmit={handleSignup}>
 		<div>
-			<label for="username">Username:</label>
+			<label for="username">Username</label>
 			<input
 				id="username"
 				type="text"
@@ -62,9 +56,9 @@
 				disabled={loading}
 			/>
 		</div>
-		
+
 		<div>
-			<label for="email">Email:</label>
+			<label for="email">Email</label>
 			<input
 				id="email"
 				type="email"
@@ -73,9 +67,9 @@
 				disabled={loading}
 			/>
 		</div>
-		
+
 		<div>
-			<label for="password">Password:</label>
+			<label for="password">Password</label>
 			<input
 				id="password"
 				type="password"
@@ -84,28 +78,42 @@
 				disabled={loading}
 			/>
 		</div>
-		
-		<div>
-			<label for="confirmPassword">Confirm Password:</label>
-			<input
-				id="confirmPassword"
-				type="password"
-				bind:value={confirmPassword}
-				required
-				disabled={loading}
-			/>
-		</div>
-		
+
 		{#if error}
 			<div class="error">{error}</div>
 		{/if}
-		
+
 		<button type="submit" disabled={loading}>
 			{loading ? 'Creating account...' : 'Sign Up'}
 		</button>
 	</form>
-	
+
 	<p>
 		Already have an account? <a href="/login">Login</a>
 	</p>
 </main>
+
+<style>
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	form div {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	input {
+		background: var(--surface);
+		padding: 0.5rem;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+	}
+
+	button {
+		margin-top: 0.5rem;
+	}
+</style>

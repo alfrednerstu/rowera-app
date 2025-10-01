@@ -41,10 +41,10 @@
 
 <main>
 	<h1>Login</h1>
-	
+
 	<form onsubmit={handleLogin}>
 		<div>
-			<label for="username">Username:</label>
+			<label for="username">Username</label>
 			<input
 				id="username"
 				type="text"
@@ -53,9 +53,9 @@
 				disabled={loading}
 			/>
 		</div>
-		
+
 		<div>
-			<label for="password">Password:</label>
+			<label for="password">Password</label>
 			<input
 				id="password"
 				type="password"
@@ -64,17 +64,42 @@
 				disabled={loading}
 			/>
 		</div>
-		
+
 		{#if error}
 			<div class="error">{error}</div>
 		{/if}
-		
+
 		<button type="submit" disabled={loading}>
 			{loading ? 'Logging in...' : 'Login'}
 		</button>
 	</form>
-	
+
 	<p>
 		Don't have an account? <a href="/signup">Sign up</a>
 	</p>
 </main>
+
+<style>
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	form div {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	input {
+		background: var(--surface);
+		padding: 0.5rem;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+	}
+
+	button {
+		margin-top: 0.5rem;
+	}
+</style>
