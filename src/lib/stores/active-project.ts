@@ -11,7 +11,7 @@ export interface Project {
 
 const defaultProject: Project = {
 	id: 'default',
-	name: 'Default project',
+	name: 'Select project',
 	userId: '',
 	createdAt: new Date(),
 	updatedAt: new Date()
