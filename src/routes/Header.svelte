@@ -25,6 +25,28 @@
 		isAdmin = data?.success && !error;
 	});
 
+	// Auto-select the most recently updated project if currently on default
+	$effect(async () => {
+		const uid = $session.data?.user?.id;
+		if (!uid || $activeProject.id !== 'default') return;
+
+		try {
+			const response = await fetch('/api/projects');
+			if (!response.ok) return;
+
+			const { projects } = await response.json();
+			if (projects && projects.length > 0) {
+				// Sort by updatedAt descending and select the most recent
+				const sortedProjects = [...projects].sort((a, b) =>
+					new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+				);
+				activeProject.setActive(sortedProjects[0]);
+			}
+		} catch (err) {
+			console.error('Failed to auto-select project:', err);
+		}
+	});
+
 	async function handleLogout() {
 		await signOut();
 	}

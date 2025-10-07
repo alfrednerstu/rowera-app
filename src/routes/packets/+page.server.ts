@@ -10,10 +10,30 @@ export async function load({ parent, cookies }) {
     throw redirect(302, '/login')
   }
 
-  const activeProjectId = cookies.get('activeProjectId')
+  let activeProjectId = cookies.get('activeProjectId')
 
-  // Packets that belong to the user's projects (filtered by active project if specified)
-  let query = db
+  // If activeProjectId is 'default', look up the actual Default project
+  if (activeProjectId === 'default') {
+    const defaultProject = await db
+      .select()
+      .from(project)
+      .where(and(eq(project.userId, user.id), eq(project.name, 'Default')))
+      .limit(1)
+
+    if (defaultProject.length > 0) {
+      activeProjectId = defaultProject[0].id
+    }
+  }
+
+  // If still 'default' or not set, return empty arrays
+  if (!activeProjectId || activeProjectId === 'default') {
+    return {
+      packets: []
+    }
+  }
+
+  // Packets that belong to the user's projects (filtered by active project)
+  const userPackets = await db
     .select({
       id: packet.id,
       name: packet.name,
@@ -25,17 +45,10 @@ export async function load({ parent, cookies }) {
     })
     .from(packet)
     .innerJoin(project, eq(packet.projectId, project.id))
-
-  if (activeProjectId && activeProjectId !== 'default') {
-    query = query.where(and(
+    .where(and(
       eq(project.userId, user.id),
       eq(project.id, activeProjectId)
     ))
-  } else {
-    query = query.where(eq(project.userId, user.id))
-  }
-
-  const userPackets = await query
 
   return {
     packets: userPackets

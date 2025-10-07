@@ -10,13 +10,31 @@ export async function load({ parent, cookies }) {
     throw redirect(302, '/login')
   }
 
-  const activeProjectId = cookies.get('activeProjectId')
+  let activeProjectId = cookies.get('activeProjectId')
+
+  // If activeProjectId is 'default', look up the actual Default project
+  if (activeProjectId === 'default') {
+    const defaultProject = await db
+      .select()
+      .from(project)
+      .where(and(eq(project.userId, user.id), eq(project.name, 'Default')))
+      .limit(1)
+
+    if (defaultProject.length > 0) {
+      activeProjectId = defaultProject[0].id
+    }
+  }
+
+  // If still 'default' or not set, return empty arrays
+  if (!activeProjectId || activeProjectId === 'default') {
+    return {
+      presets: []
+    }
+  }
 
   // Build base conditions
   const userCondition = eq(project.userId, user.id)
-  const projectCondition = activeProjectId && activeProjectId !== 'default' 
-    ? and(userCondition, eq(project.id, activeProjectId))
-    : userCondition
+  const projectCondition = and(userCondition, eq(project.id, activeProjectId))
 
   // Presets that belong to user's packets
   const userPresets = await db

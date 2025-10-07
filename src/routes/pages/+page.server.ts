@@ -10,10 +10,36 @@ export async function load({ parent, cookies }) {
     throw redirect(302, '/login')
   }
 
-  const activeProjectId = cookies.get('activeProjectId')
+  let activeProjectId = cookies.get('activeProjectId')
 
-  // Pages that belong to the user's projects (filtered by active project if specified)
-  let pageQuery = db
+  // If activeProjectId is 'default', look up the actual Default project
+  if (activeProjectId === 'default') {
+    const defaultProject = await db
+      .select()
+      .from(project)
+      .where(and(eq(project.userId, user.id), eq(project.name, 'Default')))
+      .limit(1)
+
+    if (defaultProject.length > 0) {
+      activeProjectId = defaultProject[0].id
+    }
+  }
+
+  // If still 'default' or not set, return empty arrays
+  if (!activeProjectId || activeProjectId === 'default') {
+    const userProjects = await db
+      .select()
+      .from(project)
+      .where(eq(project.userId, user.id))
+
+    return {
+      pages: [],
+      projects: userProjects
+    }
+  }
+
+  // Pages that belong to the user's projects (filtered by active project)
+  const userPages = await db
     .select({
       id: page.id,
       name: page.title,
@@ -25,17 +51,10 @@ export async function load({ parent, cookies }) {
     })
     .from(page)
     .innerJoin(project, eq(page.projectId, project.id))
-
-  if (activeProjectId && activeProjectId !== 'default') {
-    pageQuery = pageQuery.where(and(
+    .where(and(
       eq(project.userId, user.id),
       eq(project.id, activeProjectId)
     ))
-  } else {
-    pageQuery = pageQuery.where(eq(project.userId, user.id))
-  }
-
-  const userPages = await pageQuery
 
   const userProjects = await db
     .select()
