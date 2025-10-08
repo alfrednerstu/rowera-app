@@ -1,15 +1,16 @@
 <script>
-	let { 
+	let {
 		title,
 		fields = [],
 		item = {},
 		submitLabel = 'Save',
 		cancelUrl = '/',
-		onSubmit
+		onSubmit,
+		children
 	} = $props()
-	
+
 	let formData = $state({ ...item })
-	
+
 	function handleSubmit(event) {
 		event.preventDefault()
 		onSubmit?.(formData)
@@ -29,14 +30,14 @@
 			<div class="form-group">
 				<label for={field.name}>{field.label}</label>
 				{#if field.type === 'textarea'}
-					<textarea 
+					<textarea
 						id={field.name}
 						bind:value={formData[field.name]}
 						placeholder={field.placeholder}
 						required={field.required}
 					></textarea>
 				{:else if field.type === 'select'}
-					<select 
+					<select
 						id={field.name}
 						bind:value={formData[field.name]}
 						required={field.required}
@@ -47,7 +48,7 @@
 						{/each}
 					</select>
 				{:else}
-					<input 
+					<input
 						id={field.name}
 						type={field.type || 'text'}
 						bind:value={formData[field.name]}
@@ -57,7 +58,11 @@
 				{/if}
 			</div>
 		{/each}
-		
+
+		{#if children}
+			{@render children()}
+		{/if}
+
 		<div class="form-actions">
 			<button type="submit" class="btn btn-primary">{submitLabel}</button>
 			<a href={cancelUrl} class="btn btn-secondary">Cancel</a>

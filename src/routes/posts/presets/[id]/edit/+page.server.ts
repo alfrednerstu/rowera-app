@@ -1,20 +1,21 @@
 import { db } from '$lib/server/db'
-import { preset, publication, project } from '$lib/server/db/schema'
+import { preset, publication, project, primitive } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
 export async function load({ params, parent }) {
 	const { user } = await parent()
-	
+
 	if (!user?.id) {
 		throw redirect(302, '/login')
 	}
-	
+
 	// Get the preset with ownership verification through publication
-	const preset = await db.select({
+	const presetResult = await db.select({
 		id: preset.id,
 		name: preset.name,
 		publicationId: preset.publicationId,
+		primitives: preset.primitives,
 		createdAt: preset.createdAt,
 		updatedAt: preset.updatedAt
 	})
@@ -28,11 +29,11 @@ export async function load({ params, parent }) {
 		)
 	)
 	.limit(1)
-	
-	if (!preset.length) {
+
+	if (!presetResult.length) {
 		throw error(404, 'Preset not found')
 	}
-	
+
 	// Get all publications that belong to the user's projects
 	const userPublications = await db.select({
 		id: publication.id,
@@ -42,9 +43,13 @@ export async function load({ params, parent }) {
 	.from(publication)
 	.innerJoin(project, eq(publication.projectId, project.id))
 	.where(eq(project.userId, user.id))
-	
+
+	// Get all available primitives
+	const allPrimitives = await db.select().from(primitive)
+
 	return {
-		preset: preset[0],
-		publications: userPublications
+		preset: presetResult[0],
+		publications: userPublications,
+		primitives: allPrimitives
 	}
 }

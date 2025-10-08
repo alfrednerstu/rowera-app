@@ -59,6 +59,7 @@ export const preset = pgTable('preset', {
   name: varchar('name', { length: 255 }).notNull(),
   publicationId: uuid('publication_id').references(() => publication.id, { onDelete: 'cascade' }),
   packetId: uuid('packet_id').references(() => packet.id, { onDelete: 'cascade' }),
+  primitives: json('primitives'), // Array of primitive configurations with order
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
@@ -140,6 +141,7 @@ export const page = pgTable('page', {
   title: varchar('title', { length: 500 }).notNull(),
   slug: varchar('slug', { length: 500 }).notNull().unique(),
   content: json('content').notNull(), // Array of partial instances with filled data
+  primitives: json('primitives'), // Array of primitive configurations with order
   isPublished: boolean('is_published').notNull().default(false),
   publishedAt: timestamp('published_at'),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
@@ -155,6 +157,7 @@ export const partial = pgTable('partial', {
   slug: varchar('slug', { length: 255 }).notNull(),
   description: text('description'),
   elements: json('elements').notNull(), // Array of semantic HTML elements with their structure
+  primitives: json('primitives'), // Array of primitive configurations with order
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()

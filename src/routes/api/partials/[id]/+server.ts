@@ -10,15 +10,16 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 	}
 	
 	try {
-		const { name } = await request.json()
-		
+		const { name, primitives } = await request.json()
+
 		if (!name?.trim()) {
 			return json({ error: 'Partial name is required' }, { status: 400 })
 		}
-		
-		const [partial] = await db.update(partial)
-			.set({ 
+
+		const [updatedPartial] = await db.update(partial)
+			.set({
 				name: name.trim(),
+				primitives: primitives || null,
 				updatedAt: new Date()
 			})
 			.where(
@@ -29,11 +30,11 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 			)
 			.returning()
 		
-		if (!partial) {
+		if (!updatedPartial) {
 			return json({ error: 'Partial not found' }, { status: 404 })
 		}
-		
-		return json(partial)
+
+		return json(updatedPartial)
 	} catch (error) {
 		console.error('Error updating partial:', error)
 		return json({ error: 'Failed to update partial' }, { status: 500 })

@@ -10,17 +10,17 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 	}
 	
 	try {
-		const { name, publicationId, packetId } = await request.json()
-		
+		const { name, publicationId, packetId, primitives } = await request.json()
+
 		if (!name?.trim()) {
 			return json({ error: 'Preset name is required' }, { status: 400 })
 		}
-		
+
 		// Must belong to either a publication or a packet, but not both
 		if (!publicationId && !packetId) {
 			return json({ error: 'Either publication or packet is required' }, { status: 400 })
 		}
-		
+
 		if (publicationId && packetId) {
 			return json({ error: 'Preset cannot belong to both publication and packet' }, { status: 400 })
 		}
@@ -88,10 +88,11 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 		
 		// Update the preset
 		const [updatedPreset] = await db.update(preset)
-			.set({ 
+			.set({
 				name: name.trim(),
 				publicationId: publicationId || null,
-				projectId: projectId || null,
+				packetId: packetId || null,
+				primitives: primitives || null,
 				updatedAt: new Date()
 			})
 			.where(eq(preset.id, params.id))

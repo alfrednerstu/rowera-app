@@ -10,20 +10,20 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 	}
 	
 	try {
-		const { name, slug, projectId } = await request.json()
-		
+		const { name, slug, projectId, primitives } = await request.json()
+
 		if (!name?.trim()) {
 			return json({ error: 'Page name is required' }, { status: 400 })
 		}
-		
+
 		if (!slug?.trim()) {
 			return json({ error: 'Page slug is required' }, { status: 400 })
 		}
-		
+
 		if (!projectId) {
 			return json({ error: 'Project is required' }, { status: 400 })
 		}
-		
+
 		// Verify that the new project belongs to the user
 		const projectRows = await db.select()
 			.from(project)
@@ -34,17 +34,18 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 				)
 			)
 			.limit(1)
-		
+
 		if (!projectRows.length) {
 			return json({ error: 'Project not found or access denied' }, { status: 404 })
 		}
-		
+
 		// Update the page with ownership verification through original project
 		const [updatedPage] = await db.update(page)
-			.set({ 
+			.set({
 				name: name.trim(),
 				slug: slug.trim(),
 				projectId,
+				primitives: primitives || null,
 				updatedAt: new Date()
 			})
 			.from(project)
