@@ -1,9 +1,12 @@
 <script>
 	import CrudForm from '$lib/components/CrudForm.svelte'
+	import PrimitiveBuilder from '$lib/components/PrimitiveBuilder.svelte'
 	import { goto } from '$app/navigation'
-	
+
 	let { data } = $props()
-	
+
+	let primitives = $state(data.page.primitives || [])
+
 	const fields = [
 		{
 			name: 'name',
@@ -30,15 +33,18 @@
 			}))
 		}
 	]
-	
+
 	async function handleSubmit(formData) {
 		try {
 			const response = await fetch(`/api/pages/${data.page.id}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(formData)
+				body: JSON.stringify({
+					...formData,
+					primitives
+				})
 			})
-			
+
 			if (response.ok) {
 				goto('/pages')
 			} else {
@@ -50,11 +56,15 @@
 	}
 </script>
 
-<CrudForm 
+<CrudForm
 	title="Edit Page"
 	{fields}
 	item={data.page}
 	submitLabel="Update Page"
 	cancelUrl="/pages"
 	onSubmit={handleSubmit}
-/>
+>
+	{#snippet children()}
+		<PrimitiveBuilder bind:primitives availablePrimitives={data.primitives} />
+	{/snippet}
+</CrudForm>

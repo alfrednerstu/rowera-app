@@ -1,27 +1,31 @@
 import { db } from '$lib/server/db'
-import { partial } from '$lib/server/db/schema'
+import { partial, primitive } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
 export const load = async ({ params, locals }) => {
-	
-	
+
+
 	if (!locals.user?.id) {
 		throw redirect(302, '/login')
 	}
-	
-	const partial = await db.select().from(partial).where(
+
+	const partialResult = await db.select().from(partial).where(
 		and(
 			eq(partial.id, params.id),
 			eq(partial.userId, locals.user.id)
 		)
 	).limit(1)
-	
-	if (!partial.length) {
+
+	if (!partialResult.length) {
 		throw error(404, 'Partial not found')
 	}
-	
+
+	// Get all available primitives
+	const allPrimitives = await db.select().from(primitive)
+
 	return {
-		partial: partial[0]
+		partial: partialResult[0],
+		primitives: allPrimitives
 	}
 }
