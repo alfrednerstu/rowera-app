@@ -11,15 +11,15 @@
 	})
 	
 	const columns = [
-		{ key: 'name', header: 'Primitive Name' },
-		{ key: 'tagName', header: 'HTML Tag' },
-		{ 
-			key: 'defaultContent', 
-			header: 'Default Content',
-			render: (item) => item.defaultContent || '-'
+		{ key: 'name', header: 'Name' },
+		{ key: 'description', header: 'Description' },
+		{
+			key: 'tags',
+			header: 'HTML Tags',
+			render: (item) => item.tags.substring(0, 50) + (item.tags.length > 50 ? '...' : '')
 		},
-		{ 
-			key: 'createdAt', 
+		{
+			key: 'createdAt',
 			header: 'Created',
 			render: (item) => new Date(item.createdAt).toLocaleDateString()
 		}

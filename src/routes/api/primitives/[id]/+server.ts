@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { primitive } from '$lib/server/db/schema'
+import { primitive, primitiveField } from '$lib/server/db/schema'
 import { auth } from '$lib/server/auth'
 import { eq } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
@@ -29,13 +29,20 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	}
 	
 	try {
-		const [primitive] = await db.select().from(primitive).where(eq(primitive.id, params.id)).limit(1)
-		
-		if (!primitive) {
+		const foundPrimitive = await db.query.primitive.findFirst({
+			where: (p, { eq }) => eq(p.id, params.id),
+			with: {
+				fields: {
+					orderBy: (fields, { asc }) => [asc(fields.order)]
+				}
+			}
+		})
+
+		if (!foundPrimitive) {
 			return json({ error: 'Primitive not found' }, { status: 404 })
 		}
-		
-		return json(primitive)
+
+		return json(foundPrimitive)
 	} catch (error) {
 		console.error('Error fetching primitive:', error)
 		return json({ error: 'Failed to fetch primitive' }, { status: 500 })
@@ -54,29 +61,56 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 	}
 	
 	try {
-		const { name, tagName, attributes, defaultContent, cssStyles } = await request.json()
-		
-		if (!name?.trim() || !tagName?.trim()) {
-			return json({ error: 'Name and tagName are required' }, { status: 400 })
+		const { name, description, tags, fields } = await request.json()
+
+		if (!name?.trim() || !description?.trim() || !tags?.trim()) {
+			return json({ error: 'Name, description, and tags are required' }, { status: 400 })
 		}
-		
-		const [primitive] = await db.update(primitive)
-			.set({ 
+
+		// Update primitive
+		const [updatedPrimitive] = await db.update(primitive)
+			.set({
 				name: name.trim(),
-				tagName: tagName.trim(),
-				attributes: attributes || {},
-				defaultContent: defaultContent?.trim() || null,
-				cssStyles: cssStyles?.trim() || null,
+				description: description.trim(),
+				tags: tags.trim(),
 				updatedAt: new Date()
 			})
 			.where(eq(primitive.id, params.id))
 			.returning()
-		
-		if (!primitive) {
+
+		if (!updatedPrimitive) {
 			return json({ error: 'Primitive not found' }, { status: 404 })
 		}
-		
-		return json(primitive)
+
+		// Delete existing fields and insert new ones
+		await db.delete(primitiveField).where(eq(primitiveField.primitiveId, params.id))
+
+		if (fields && Array.isArray(fields) && fields.length > 0) {
+			await db.insert(primitiveField).values(
+				fields.map((field: any, index: number) => ({
+					primitiveId: params.id,
+					name: field.name.trim(),
+					label: field.label.trim(),
+					type: field.type.trim(),
+					description: field.description?.trim() || null,
+					placeholder: field.placeholder?.trim() || null,
+					optional: field.optional || false,
+					order: field.order ?? index
+				}))
+			)
+		}
+
+		// Return primitive with fields
+		const result = await db.query.primitive.findFirst({
+			where: (p, { eq }) => eq(p.id, params.id),
+			with: {
+				fields: {
+					orderBy: (fields, { asc }) => [asc(fields.order)]
+				}
+			}
+		})
+
+		return json(result)
 	} catch (error) {
 		console.error('Error updating primitive:', error)
 		return json({ error: 'Failed to update primitive' }, { status: 500 })

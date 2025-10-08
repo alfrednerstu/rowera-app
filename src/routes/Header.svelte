@@ -89,6 +89,9 @@
 					<li aria-current={page.url.pathname === '/preferences' ? 'page' : undefined}>
 						<a href="/preferences">Preferences</a>
 					</li>
+					<li aria-current={page.url.pathname.startsWith('/primer') ? 'page' : undefined}>
+						<a href="/primer">Primer</a>
+					</li>
 					<li aria-current={page.url.pathname === '/profile' ? 'page' : undefined}>
 						<a href="/profile">Profile</a>
 					</li>

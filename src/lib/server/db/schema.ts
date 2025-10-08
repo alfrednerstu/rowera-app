@@ -78,10 +78,23 @@ export const piece = pgTable('piece', {
 export const primitive = pgTable('primitive', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
-  tagName: varchar('tag_name', { length: 50 }).notNull(),
-  attributes: json('attributes'),
-  defaultContent: text('default_content'),
-  cssStyles: text('css_styles'),
+  description: text('description').notNull(),
+  tags: text('tags').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
+// Primitive Field - defines inputs for primitives
+export const primitiveField = pgTable('primitive_field', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  primitiveId: uuid('primitive_id').notNull().references(() => primitive.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 255 }).notNull(),
+  label: varchar('label', { length: 255 }).notNull(),
+  type: varchar('type', { length: 50 }).notNull(),
+  description: text('description'),
+  placeholder: varchar('placeholder', { length: 255 }),
+  optional: boolean('optional').notNull().default(false),
+  order: integer('order').notNull().default(0),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
@@ -386,6 +399,17 @@ export const pieceRelations = relations(piece, ({ one, many }) => ({
   preset: one(preset, {
     fields: [piece.presetId!],
     references: [preset.id]
+  })
+}));
+
+export const primitiveRelations = relations(primitive, ({ many }) => ({
+  fields: many(primitiveField)
+}));
+
+export const primitiveFieldRelations = relations(primitiveField, ({ one }) => ({
+  primitive: one(primitive, {
+    fields: [primitiveField.primitiveId],
+    references: [primitive.id]
   })
 }));
 
