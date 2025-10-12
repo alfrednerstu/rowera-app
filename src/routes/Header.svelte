@@ -265,9 +265,9 @@
 	}
 
 	.project-selector {
-		background: var(--base-color);
+		background: transparent;
 		color: var(--primary-color);
-		border: 1px solid var(--quad-color);
+		border: none;
 		padding: .125em .5em;
 		border-radius: .25em;
 		font-size: .875rem;
@@ -279,10 +279,13 @@
 		gap: .5rem;
 		transition: all .2s ease;
 		text-transform: unset;
+		opacity: 0.75;
+		outline: none;
 	}
 
 	.project-selector:hover {
 		background: var(--surface-color);
+		opacity: 1;
 	}
 
 	.chevron {
