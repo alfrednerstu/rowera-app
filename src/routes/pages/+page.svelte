@@ -10,13 +10,17 @@
 	})
 	
 	const columns = [
-		{ key: 'name', header: 'Page Name' },
-		{ key: 'slug', header: 'Slug' },
+		{ key: 'name', header: 'Page Name', microformatClass: 'p-name' },
+		{ key: 'slug', header: 'Slug', microformatClass: 'u-url' },
 		{ key: 'projectName', header: 'Project' },
-		{ 
-			key: 'createdAt', 
+		{
+			key: 'createdAt',
 			header: 'Created',
-			render: (item) => new Date(item.createdAt).toLocaleDateString()
+			microformatClass: 'dt-published',
+			render: (item) => {
+				const date = new Date(item.createdAt)
+				return `<time datetime="${date.toISOString()}">${date.toLocaleDateString()}</time>`
+			}
 		}
 	]
 	
@@ -45,11 +49,12 @@
 	<meta name="description" content="Manage your pages" />
 </svelte:head>
 
-<CrudTable 
+<CrudTable
 	items={pages}
 	{columns}
 	title="Pages"
 	createUrl="/pages/new"
 	editUrl={(item) => `/pages/${item.id}/edit`}
 	onDelete={handleDelete}
+	microformat="h-entry"
 />

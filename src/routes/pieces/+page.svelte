@@ -19,37 +19,49 @@
 	
 	// Packets table configuration
 	const packetColumns = [
-		{ key: 'name', header: 'Packet Name' },
-		{ key: 'slug', header: 'Slug' },
+		{ key: 'name', header: 'Packet Name', microformatClass: 'p-name' },
+		{ key: 'slug', header: 'Slug', microformatClass: 'u-url' },
 		{ key: 'projectName', header: 'Project' },
-		{ 
-			key: 'createdAt', 
+		{
+			key: 'createdAt',
 			header: 'Created',
-			render: (item) => new Date(item.createdAt).toLocaleDateString()
+			microformatClass: 'dt-published',
+			render: (item) => {
+				const date = new Date(item.createdAt)
+				return `<time datetime="${date.toISOString()}">${date.toLocaleDateString()}</time>`
+			}
 		}
 	]
 	
 	// Pieces table configuration
 	const pieceColumns = [
-		{ key: 'name', header: 'Piece Name' },
-		{ key: 'slug', header: 'Slug' },
+		{ key: 'name', header: 'Piece Name', microformatClass: 'p-name' },
+		{ key: 'slug', header: 'Slug', microformatClass: 'u-url' },
 		{ key: 'packetName', header: 'Packet' },
 		{ key: 'presetName', header: 'Preset' },
-		{ 
-			key: 'createdAt', 
+		{
+			key: 'createdAt',
 			header: 'Created',
-			render: (item) => new Date(item.createdAt).toLocaleDateString()
+			microformatClass: 'dt-published',
+			render: (item) => {
+				const date = new Date(item.createdAt)
+				return `<time datetime="${date.toISOString()}">${date.toLocaleDateString()}</time>`
+			}
 		}
 	]
 	
 	// Presets table configuration
 	const presetColumns = [
-		{ key: 'name', header: 'Preset Name' },
+		{ key: 'name', header: 'Preset Name', microformatClass: 'p-name' },
 		{ key: 'packetName', header: 'Packet' },
-		{ 
-			key: 'createdAt', 
+		{
+			key: 'createdAt',
 			header: 'Created',
-			render: (item) => new Date(item.createdAt).toLocaleDateString()
+			microformatClass: 'dt-published',
+			render: (item) => {
+				const date = new Date(item.createdAt)
+				return `<time datetime="${date.toISOString()}">${date.toLocaleDateString()}</time>`
+			}
 		}
 	]
 	
@@ -142,25 +154,27 @@
 </nav>
 
 {#if activeTab === 'packets'}
-	<CrudTable 
+	<CrudTable
 		items={packets}
 		columns={packetColumns}
 		title="Packets"
 		createUrl="/pieces/packets/new"
 		editUrl={(item) => `/pieces/packets/${item.id}/edit`}
 		onDelete={handleDeletePacket}
+		microformat="h-feed"
 	/>
 {:else if activeTab === 'pieces'}
-	<CrudTable 
+	<CrudTable
 		items={pieces}
 		columns={pieceColumns}
 		title="Pieces"
 		createUrl="/pieces/new"
 		editUrl={(item) => `/pieces/${item.id}/edit`}
 		onDelete={handleDeletePiece}
+		microformat="h-entry"
 	/>
 {:else if activeTab === 'presets'}
-	<CrudTable 
+	<CrudTable
 		items={presets}
 		columns={presetColumns}
 		title="Presets"
