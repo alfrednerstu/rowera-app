@@ -1,1 +1,1 @@
-export { load } from '../posts/+layout.server'
+// Data is loaded in +layout.server.ts
