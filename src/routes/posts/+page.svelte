@@ -19,37 +19,49 @@
 	
 	// Publications table configuration
 	const publicationColumns = [
-		{ key: 'name', header: 'Publication Name' },
-		{ key: 'slug', header: 'Slug' },
+		{ key: 'name', header: 'Publication Name', microformatClass: 'p-name' },
+		{ key: 'slug', header: 'Slug', microformatClass: 'u-url' },
 		{ key: 'projectName', header: 'Project' },
-		{ 
-			key: 'createdAt', 
+		{
+			key: 'createdAt',
 			header: 'Created',
-			render: (item) => new Date(item.createdAt).toLocaleDateString()
+			microformatClass: 'dt-published',
+			render: (item) => {
+				const date = new Date(item.createdAt)
+				return `<time datetime="${date.toISOString()}">${date.toLocaleDateString()}</time>`
+			}
 		}
 	]
 	
 	// Posts table configuration
 	const postColumns = [
-		{ key: 'title', header: 'Post Title' },
-		{ key: 'slug', header: 'Slug' },
+		{ key: 'title', header: 'Post Title', microformatClass: 'p-name' },
+		{ key: 'slug', header: 'Slug', microformatClass: 'u-url' },
 		{ key: 'publicationName', header: 'Publication' },
 		{ key: 'presetName', header: 'Preset' },
-		{ 
-			key: 'createdAt', 
+		{
+			key: 'createdAt',
 			header: 'Created',
-			render: (item) => new Date(item.createdAt).toLocaleDateString()
+			microformatClass: 'dt-published',
+			render: (item) => {
+				const date = new Date(item.createdAt)
+				return `<time datetime="${date.toISOString()}">${date.toLocaleDateString()}</time>`
+			}
 		}
 	]
 	
 	// Presets table configuration
 	const presetColumns = [
-		{ key: 'name', header: 'Preset Name' },
+		{ key: 'name', header: 'Preset Name', microformatClass: 'p-name' },
 		{ key: 'publicationName', header: 'Publication' },
-		{ 
-			key: 'createdAt', 
+		{
+			key: 'createdAt',
 			header: 'Created',
-			render: (item) => new Date(item.createdAt).toLocaleDateString()
+			microformatClass: 'dt-published',
+			render: (item) => {
+				const date = new Date(item.createdAt)
+				return `<time datetime="${date.toISOString()}">${date.toLocaleDateString()}</time>`
+			}
 		}
 	]
 	
@@ -142,22 +154,24 @@
 </nav>
 
 {#if activeTab === 'publications'}
-	<CrudTable 
+	<CrudTable
 		items={publications}
 		columns={publicationColumns}
 		title="Publications"
 		createUrl="/posts/publications/new"
 		editUrl={(item) => `/posts/publications/${item.id}/edit`}
 		onDelete={handleDeletePublication}
+		microformat="h-feed"
 	/>
 {:else if activeTab === 'posts'}
-	<CrudTable 
+	<CrudTable
 		items={posts}
 		columns={postColumns}
 		title="Posts"
 		createUrl="/posts/new"
 		editUrl={(item) => `/posts/${item.id}/edit`}
 		onDelete={handleDeletePost}
+		microformat="h-entry"
 	/>
 {:else if activeTab === 'presets'}
 	<CrudTable 

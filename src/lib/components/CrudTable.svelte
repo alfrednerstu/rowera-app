@@ -1,12 +1,13 @@
 <script>
-	let { 
-		items = [], 
-		columns = [], 
-		title, 
+	let {
+		items = [],
+		columns = [],
+		title,
 		createLabel = 'Create new',
 		createUrl,
 		editUrl = (item) => `/${item.id}/edit`,
-		onDelete
+		onDelete,
+		microformat = null // Optional: 'h-entry', 'h-card', etc.
 	} = $props()
 </script>
 
@@ -38,9 +39,9 @@
 			</thead>
 			<tbody>
 				{#each items as item}
-					<tr>
+					<tr class={microformat || ''}>
 						{#each columns as column}
-							<td>
+							<td class={column.microformatClass || ''}>
 								{#if column.render}
 									{@html column.render(item)}
 								{:else}
