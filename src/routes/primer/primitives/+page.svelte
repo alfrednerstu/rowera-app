@@ -57,10 +57,12 @@
 	function getExampleOutput(tags, fields) {
 		let example = tags
 
-		// Handle variants - show first option
+		// Handle variants - show first option and store the variant value
 		const variants = parseVariants(tags)
+		let variantValue = null
 		if (variants) {
-			example = example.replace(/\{variant:[^}]+\}/g, variants[0])
+			variantValue = variants[0]
+			example = example.replace(/\{variant:[^}]+\}/g, variantValue)
 		}
 
 		// Handle repeatable sections
@@ -78,18 +80,23 @@
 			const placeholder = `{${field.name}}`
 			let replacement = ''
 
-			switch (field.type) {
-				case 'text':
-					replacement = field.label
-					break
-				case 'textarea':
-					replacement = 'Content goes here'
-					break
-				case 'url':
-					replacement = 'https://example.com'
-					break
-				default:
-					replacement = field.label
+			if (field.type === 'variant' && variantValue) {
+				// For variant fields, use the actual variant value
+				replacement = variantValue
+			} else {
+				switch (field.type) {
+					case 'text':
+						replacement = field.label
+						break
+					case 'textarea':
+						replacement = 'Content goes here'
+						break
+					case 'url':
+						replacement = 'https://example.com'
+						break
+					default:
+						replacement = field.label
+				}
 			}
 
 			example = example.replaceAll(placeholder, replacement)
@@ -105,100 +112,167 @@
 </svelte:head>
 
 <main>
-	<header>
-		<h1>Primitives Reference</h1>
-		<p>
-			Primitives are the fundamental building blocks of your content. Each primitive represents
-			a semantic HTML element that you can use to construct pages, posts, and pieces.
-		</p>
-	</header>
-
-	<section class="controls">
-		<input
-			type="search"
-			bind:value={searchQuery}
-			placeholder="Search primitives..."
-			aria-label="Search primitives"
-		/>
-
-		<nav class="category-filter">
-			{#each Object.entries(categories) as [key, label]}
-				<button
-					class:active={selectedCategory === key}
-					onclick={() => selectedCategory = key}
-				>
-					{label}
-				</button>
-			{/each}
+	<aside class="sidebar">
+		<nav>
+			<h2>Contents</h2>
+			<ul>
+				{#each filteredPrimitives as primitive}
+					<li>
+						<a href="#{primitive.name.toLowerCase()}">{primitive.name}</a>
+					</li>
+				{/each}
+			</ul>
 		</nav>
-	</section>
+	</aside>
 
-	<section class="primitives-list">
-		{#if filteredPrimitives.length === 0}
-			<p class="no-results">No primitives found matching your search.</p>
-		{:else}
-			{#each filteredPrimitives as primitive}
-				<article class="primitive-card" id={primitive.name.toLowerCase()}>
-					<header>
-						<h2>{primitive.name}</h2>
-						<span class="category-badge">{categories[categoryMap[primitive.name]]}</span>
-					</header>
+	<div class="content">
+		<header>
+			<h1>Primitives Reference</h1>
+			<p>
+				Primitives are the fundamental building blocks of your content. Each primitive represents
+				a semantic HTML element that you can use to construct pages, posts, and pieces.
+			</p>
+		</header>
 
-					<p class="description">{primitive.description}</p>
+		<section class="controls">
+			<input
+				type="search"
+				bind:value={searchQuery}
+				placeholder="Search primitives..."
+				aria-label="Search primitives"
+			/>
 
-					{#if parseVariants(primitive.tags)}
-						<section class="variants">
-							<h3>Variants</h3>
+			<nav class="category-filter">
+				{#each Object.entries(categories) as [key, label]}
+					<button
+						class:active={selectedCategory === key}
+						onclick={() => selectedCategory = key}
+					>
+						{label}
+					</button>
+				{/each}
+			</nav>
+		</section>
+
+		<section class="primitives-list">
+			{#if filteredPrimitives.length === 0}
+				<p class="no-results">No primitives found matching your search.</p>
+			{:else}
+				{#each filteredPrimitives as primitive}
+					<article class="primitive-card" id={primitive.name.toLowerCase()}>
+						<header>
+							<h2>{primitive.name}</h2>
+							<span class="category-badge">{categories[categoryMap[primitive.name]]}</span>
+						</header>
+
+						<p class="description">{primitive.description}</p>
+
+						{#if parseVariants(primitive.tags)}
+							<section class="variants">
+								<h3>Variants</h3>
+								<ul>
+									{#each parseVariants(primitive.tags) as variant}
+										<li><code>{variant}</code></li>
+									{/each}
+								</ul>
+							</section>
+						{/if}
+
+						<section class="fields">
+							<h3>Fields</h3>
 							<ul>
-								{#each parseVariants(primitive.tags) as variant}
-									<li><code>{variant}</code></li>
+								{#each primitive.fields as field}
+									<li>
+										<strong>{field.label}</strong>
+										<span class="field-type">{field.type}</span>
+										{#if field.optional}
+											<span class="optional-badge">optional</span>
+										{/if}
+										{#if hasRepeatable(primitive.tags) && primitive.tags.includes(`{${field.name}}`)}
+											<span class="repeatable-badge">repeatable</span>
+										{/if}
+										{#if field.description}
+											<p class="field-description">{field.description}</p>
+										{/if}
+									</li>
 								{/each}
 							</ul>
 						</section>
-					{/if}
 
-					<section class="fields">
-						<h3>Fields</h3>
-						<ul>
-							{#each primitive.fields as field}
-								<li>
-									<strong>{field.label}</strong>
-									<span class="field-type">{field.type}</span>
-									{#if field.optional}
-										<span class="optional-badge">optional</span>
-									{/if}
-									{#if hasRepeatable(primitive.tags) && primitive.tags.includes(`{${field.name}}`)}
-										<span class="repeatable-badge">repeatable</span>
-									{/if}
-									{#if field.description}
-										<p class="field-description">{field.description}</p>
-									{/if}
-								</li>
-							{/each}
-						</ul>
-					</section>
-
-					<section class="example">
-						<h3>Example Output</h3>
-						<pre><code>{getExampleOutput(primitive.tags, primitive.fields)}</code></pre>
-					</section>
-				</article>
-			{/each}
-		{/if}
-	</section>
+						<section class="example">
+							<h3>Example Output</h3>
+							<pre><code>{getExampleOutput(primitive.tags, primitive.fields)}</code></pre>
+						</section>
+					</article>
+				{/each}
+			{/if}
+		</section>
+	</div>
 </main>
 
 <style>
 	main {
-		max-width: 64rem;
+		display: flex;
+		gap: 2rem;
+		max-width: 80rem;
 		margin: 0 auto;
 		padding: 2rem;
 	}
 
+	.sidebar {
+		flex: 0 0 16rem;
+		position: sticky;
+		top: 2rem;
+		align-self: flex-start;
+		max-height: calc(100vh - 4rem);
+		overflow-y: auto;
+	}
+
+	.sidebar nav {
+		padding: 1rem;
+		background: var(--surface-color);
+		border-radius: 0.5rem;
+		border: 1px solid var(--quad-color);
+	}
+
+	.sidebar h2 {
+		margin: 0 0 1rem 0;
+		font-size: 1rem;
+		font-weight: 600;
+		opacity: 0.75;
+	}
+
+	.sidebar ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.sidebar li {
+		margin-bottom: 0.5rem;
+	}
+
+	.sidebar a {
+		display: block;
+		padding: 0.5rem 0.75rem;
+		color: var(--text-color);
+		text-decoration: none;
+		border-radius: 0.25rem;
+		transition: background 0.2s ease;
+		font-size: 0.875rem;
+	}
+
+	.sidebar a:hover {
+		background: var(--quad-color);
+	}
+
+	.content {
+		flex: 1;
+		min-width: 0;
+	}
+
 	header {
 		margin-bottom: 3rem;
-		padding-bottom: 2rem;
-		border-bottom: 1px solid var(--quad-color);
 	}
 
 	h1 {

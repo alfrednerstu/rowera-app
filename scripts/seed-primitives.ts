@@ -28,7 +28,7 @@ const primitives = [
 	{
 		name: 'List',
 		description: 'Create ordered or unordered lists',
-		tags: '<{variant:ul,ol}>{repeatable}<li>{item}</li>{/repeatable}</{variant}>',
+		tags: '<{variant:ul,ol}>\n{repeatable}<li>{item}</li>{/repeatable}\n</{variant}>',
 		fields: [
 			{ name: 'variant', label: 'List Type', type: 'variant', optional: false, order: 0 },
 			{ name: 'item', label: 'List Item', type: 'text', optional: false, order: 1 }
