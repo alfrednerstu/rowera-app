@@ -49,8 +49,8 @@
 	items={publications}
 	columns={publicationColumns}
 	title="Publications"
-	createUrl="/posts/publications/new"
-	editUrl={(item) => `/posts/publications/${item.id}/edit`}
+	createUrl="/publications/new"
+	editUrl={(item) => `/publications/${item.id}/edit`}
 	onDelete={handleDeletePublication}
 	microformat="h-feed"
 />

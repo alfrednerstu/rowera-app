@@ -39,7 +39,7 @@
 			})
 
 			if (response.ok) {
-				goto('/posts')
+				goto('/publications/presets')
 			} else {
 				console.error('Failed to update preset')
 			}
@@ -54,7 +54,7 @@
 	{fields}
 	item={data.preset}
 	submitLabel="Update Preset"
-	cancelUrl="/posts"
+	cancelUrl="/publications/presets"
 	onSubmit={handleSubmit}
 >
 	{#snippet children()}

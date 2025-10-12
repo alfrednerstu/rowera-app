@@ -6,17 +6,11 @@
 	
 	const fields = [
 		{
-			name: 'title',
-			label: 'Post Title',
+			name: 'name',
+			label: 'Preset Name',
 			type: 'text',
-			placeholder: 'Enter post title',
+			placeholder: 'Enter preset name',
 			required: true
-		},
-		{
-			name: 'slug',
-			label: 'Slug',
-			type: 'text',
-			placeholder: 'post-url-slug'
 		},
 		{
 			name: 'publicationId',
@@ -27,42 +21,32 @@
 				value: publication.id,
 				label: publication.name
 			}))
-		},
-		{
-			name: 'presetId',
-			label: 'Preset',
-			type: 'select',
-			required: true,
-			options: data.presets.map(preset => ({
-				value: preset.id,
-				label: preset.name
-			}))
 		}
 	]
 	
 	async function handleSubmit(formData) {
 		try {
-			const response = await fetch('/api/posts', {
+			const response = await fetch('/api/presets', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(formData)
 			})
 			
 			if (response.ok) {
-				goto('/posts')
+				goto('/publications/presets')
 			} else {
-				console.error('Failed to create post')
+				console.error('Failed to create preset')
 			}
 		} catch (error) {
-			console.error('Error creating post:', error)
+			console.error('Error creating preset:', error)
 		}
 	}
 </script>
 
-<CrudForm 
-	title="Create Post"
+<CrudForm
+	title="Create Preset"
 	{fields}
-	submitLabel="Create Post"
-	cancelUrl="/posts"
+	submitLabel="Create Preset"
+	cancelUrl="/publications/presets"
 	onSubmit={handleSubmit}
 />

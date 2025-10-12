@@ -1,17 +1,31 @@
 <script>
 	import { page } from '$app/state'
-	
+	import { crossfade } from 'svelte/transition'
+
 	let { activeRoute = '/packets' } = $props()
+
+	const [send, receive] = crossfade({
+		duration: 150
+	})
 </script>
 
 <nav class="tabs">
 	<a href="/packets/pieces" class:active={activeRoute === '/packets/pieces'}>
+		{#if activeRoute === '/packets/pieces'}
+			<span class="active-pill" in:receive={{ key: 'tabs-pill' }} out:send={{ key: 'tabs-pill' }} />
+		{/if}
 		Pieces
 	</a>
 	<a href="/packets" class:active={activeRoute === '/packets'}>
+		{#if activeRoute === '/packets'}
+			<span class="active-pill" in:receive={{ key: 'tabs-pill' }} out:send={{ key: 'tabs-pill' }} />
+		{/if}
 		Packets
 	</a>
 	<a href="/packets/presets" class:active={activeRoute === '/packets/presets'}>
+		{#if activeRoute === '/packets/presets'}
+			<span class="active-pill" in:receive={{ key: 'tabs-pill' }} out:send={{ key: 'tabs-pill' }} />
+		{/if}
 		Presets
 	</a>
 </nav>
@@ -50,5 +64,15 @@
 	.tabs a.active {
 		background: var(--accent-color);
 		color: var(--base-color);
+	}
+
+	/* moving active background */
+	.active-pill {
+		position: absolute;
+		inset: 0;
+		border-radius: .25rem;
+		background: var(--accent-color);
+		pointer-events: none;
+		z-index: -1;
 	}
 </style>
