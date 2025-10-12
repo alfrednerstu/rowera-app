@@ -36,7 +36,7 @@
 			})
 			
 			if (response.ok) {
-				goto('/posts')
+				goto('/publications')
 			} else {
 				console.error('Failed to create publication')
 			}
@@ -46,10 +46,10 @@
 	}
 </script>
 
-<CrudForm 
+<CrudForm
 	title="Create Publication"
 	{fields}
 	submitLabel="Create Publication"
-	cancelUrl="/posts"
+	cancelUrl="/publications"
 	onSubmit={handleSubmit}
 />

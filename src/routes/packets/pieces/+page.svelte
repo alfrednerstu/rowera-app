@@ -1,7 +1,6 @@
 <script>
 	import CrudTable from '$lib/components/CrudTable.svelte'
-	import PacketsNavigation from '$lib/components/PacketsNavigation.svelte'
-	
+
 	let { data } = $props()
 	let pieces = $state(data.pieces)
 	
@@ -46,13 +45,6 @@
 		}
 	}
 </script>
-
-<svelte:head>
-	<title>Pieces - Rowera CMS</title>
-	<meta name="description" content="Manage your pieces" />
-</svelte:head>
-
-<PacketsNavigation activeRoute="/packets/pieces" />
 
 <CrudTable 
 	items={pieces}

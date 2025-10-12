@@ -50,8 +50,8 @@
 	items={posts}
 	columns={postColumns}
 	title="Posts"
-	createUrl="/posts/new"
-	editUrl={(item) => `/posts/${item.id}/edit`}
+	createUrl="/publications/posts/new"
+	editUrl={(item) => `/publications/posts/${item.id}/edit`}
 	onDelete={handleDeletePost}
 	microformat="h-entry"
 />

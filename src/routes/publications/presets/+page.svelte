@@ -48,7 +48,7 @@
 	items={presets}
 	columns={presetColumns}
 	title="Presets"
-	createUrl="/posts/presets/new"
-	editUrl={(item) => `/posts/presets/${item.id}/edit`}
+	createUrl="/publications/presets/new"
+	editUrl={(item) => `/publications/presets/${item.id}/edit`}
 	onDelete={handleDeletePreset}
 />

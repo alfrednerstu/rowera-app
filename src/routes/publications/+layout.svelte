@@ -12,13 +12,13 @@
 </script>
 
 <svelte:head>
-	<title>Posts - Rowera CMS</title>
+	<title>Publications - Rowera CMS</title>
 	<meta name="description" content="Manage your publications, posts, and presets" />
 </svelte:head>
 
 <nav class="tabs">
-	<a href="/posts" class:active={isActive('/posts')}>
-		{#if isActive('/posts')}
+	<a href="/publications/posts" class:active={isActive('/publications/posts')}>
+		{#if isActive('/publications/posts')}
 			<span class="active-pill" in:receive={{ key: 'tabs-pill' }} out:send={{ key: 'tabs-pill' }} />
 		{/if}
 		Posts
@@ -29,8 +29,8 @@
 		{/if}
 		Publications
 	</a>
-	<a href="/posts/presets" class:active={isActive('/posts/presets')}>
-		{#if isActive('/posts/presets')}
+	<a href="/publications/presets" class:active={isActive('/publications/presets')}>
+		{#if isActive('/publications/presets')}
 			<span class="active-pill" in:receive={{ key: 'tabs-pill' }} out:send={{ key: 'tabs-pill' }} />
 		{/if}
 		Presets

@@ -42,28 +42,27 @@
 	
 	async function handleSubmit(formData) {
 		try {
-			const response = await fetch(`/api/posts/${data.post.id}`, {
-				method: 'PUT',
+			const response = await fetch('/api/posts', {
+				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(formData)
 			})
 			
 			if (response.ok) {
-				goto('/posts')
+				goto('/publications/posts')
 			} else {
-				console.error('Failed to update post')
+				console.error('Failed to create post')
 			}
 		} catch (error) {
-			console.error('Error updating post:', error)
+			console.error('Error creating post:', error)
 		}
 	}
 </script>
 
-<CrudForm 
-	title="Edit Post"
+<CrudForm
+	title="Create Post"
 	{fields}
-	item={data.post}
-	submitLabel="Update Post"
-	cancelUrl="/posts"
+	submitLabel="Create Post"
+	cancelUrl="/publications/posts"
 	onSubmit={handleSubmit}
 />
