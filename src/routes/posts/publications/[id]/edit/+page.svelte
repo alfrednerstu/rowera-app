@@ -36,7 +36,7 @@
 			})
 			
 			if (response.ok) {
-				goto('/posts')
+				goto('/publications')
 			} else {
 				console.error('Failed to update publication')
 			}
@@ -51,6 +51,6 @@
 	{fields}
 	item={data.publication}
 	submitLabel="Update Publication"
-	cancelUrl="/posts"
+	cancelUrl="/publications"
 	onSubmit={handleSubmit}
 />

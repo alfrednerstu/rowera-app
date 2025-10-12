@@ -1,17 +1,8 @@
 <script>
 	import CrudForm from '$lib/components/CrudForm.svelte'
 	import { goto } from '$app/navigation'
-	import { browser } from '$app/environment'
-	
+
 	let { data } = $props()
-	
-	// Determine return URL based on context
-	const getReturnUrl = () => {
-		if (!browser) return '/packets'
-		const urlParams = new URLSearchParams(window.location.search)
-		return urlParams.get('return') || 
-			(document.referrer.includes('/packets/pieces') ? '/packets/pieces' : '/packets')
-	}
 	
 	const fields = [
 		{
@@ -46,7 +37,7 @@
 			})
 			
 			if (response.ok) {
-				goto(getReturnUrl())
+				goto('/packets')
 			} else {
 				console.error('Failed to update packet')
 			}
@@ -61,6 +52,6 @@
 	{fields}
 	item={data.packet}
 	submitLabel="Update Packet"
-	cancelUrl={getReturnUrl()}
+	cancelUrl="/packets"
 	onSubmit={handleSubmit}
 />
