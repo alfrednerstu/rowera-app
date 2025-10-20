@@ -1,12 +1,10 @@
 <script>
 	import CrudForm from '$lib/components/CrudForm.svelte'
 	import { goto } from '$app/navigation'
-	
-	let { data } = $props()
-	
+
 	const fields = [
 		{
-			name: 'name',
+			name: 'title',
 			label: 'Page Name',
 			type: 'text',
 			placeholder: 'Enter page name',
@@ -18,19 +16,9 @@
 			type: 'text',
 			placeholder: 'page-url-slug',
 			required: true
-		},
-		{
-			name: 'projectId',
-			label: 'Project',
-			type: 'select',
-			required: true,
-			options: data.projects.map(project => ({
-				value: project.id,
-				label: project.name
-			}))
 		}
 	]
-	
+
 	async function handleSubmit(formData) {
 		try {
 			const response = await fetch('/api/pages', {
@@ -38,7 +26,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(formData)
 			})
-			
+
 			if (response.ok) {
 				goto('/pages')
 			} else {
