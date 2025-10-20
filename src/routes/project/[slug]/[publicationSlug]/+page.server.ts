@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db'
 import { publication, post, postContent, primitive } from '$lib/server/db/schema'
 import { error } from '@sveltejs/kit'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, isNotNull } from 'drizzle-orm'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ params, parent }) => {
@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 		.where(
 			and(
 				eq(post.publicationId, publicationData[0].id),
-				eq(post.isPublished, true)
+				isNotNull(post.publishedAt)
 			)
 		)
 		.orderBy(post.publishedAt)

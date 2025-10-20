@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db'
 import { publication, post, postContent, primitive, primitiveField, partial } from '$lib/server/db/schema'
 import { error } from '@sveltejs/kit'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, isNotNull } from 'drizzle-orm'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ params, parent }) => {
@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 		throw error(404, 'Publication not found')
 	}
 
-	// Find post by slug
+	// Find post by slug (only published)
 	const postData = await db
 		.select()
 		.from(post)
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 			and(
 				eq(post.slug, params.postSlug),
 				eq(post.publicationId, publicationData[0].id),
-				eq(post.isPublished, true)
+				isNotNull(post.publishedAt)
 			)
 		)
 		.limit(1)
