@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db'
 import { packet, piece, pieceContent, primitive, primitiveField, partial } from '$lib/server/db/schema'
 import { error } from '@sveltejs/kit'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, lte } from 'drizzle-orm'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ params, parent }) => {
@@ -23,14 +23,16 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 		throw error(404, 'Packet not found')
 	}
 
-	// Find piece by slug
+	// Find piece by slug (only if publishedAt is now or in the past)
+	const now = new Date()
 	const pieceData = await db
 		.select()
 		.from(piece)
 		.where(
 			and(
 				eq(piece.slug, params.pieceSlug),
-				eq(piece.packetId, packetData[0].id)
+				eq(piece.packetId, packetData[0].id),
+				lte(piece.publishedAt, now)
 			)
 		)
 		.limit(1)

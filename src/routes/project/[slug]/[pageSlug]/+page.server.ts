@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db'
 import { page, pageContent, primitive, primitiveField, partial, publication, packet } from '$lib/server/db/schema'
 import { error } from '@sveltejs/kit'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, isNotNull } from 'drizzle-orm'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ params, parent }) => {
@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 		return
 	}
 
-	// Find page by slug within this project
+	// Find page by slug within this project (only published)
 	const pageData = await db
 		.select()
 		.from(page)
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 			and(
 				eq(page.slug, params.pageSlug),
 				eq(page.projectId, project.id),
-				eq(page.isPublished, true)
+				isNotNull(page.publishedAt)
 			)
 		)
 		.limit(1)
