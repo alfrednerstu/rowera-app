@@ -14,7 +14,7 @@
 <header>
 	<h1>{title}</h1>
 	<button>
-		<a href={createUrl} class="btn btn-primary">{createLabel} {title.slice(0, -1)}</a>
+		<a href={createUrl}>{createLabel} {title.slice(0, -1)}</a>
 	</button>
 </header>
 
@@ -23,7 +23,7 @@
 		<h2>No {title.toLowerCase()} yet</h2>
 		<p>Get started by creating your first {title.toLowerCase().slice(0, -1)}.</p>
 		<button>
-			<a href={createUrl} class="btn btn-primary">Create first {title.slice(0, -1)}</a>
+			<a href={createUrl}>Create first {title.slice(0, -1)}</a>
 		</button>
 	</section>
 {:else}
@@ -50,8 +50,8 @@
 							</td>
 						{/each}
 						<td class="actions">
-							<a href={editUrl(item)} class="btn btn-small btn-secondary">Edit</a>
-							<button onclick={() => onDelete?.(item)} class="btn btn-small btn-danger">Delete</button>
+							<button><a href={editUrl(item)}>Edit</a></button>
+							<button onclick={() => onDelete?.(item)}>Delete</button>
 						</td>
 					</tr>
 				{/each}
@@ -121,8 +121,8 @@
 	.actions {
 		white-space: nowrap;
 	}
-	
-	.actions .btn {
+
+	.actions button {
 		margin-right: 0.5rem;
 	}
 </style>

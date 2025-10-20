@@ -82,11 +82,12 @@
 	.error {
 		text-align: center;
 		padding: 2rem;
-		color: var(--text-muted, #666);
+		color: var(--secondary-color);
+		opacity: 0.75;
 	}
 
 	.error {
-		color: var(--error-color, #dc2626);
+		color: var(--accent-color);
 	}
 
 	.project-list {
@@ -107,8 +108,7 @@
 	}
 
 	.project-item:hover {
-		background: var(--surface-color, #f9f9f9);
-		border-color: var(--border-color-hover, #d5d5d5);
+		background: var(--surface-color);
 	}
 
 	.project-item.active {
@@ -124,13 +124,15 @@
 
 	.project-date {
 		font-size: 0.875rem;
-		color: var(--text-muted, #666);
+		color: var(--secondary-color);
+		opacity: 0.75;
 	}
 
 	.empty-state {
 		text-align: center;
 		padding: 2rem;
-		color: var(--text-muted, #666);
+		color: var(--secondary-color);
+		opacity: 0.75;
 	}
 
 	.empty-subtitle {

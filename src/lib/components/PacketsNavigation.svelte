@@ -57,7 +57,7 @@
 	}
 	
 	.tabs a:hover {
-		color: #495057;
+		color: var(--primary-color);
 		background: var(--surface-color);
 	}
 	

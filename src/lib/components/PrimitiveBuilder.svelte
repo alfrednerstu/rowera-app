@@ -121,9 +121,9 @@
 	.primitive-builder {
 		margin: 1.5rem 0;
 		padding: 1.5rem;
-		border: 1px solid #ddd;
+		border: 1px solid var(--quad-color);
 		border-radius: 8px;
-		background: #fafafa;
+		background: var(--quint-color);
 	}
 
 	h3 {
@@ -133,7 +133,8 @@
 	}
 
 	.empty-message {
-		color: #666;
+		color: var(--secondary-color);
+		opacity: 0.75;
 		font-style: italic;
 		margin: 1rem 0;
 	}
@@ -150,15 +151,15 @@
 		gap: 0.75rem;
 		padding: 0.75rem;
 		margin-bottom: 0.5rem;
-		background: white;
-		border: 1px solid #ddd;
+		background: var(--base-color);
+		border: 1px solid var(--quad-color);
 		border-radius: 4px;
 		cursor: move;
 		transition: opacity 0.2s, transform 0.2s;
 	}
 
 	.primitive-item:hover {
-		border-color: #999;
+		border-color: var(--secondary-color);
 	}
 
 	.primitive-item.dragging {
@@ -167,7 +168,7 @@
 
 	.drag-handle {
 		cursor: grab;
-		color: #999;
+		color: var(--secondary-color);
 		font-size: 1.2rem;
 		user-select: none;
 	}
@@ -183,8 +184,8 @@
 
 	.remove-button {
 		padding: 0.5rem 1rem;
-		background: #f44336;
-		color: white;
+		background: var(--accent-color);
+		color: var(--base-color);
 		border: none;
 		border-radius: 4px;
 		cursor: pointer;
@@ -192,26 +193,23 @@
 		font-weight: 500;
 	}
 
-	.remove-button:hover {
-		background: #d32f2f;
-	}
-
 	.dropdown-container {
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
 		padding: 1rem;
-		background: white;
-		border: 1px solid #ddd;
+		background: var(--base-color);
+		border: 1px solid var(--quad-color);
 		border-radius: 4px;
 	}
 
 	.primitive-select {
 		width: 100%;
 		padding: 0.75rem;
-		border: 1px solid #ddd;
+		border: 1px solid var(--quad-color);
 		border-radius: 4px;
 		font-size: 1rem;
+		background: var(--base-color);
 	}
 
 	.dropdown-actions {
@@ -222,24 +220,20 @@
 	.confirm-button {
 		flex: 1;
 		padding: 0.75rem 1.5rem;
-		background: #4caf50;
-		color: white;
+		background: var(--accent-color);
+		color: var(--base-color);
 		border: none;
 		border-radius: 4px;
 		cursor: pointer;
 		font-size: 1rem;
 		font-weight: 500;
-	}
-
-	.confirm-button:hover {
-		background: #45a049;
 	}
 
 	.cancel-button {
 		flex: 1;
 		padding: 0.75rem 1.5rem;
-		background: #6c757d;
-		color: white;
+		background: var(--secondary-color);
+		color: var(--base-color);
 		border: none;
 		border-radius: 4px;
 		cursor: pointer;
@@ -247,23 +241,15 @@
 		font-weight: 500;
 	}
 
-	.cancel-button:hover {
-		background: #545b62;
-	}
-
 	.add-button {
 		padding: 0.75rem 1.5rem;
-		background: #4caf50;
-		color: white;
+		background: var(--accent-color);
+		color: var(--base-color);
 		border: none;
 		border-radius: 4px;
 		cursor: pointer;
 		font-size: 1rem;
 		font-weight: 500;
 		width: 100%;
-	}
-
-	.add-button:hover {
-		background: #45a049;
 	}
 </style>

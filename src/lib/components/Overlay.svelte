@@ -150,7 +150,7 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 1.5rem;
-		border-bottom: 1px solid var(--border-color, #e5e5e5);
+		border-bottom: 1px solid var(--quad-color);
 	}
 
 	.overlay-header h2 {

@@ -210,27 +210,22 @@
 }
 	
 	.tabs button:hover {
-		color: #495057;
+		color: var(--primary-color);
 		background: var(--surface-color);
 	}
-	
-	.tabs button.active {
-    background: var(--accent-color);
-    color: var(--base-color);
-}
 
-/* moving active background */
-.active-pill {
-    position: absolute;
-    inset: 0;
-    border-radius: .25rem;
-    background: var(--accent-color);
-    pointer-events: none;
-    z-index: -1;
-}
-	
-	.page-header h1 {
-		margin: 0;
-		color: #495057;
+	.tabs button.active {
+		background: var(--accent-color);
+		color: var(--base-color);
+	}
+
+	/* moving active background */
+	.active-pill {
+		position: absolute;
+		inset: 0;
+		border-radius: .25rem;
+		background: var(--accent-color);
+		pointer-events: none;
+		z-index: -1;
 	}
 </style>
