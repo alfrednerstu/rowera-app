@@ -1,9 +1,16 @@
 <script>
 	import CrudForm from '$lib/components/CrudForm.svelte'
+	import PrimitiveBuilder from '$lib/components/PrimitiveBuilder.svelte'
 	import { goto } from '$app/navigation'
 
 	let { data } = $props()
-	
+
+	let primitives = $state(data.packet.content?.map(c => ({
+		id: c.id,
+		primitiveId: c.primitiveId,
+		order: c.order
+	})) || [])
+
 	const fields = [
 		{
 			name: 'name',
@@ -27,15 +34,18 @@
 			options: data.projects.map(p => ({ value: p.id, label: p.name }))
 		}
 	]
-	
+
 	async function handleSubmit(formData) {
 		try {
 			const response = await fetch(`/api/packets/${data.packet.id}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(formData)
+				body: JSON.stringify({
+					...formData,
+					primitives
+				})
 			})
-			
+
 			if (response.ok) {
 				goto('/packets')
 			} else {
@@ -47,11 +57,15 @@
 	}
 </script>
 
-<CrudForm 
+<CrudForm
 	title="Edit Packet"
 	{fields}
 	item={data.packet}
 	submitLabel="Update Packet"
 	cancelUrl="/packets"
 	onSubmit={handleSubmit}
-/>
+>
+	{#snippet children()}
+		<PrimitiveBuilder bind:primitives availablePrimitives={data.primitives} />
+	{/snippet}
+</CrudForm>

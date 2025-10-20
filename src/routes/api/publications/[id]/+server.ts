@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { publication, project } from '$lib/server/db/schema'
+import { publication, project, publicationContent } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -8,22 +8,22 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
-	
+
 	try {
-		const { name, slug, projectId } = await request.json()
-		
+		const { name, slug, projectId, primitives } = await request.json()
+
 		if (!name?.trim()) {
 			return json({ error: 'Publication name is required' }, { status: 400 })
 		}
-		
+
 		if (!slug?.trim()) {
 			return json({ error: 'Publication slug is required' }, { status: 400 })
 		}
-		
+
 		if (!projectId) {
 			return json({ error: 'Project is required' }, { status: 400 })
 		}
-		
+
 		// Verify that the new product belongs to the user
 		const projectResult = await db.select()
 			.from(project)
@@ -34,11 +34,11 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 				)
 			)
 			.limit(1)
-		
+
 		if (!projectResult.length) {
 			return json({ error: 'Project not found or access denied' }, { status: 404 })
 		}
-		
+
 		// First verify ownership of the publication through its current project
 		const currentPublication = await db.select({ id: publication.id })
 			.from(publication)
@@ -50,14 +50,14 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 				)
 			)
 			.limit(1)
-		
+
 		if (!currentPublication.length) {
 			return json({ error: 'Publication not found or access denied' }, { status: 404 })
 		}
-		
+
 		// Update the publication
 		const updatedPublication = await db.update(publication)
-			.set({ 
+			.set({
 				name: name.trim(),
 				slug: slug.trim(),
 				projectId,
@@ -72,11 +72,29 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 				createdAt: publication.createdAt,
 				updatedAt: publication.updatedAt
 			})
-		
+
 		if (!updatedPublication.length) {
 			return json({ error: 'Publication not found' }, { status: 404 })
 		}
-		
+
+		// Update publication content if primitives are provided
+		if (primitives) {
+			// Delete existing content
+			await db.delete(publicationContent).where(eq(publicationContent.publicationId, params.id))
+
+			// Insert new content
+			if (primitives.length > 0) {
+				await db.insert(publicationContent).values(
+					primitives.map((prim, index) => ({
+						publicationId: params.id,
+						primitiveId: prim.primitiveId,
+						order: index,
+						content: {}
+					}))
+				)
+			}
+		}
+
 		return json(updatedPublication[0])
 	} catch (error) {
 		console.error('Error updating publication:', error)

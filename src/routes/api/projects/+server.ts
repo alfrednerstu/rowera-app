@@ -8,10 +8,10 @@ export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
-	
+
 	try {
 		const projects = await db.select().from(project).where(eq(project.userId, locals.user.id))
-		
+
 		return json({ projects })
 	} catch (error) {
 		console.error('Error fetching projects:', error)
@@ -23,14 +23,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
-	
+
 	try {
 		const { name } = await request.json()
-		
+
 		if (!name?.trim()) {
 			return json({ error: 'Project name is required' }, { status: 400 })
 		}
-		
+
 		const [newProject] = await db.insert(project).values({
 			name: name.trim(),
 			userId: locals.user.id
@@ -49,11 +49,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			slug: 'default',
 			projectId: newProject.id
 		}).returning()
-		
-		return json({ 
-			project: newProject, 
-			defaultPublication, 
-			defaultPacket 
+
+		return json({
+			project: newProject,
+			defaultPublication,
+			defaultPacket
 		})
 	} catch (error) {
 		console.error('Error creating project:', error)
