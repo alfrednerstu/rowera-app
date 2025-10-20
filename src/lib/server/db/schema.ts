@@ -103,6 +103,7 @@ export const primitive = pgTable('primitive', {
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description').notNull(),
   tags: text('tags').notNull(),
+  category: varchar('category', { length: 50 }).notNull().default('content'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });

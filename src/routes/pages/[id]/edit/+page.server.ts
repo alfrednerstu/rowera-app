@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { page, project, primitive } from '$lib/server/db/schema'
+import { page, project, primitive, primitiveField } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
@@ -37,12 +37,21 @@ export const load = async ({ params, locals }) => {
 	// Get all user's projects for the select field
 	const userProjects = await db.select().from(project).where(eq(project.userId, locals.user.id))
 
-	// Get all available primitives
+	// Get all available primitives with their fields
 	const allPrimitives = await db.select().from(primitive)
+
+	// Get all primitive fields
+	const allFields = await db.select().from(primitiveField)
+
+	// Attach fields to each primitive
+	const primitivesWithFields = allPrimitives.map(prim => ({
+		...prim,
+		fields: allFields.filter(f => f.primitiveId === prim.id).sort((a, b) => a.order - b.order)
+	}))
 
 	return {
 		page: pageResult[0],
 		projects: userProjects,
-		primitives: allPrimitives
+		primitives: primitivesWithFields
 	}
 }

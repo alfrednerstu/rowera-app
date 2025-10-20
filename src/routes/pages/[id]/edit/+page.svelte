@@ -1,6 +1,6 @@
 <script>
 	import CrudForm from '$lib/components/CrudForm.svelte'
-	import PrimitiveBuilder from '$lib/components/PrimitiveBuilder.svelte'
+	import ContentEditor from '$lib/components/ContentEditor.svelte'
 	import { goto } from '$app/navigation'
 
 	let { data } = $props()
@@ -65,6 +65,6 @@
 	onSubmit={handleSubmit}
 >
 	{#snippet children()}
-		<PrimitiveBuilder bind:primitives availablePrimitives={data.primitives} />
+		<ContentEditor bind:primitives availablePrimitives={data.primitives} mode="full" />
 	{/snippet}
 </CrudForm>

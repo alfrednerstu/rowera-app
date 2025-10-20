@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { preset, project, packet, primitive } from '$lib/server/db/schema'
+import { preset, project, packet, primitive, primitiveField } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
@@ -51,12 +51,21 @@ export async function load({ params, parent, cookies }) {
 			: eq(project.userId, user.id)
 	)
 
-	// Get all available primitives
+	// Get all available primitives with their fields
 	const allPrimitives = await db.select().from(primitive)
+
+	// Get all primitive fields
+	const allFields = await db.select().from(primitiveField)
+
+	// Attach fields to each primitive
+	const primitivesWithFields = allPrimitives.map(prim => ({
+		...prim,
+		fields: allFields.filter(f => f.primitiveId === prim.id).sort((a, b) => a.order - b.order)
+	}))
 
 	return {
 		preset: presetResult[0],
 		packets: userPackets,
-		primitives: allPrimitives
+		primitives: primitivesWithFields
 	}
 }
