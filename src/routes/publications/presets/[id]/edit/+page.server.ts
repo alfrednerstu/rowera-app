@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { preset, publication, project, primitive } from '$lib/server/db/schema'
+import { preset, publication, project, primitive, primitiveField } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
@@ -44,12 +44,21 @@ export async function load({ params, parent }) {
 	.innerJoin(project, eq(publication.projectId, project.id))
 	.where(eq(project.userId, user.id))
 
-	// Get all available primitives
+	// Get all available primitives with their fields
 	const allPrimitives = await db.select().from(primitive)
+
+	// Get all primitive fields
+	const allFields = await db.select().from(primitiveField)
+
+	// Attach fields to each primitive
+	const primitivesWithFields = allPrimitives.map(prim => ({
+		...prim,
+		fields: allFields.filter(f => f.primitiveId === prim.id).sort((a, b) => a.order - b.order)
+	}))
 
 	return {
 		preset: presetResult[0],
 		publications: userPublications,
-		primitives: allPrimitives
+		primitives: primitivesWithFields
 	}
 }
