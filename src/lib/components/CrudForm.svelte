@@ -41,6 +41,7 @@
 						id={field.name}
 						bind:value={formData[field.name]}
 						required={field.required}
+						onchange={(e) => field.onChange?.(e.target.value)}
 					>
 						<option value="">Select {field.label}</option>
 						{#each field.options as option}
