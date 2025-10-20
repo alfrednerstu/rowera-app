@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { publication, project } from '$lib/server/db/schema'
+import { publication, project, publicationContent, primitive } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
@@ -8,22 +8,22 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
-	
+
 	try {
 		const { name, slug, projectId } = await request.json()
-		
+
 		if (!name?.trim()) {
 			return json({ error: 'Publication name is required' }, { status: 400 })
 		}
-		
+
 		if (!slug?.trim()) {
 			return json({ error: 'Publication slug is required' }, { status: 400 })
 		}
-		
+
 		if (!projectId) {
 			return json({ error: 'Project is required' }, { status: 400 })
 		}
-		
+
 		// Verify that the project belongs to the user
 		const projectRows = await db.select()
 			.from(project)
@@ -34,17 +34,32 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				)
 			)
 			.limit(1)
-		
+
 		if (!projectRows.length) {
 			return json({ error: 'Project not found or access denied' }, { status: 404 })
 		}
-		
+
 		const [newPublication] = await db.insert(publication).values({
 			name: name.trim(),
 			slug: slug.trim(),
 			projectId
 		}).returning()
-		
+
+		// Automatically add "Post List" primitive to the new publication
+		const postListPrimitive = await db.select()
+			.from(primitive)
+			.where(eq(primitive.name, 'Post List'))
+			.limit(1)
+
+		if (postListPrimitive.length > 0) {
+			await db.insert(publicationContent).values({
+				publicationId: newPublication.id,
+				primitiveId: postListPrimitive[0].id,
+				order: 0,
+				content: {}
+			})
+		}
+
 		return json(newPublication)
 	} catch (error) {
 		console.error('Error creating publication:', error)

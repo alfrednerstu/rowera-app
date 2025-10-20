@@ -1,15 +1,15 @@
 import { db } from '$lib/server/db'
-import { packet, project } from '$lib/server/db/schema'
+import { packet, project, packetContent, primitive } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, asc } from 'drizzle-orm'
 
 export const load = async ({ params, locals }) => {
-	
-	
+
+
 	if (!locals.user?.id) {
 		throw redirect(302, '/login')
 	}
-	
+
 	const packetQuery = await db.select({
 		id: packet.id,
 		name: packet.name,
@@ -27,16 +27,29 @@ export const load = async ({ params, locals }) => {
 		)
 	)
 	.limit(1)
-	
+
 	if (!packetQuery.length) {
 		throw error(404, 'Packet not found')
 	}
-	
+
+	// Get packet content (layout primitives)
+	const content = await db.select()
+		.from(packetContent)
+		.where(eq(packetContent.packetId, params.id))
+		.orderBy(asc(packetContent.order))
+
 	// Get user's projects for the form
 	const userProjects = await db.select().from(project).where(eq(project.userId, locals.user.id))
-	
+
+	// Get all available primitives
+	const allPrimitives = await db.select().from(primitive)
+
 	return {
-		packet: packetQuery[0],
-		projects: userProjects
+		packet: {
+			...packetQuery[0],
+			content
+		},
+		projects: userProjects,
+		primitives: allPrimitives
 	}
 }

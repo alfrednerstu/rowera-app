@@ -33,6 +33,19 @@ export const project = pgTable('project', {
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
+// Project Content - the primitives and partials on a project root page with their content
+export const projectContent = pgTable('project_content', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').notNull().references(() => project.id, { onDelete: 'cascade' }),
+  order: integer('order').notNull(),
+  primitiveId: uuid('primitive_id').references(() => primitive.id, { onDelete: 'restrict' }),
+  sourcePresetId: uuid('source_preset_id').references(() => preset.id, { onDelete: 'restrict' }),
+  sourcePartialId: uuid('source_partial_id').references(() => partial.id, { onDelete: 'restrict' }),
+  content: json('content').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+})
+
 // Publication - groups posts under a project
 export const publication = pgTable('publication', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -84,6 +97,19 @@ export const piece = pgTable('piece', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
+
+// Packet Content - the primitives and partials on a packet root page with their content
+export const packetContent = pgTable('packet_content', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  packetId: uuid('packet_id').notNull().references(() => packet.id, { onDelete: 'cascade' }),
+  order: integer('order').notNull(),
+  primitiveId: uuid('primitive_id').references(() => primitive.id, { onDelete: 'restrict' }),
+  sourcePresetId: uuid('source_preset_id').references(() => preset.id, { onDelete: 'restrict' }),
+  sourcePartialId: uuid('source_partial_id').references(() => partial.id, { onDelete: 'restrict' }),
+  content: json('content').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+})
 
 // Piece Content - the primitives and partials on a piece with their content
 export const pieceContent = pgTable('piece_content', {
@@ -147,6 +173,19 @@ export const post = pgTable('post', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
+
+// Publication Content - the primitives and partials on a publication root page with their content
+export const publicationContent = pgTable('publication_content', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  publicationId: uuid('publication_id').notNull().references(() => publication.id, { onDelete: 'cascade' }),
+  order: integer('order').notNull(),
+  primitiveId: uuid('primitive_id').references(() => primitive.id, { onDelete: 'restrict' }),
+  sourcePresetId: uuid('source_preset_id').references(() => preset.id, { onDelete: 'restrict' }),
+  sourcePartialId: uuid('source_partial_id').references(() => partial.id, { onDelete: 'restrict' }),
+  content: json('content').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+})
 
 // Post Content - the primitives and partials on a post with their content
 export const postContent = pgTable('post_content', {
@@ -345,7 +384,8 @@ export const projectRelations = relations(project, ({ one, many }) => ({
   }),
   pages: many(page),
   publications: many(publication),
-  packets: many(packet)
+  packets: many(packet),
+  content: many(projectContent)
 }));
 
 export const postRelations = relations(post, ({ one, many }) => ({
@@ -363,6 +403,44 @@ export const postRelations = relations(post, ({ one, many }) => ({
   }),
   content: many(postContent)
 }));
+
+export const projectContentRelations = relations(projectContent, ({ one }) => ({
+  project: one(project, {
+    fields: [projectContent.projectId],
+    references: [project.id]
+  }),
+  primitive: one(primitive, {
+    fields: [projectContent.primitiveId!],
+    references: [primitive.id]
+  }),
+  sourcePreset: one(preset, {
+    fields: [projectContent.sourcePresetId!],
+    references: [preset.id]
+  }),
+  sourcePartial: one(partial, {
+    fields: [projectContent.sourcePartialId!],
+    references: [partial.id]
+  })
+}))
+
+export const publicationContentRelations = relations(publicationContent, ({ one }) => ({
+  publication: one(publication, {
+    fields: [publicationContent.publicationId],
+    references: [publication.id]
+  }),
+  primitive: one(primitive, {
+    fields: [publicationContent.primitiveId!],
+    references: [primitive.id]
+  }),
+  sourcePreset: one(preset, {
+    fields: [publicationContent.sourcePresetId!],
+    references: [preset.id]
+  }),
+  sourcePartial: one(partial, {
+    fields: [publicationContent.sourcePartialId!],
+    references: [partial.id]
+  })
+}))
 
 export const postContentRelations = relations(postContent, ({ one }) => ({
   post: one(post, {
@@ -446,7 +524,8 @@ export const publicationRelations = relations(publication, ({ one, many }) => ({
     references: [project.id]
   }),
   posts: many(post),
-  presets: many(preset)
+  presets: many(preset),
+  content: many(publicationContent)
 }));
 
 export const presetRelations = relations(preset, ({ one, many }) => ({
@@ -480,7 +559,8 @@ export const packetRelations = relations(packet, ({ one, many }) => ({
     references: [project.id]
   }),
   pieces: many(piece),
-  presets: many(preset)
+  presets: many(preset),
+  content: many(packetContent)
 }));
 
 export const pieceRelations = relations(piece, ({ one, many }) => ({
@@ -494,6 +574,25 @@ export const pieceRelations = relations(piece, ({ one, many }) => ({
   }),
   content: many(pieceContent)
 }));
+
+export const packetContentRelations = relations(packetContent, ({ one }) => ({
+  packet: one(packet, {
+    fields: [packetContent.packetId],
+    references: [packet.id]
+  }),
+  primitive: one(primitive, {
+    fields: [packetContent.primitiveId!],
+    references: [primitive.id]
+  }),
+  sourcePreset: one(preset, {
+    fields: [packetContent.sourcePresetId!],
+    references: [preset.id]
+  }),
+  sourcePartial: one(partial, {
+    fields: [packetContent.sourcePartialId!],
+    references: [partial.id]
+  })
+}))
 
 export const pieceContentRelations = relations(pieceContent, ({ one }) => ({
   piece: one(piece, {
