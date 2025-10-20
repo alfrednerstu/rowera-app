@@ -46,8 +46,7 @@ export const POST: RequestHandler = async ({ request, locals, cookies }) => {
 			title: title.trim(),
 			slug: slug.trim(),
 			projectId,
-			userId: locals.user.id,
-			content: null
+			userId: locals.user.id
 		}).returning()
 		
 		return json(newPage)
