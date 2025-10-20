@@ -4,13 +4,13 @@ import { page, project } from '$lib/server/db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request, locals, cookies }) => {
 	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 })
 	}
 	
 	try {
-		const { title, slug, projectId } = await request.json()
+		const { title, slug } = await request.json()
 		
 		if (!title?.trim()) {
 			return json({ error: 'Page title is required' }, { status: 400 })
@@ -20,8 +20,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ error: 'Page slug is required' }, { status: 400 })
 		}
 		
+		// Get projectId from cookie
+		const projectId = cookies.get('activeProjectId')
+		
 		if (!projectId) {
-			return json({ error: 'Project is required' }, { status: 400 })
+			return json({ error: 'No project selected' }, { status: 400 })
 		}
 		
 		// Verify that the project belongs to the user

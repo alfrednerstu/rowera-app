@@ -167,7 +167,6 @@ export const page = pgTable('page', {
 export const partial = pgTable('partial', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
-  slug: varchar('slug', { length: 255 }).notNull(),
   description: text('description'),
   elements: json('elements').notNull(), // Array of semantic HTML elements with their structure
   primitives: json('primitives'), // Array of primitive configurations with order

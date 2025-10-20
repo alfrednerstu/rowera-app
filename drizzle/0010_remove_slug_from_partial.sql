@@ -1,0 +1,1 @@
+ALTER TABLE "partial" DROP COLUMN IF EXISTS "slug";
