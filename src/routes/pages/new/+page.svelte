@@ -1,6 +1,10 @@
 <script>
 	import CrudForm from '$lib/components/CrudForm.svelte'
+	import PrimitivePartialManager from '$lib/components/PrimitivePartialManager.svelte'
+	import ContentBuilder from '$lib/components/ContentBuilder.svelte'
 	import { goto } from '$app/navigation'
+
+	let { data } = $props()
 
 	const fields = [
 		{
@@ -19,12 +23,33 @@
 		}
 	]
 
+	let selectedItems = $state([])
+	let contentData = $state([])
+
+	// Build content items for ContentBuilder
+	let contentItems = $derived(selectedItems.map(item => {
+		if (item.type === 'primitive') {
+			return {
+				primitiveId: item.id,
+				type: 'primitive'
+			}
+		} else {
+			return {
+				partialId: item.id,
+				type: 'partial'
+			}
+		}
+	}))
+
 	async function handleSubmit(formData) {
 		try {
 			const response = await fetch('/api/pages', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(formData)
+				body: JSON.stringify({
+					...formData,
+					content: contentData
+				})
 			})
 
 			if (response.ok) {
@@ -38,10 +63,29 @@
 	}
 </script>
 
-<CrudForm 
+<CrudForm
 	title="Create Page"
 	{fields}
 	submitLabel="Create Page"
 	cancelUrl="/pages"
 	onSubmit={handleSubmit}
-/>
+>
+	{#snippet children()}
+		<PrimitivePartialManager
+			primitives={data.primitives}
+			partials={data.partials}
+			bind:selectedItems
+			label="Page Content"
+		/>
+
+		{#if selectedItems.length > 0}
+			<ContentBuilder
+				{contentItems}
+				primitives={data.primitives}
+				partials={data.partials}
+				bind:contentData
+				label="Fill in Content"
+			/>
+		{/if}
+	{/snippet}
+</CrudForm>
