@@ -1,0 +1,14 @@
+{
+  "id": "0017_remove_content_columns",
+  "prevId": "0007_rename_product_to_project_and_project_to_packet",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {},
+  "enums": {},
+  "schemas": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}
