@@ -9,7 +9,7 @@ export const load: LayoutServerLoad = async ({ params }) => {
 	const projectData = await db
 		.select()
 		.from(project)
-		.where(eq(project.id, params.slug))
+		.where(eq(project.id, params.projectSlug))
 		.limit(1)
 
 	if (!projectData || projectData.length === 0) {

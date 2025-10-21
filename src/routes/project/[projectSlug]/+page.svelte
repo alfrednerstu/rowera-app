@@ -11,7 +11,7 @@
 			<ul>
 				{#each data.publications as publication}
 					<li>
-						<a href="/{publication.slug}">{publication.name}</a>
+						<a href="/project/{data.project.id}/{publication.slug}">{publication.name}</a>
 					</li>
 				{/each}
 			</ul>
@@ -24,7 +24,7 @@
 			<ul>
 				{#each data.packets as packet}
 					<li>
-						<a href="/{packet.slug}">{packet.name}</a>
+						<a href="/project/{data.project.id}/{packet.slug}">{packet.name}</a>
 					</li>
 				{/each}
 			</ul>
