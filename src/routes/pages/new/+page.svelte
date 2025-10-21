@@ -9,7 +9,7 @@
 	const fields = [
 		{
 			name: 'title',
-			label: 'Page Name',
+			label: 'Name',
 			type: 'text',
 			placeholder: 'Enter page name',
 			required: true
@@ -64,9 +64,9 @@
 </script>
 
 <CrudForm
-	title="Create Page"
+	title="Create page"
 	{fields}
-	submitLabel="Create Page"
+	submitLabel="Create page"
 	cancelUrl="/pages"
 	onSubmit={handleSubmit}
 >
@@ -84,7 +84,7 @@
 				primitives={data.primitives}
 				partials={data.partials}
 				bind:contentData
-				label="Fill in Content"
+				label="Fill in content"
 			/>
 		{/if}
 	{/snippet}
