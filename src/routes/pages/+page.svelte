@@ -10,9 +10,8 @@
 	})
 	
 	const columns = [
-		{ key: 'name', header: 'Page Name', microformatClass: 'p-name' },
+		{ key: 'title', header: 'Name', microformatClass: 'p-name' },
 		{ key: 'slug', header: 'Slug', microformatClass: 'u-url' },
-		{ key: 'projectName', header: 'Project' },
 		{
 			key: 'createdAt',
 			header: 'Created',
@@ -25,7 +24,7 @@
 	]
 	
 	async function handleDelete(page) {
-		if (confirm(`Are you sure you want to delete "${page.name}"?`)) {
+		if (confirm(`Are you sure you want to delete "${page.title}"?`)) {
 			try {
 				const response = await fetch(`/api/pages/${page.id}`, {
 					method: 'DELETE'
@@ -54,7 +53,7 @@
 	{columns}
 	title="Pages"
 	createUrl="/pages/new"
-	editUrl={(item) => `/pages/${item.id}/edit`}
+	editUrl={(item) => `/pages/${item.slug}/edit`}
 	onDelete={handleDelete}
 	microformat="h-entry"
 />

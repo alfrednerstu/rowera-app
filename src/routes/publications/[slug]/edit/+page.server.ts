@@ -10,7 +10,7 @@ export async function load({ params, parent }) {
 		throw redirect(302, '/login')
 	}
 
-	// Get the publication with ownership verification through product
+	// Get the publication with ownership verification through project
 	const publicationResult = await db.select({
 		id: publication.id,
 		name: publication.name,
@@ -23,7 +23,7 @@ export async function load({ params, parent }) {
 	.innerJoin(project, eq(publication.projectId, project.id))
 	.where(
 		and(
-			eq(publication.id, params.id),
+			eq(publication.slug, params.slug),
 			eq(project.userId, user.id)
 		)
 	)
@@ -36,7 +36,7 @@ export async function load({ params, parent }) {
 	// Get publication content (layout primitives)
 	const content = await db.select()
 		.from(publicationContent)
-		.where(eq(publicationContent.publicationId, params.id))
+		.where(eq(publicationContent.publicationId, publicationResult[0].id))
 		.orderBy(asc(publicationContent.order))
 
 	// Get all user's projects for the select field

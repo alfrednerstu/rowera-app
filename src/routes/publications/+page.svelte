@@ -11,9 +11,8 @@
 
 	// Publications table configuration
 	const publicationColumns = [
-		{ key: 'name', header: 'Publication Name', microformatClass: 'p-name' },
+		{ key: 'name', header: 'Name', microformatClass: 'p-name' },
 		{ key: 'slug', header: 'Slug', microformatClass: 'u-url' },
-		{ key: 'projectName', header: 'Project' },
 		{
 			key: 'createdAt',
 			header: 'Created',
@@ -50,7 +49,7 @@
 	columns={publicationColumns}
 	title="Publications"
 	createUrl="/publications/new"
-	editUrl={(item) => `/publications/${item.id}/edit`}
+	editUrl={(item) => `/publications/${item.slug}/edit`}
 	onDelete={handleDeletePublication}
 	microformat="h-feed"
 />

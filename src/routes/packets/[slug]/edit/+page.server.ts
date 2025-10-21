@@ -22,7 +22,7 @@ export const load = async ({ params, locals }) => {
 	.innerJoin(project, eq(packet.projectId, project.id))
 	.where(
 		and(
-			eq(packet.id, params.id),
+			eq(packet.slug, params.slug),
 			eq(project.userId, locals.user.id)
 		)
 	)
@@ -35,7 +35,7 @@ export const load = async ({ params, locals }) => {
 	// Get packet content (layout primitives)
 	const content = await db.select()
 		.from(packetContent)
-		.where(eq(packetContent.packetId, params.id))
+		.where(eq(packetContent.packetId, packetQuery[0].id))
 		.orderBy(asc(packetContent.order))
 
 	// Get user's projects for the form

@@ -19,9 +19,8 @@
 	
 	// Packets table configuration
 	const packetColumns = [
-		{ key: 'name', header: 'Packet Name', microformatClass: 'p-name' },
+		{ key: 'name', header: 'Name', microformatClass: 'p-name' },
 		{ key: 'slug', header: 'Slug', microformatClass: 'u-url' },
-		{ key: 'projectName', header: 'Project' },
 		{
 			key: 'createdAt',
 			header: 'Created',
@@ -35,7 +34,7 @@
 	
 	// Pieces table configuration
 	const pieceColumns = [
-		{ key: 'name', header: 'Piece Name', microformatClass: 'p-name' },
+		{ key: 'name', header: 'Name', microformatClass: 'p-name' },
 		{ key: 'slug', header: 'Slug', microformatClass: 'u-url' },
 		{ key: 'packetName', header: 'Packet' },
 		{ key: 'presetName', header: 'Preset' },
@@ -169,7 +168,7 @@
 		columns={pieceColumns}
 		title="Pieces"
 		createUrl="/pieces/new"
-		editUrl={(item) => `/pieces/${item.id}/edit`}
+		editUrl={(item) => `/pieces/${item.slug}/edit`}
 		onDelete={handleDeletePiece}
 		microformat="h-entry"
 	/>

@@ -11,11 +11,10 @@ export const load = async ({ params, locals }) => {
 	}
 	
 	// Get the post with ownership verification through publication
-	const post = await db.select({
+	const postResult = await db.select({
 		id: post.id,
 		title: post.title,
 		slug: post.slug,
-		content: post.content,
 		publicationId: post.publicationId,
 		presetId: post.presetId,
 		createdAt: post.createdAt,
@@ -26,13 +25,13 @@ export const load = async ({ params, locals }) => {
 	.innerJoin(project, eq(publication.projectId, project.id))
 	.where(
 		and(
-			eq(post.id, params.id),
+			eq(post.slug, params.slug),
 			eq(project.userId, locals.user.id)
 		)
 	)
 	.limit(1)
-	
-	if (!post.length) {
+
+	if (!postResult.length) {
 		throw error(404, 'Post not found')
 	}
 	
@@ -58,7 +57,7 @@ export const load = async ({ params, locals }) => {
 	.where(eq(project.userId, locals.user.id))
 	
 	return {
-		post: post[0],
+		post: postResult[0],
 		publications: userPublications,
 		presets: userPresets
 	}

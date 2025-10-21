@@ -10,13 +10,12 @@ export const load = async ({ params, locals }) => {
 		throw redirect(302, '/login')
 	}
 
-	// Get the page with ownership verification through product
+	// Get the page with ownership verification through project
 	const pageResult = await db.select({
 		id: page.id,
-		name: page.name,
+		title: page.title,
 		slug: page.slug,
 		projectId: page.projectId,
-		primitives: page.primitives,
 		createdAt: page.createdAt,
 		updatedAt: page.updatedAt
 	})
@@ -24,7 +23,7 @@ export const load = async ({ params, locals }) => {
 	.innerJoin(project, eq(page.projectId, project.id))
 	.where(
 		and(
-			eq(page.id, params.id),
+			eq(page.slug, params.slug),
 			eq(project.userId, locals.user.id)
 		)
 	)

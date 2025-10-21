@@ -11,7 +11,7 @@
 
 	// Posts table configuration
 	const postColumns = [
-		{ key: 'title', header: 'Post Title', microformatClass: 'p-name' },
+		{ key: 'title', header: 'Name', microformatClass: 'p-name' },
 		{ key: 'slug', header: 'Slug', microformatClass: 'u-url' },
 		{ key: 'publicationName', header: 'Publication' },
 		{ key: 'presetName', header: 'Preset' },
@@ -51,7 +51,7 @@
 	columns={postColumns}
 	title="Posts"
 	createUrl="/publications/posts/new"
-	editUrl={(item) => `/publications/posts/${item.id}/edit`}
+	editUrl={(item) => `/publications/posts/${item.slug}/edit`}
 	onDelete={handleDeletePost}
 	microformat="h-entry"
 />

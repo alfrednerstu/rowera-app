@@ -11,7 +11,7 @@
 	
 	// Pieces table configuration
 	const pieceColumns = [
-		{ key: 'name', header: 'Piece Name' },
+		{ key: 'name', header: 'Name' },
 		{ key: 'slug', header: 'Slug' },
 		{ 
 			key: 'packetName', 
