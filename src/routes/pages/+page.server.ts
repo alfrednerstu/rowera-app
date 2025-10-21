@@ -42,7 +42,7 @@ export async function load({ parent, cookies }) {
   const userPages = await db
     .select({
       id: page.id,
-      name: page.title,
+      title: page.title,
       slug: page.slug,
       projectId: page.projectId,
       projectName: project.name,

@@ -11,11 +11,10 @@
 	
 	// Packets table configuration
 	const packetColumns = [
-		{ key: 'name', header: 'Packet Name' },
+		{ key: 'name', header: 'Name' },
 		{ key: 'slug', header: 'Slug' },
-		{ key: 'projectName', header: 'Project' },
-		{ 
-			key: 'createdAt', 
+		{
+			key: 'createdAt',
 			header: 'Created',
 			render: (item) => new Date(item.createdAt).toLocaleDateString()
 		}
@@ -47,7 +46,7 @@
 	columns={packetColumns}
 	title="Packets"
 	createUrl="/packets/new"
-	editUrl={(item) => `/packets/${item.id}/edit`}
+	editUrl={(item) => `/packets/${item.slug}/edit`}
 	onDelete={handleDeletePacket}
 />
 

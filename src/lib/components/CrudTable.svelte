@@ -44,6 +44,8 @@
 							<td class={column.microformatClass || ''}>
 								{#if column.render}
 									{@html column.render(item)}
+								{:else if column.key === 'slug'}
+									/{item[column.key]}
 								{:else}
 									{item[column.key]}
 								{/if}

@@ -24,7 +24,7 @@ export async function load({ params, parent }) {
 	.innerJoin(project, eq(packet.projectId, project.id))
 	.where(
 		and(
-			eq(piece.id, params.id),
+			eq(piece.slug, params.slug),
 			eq(project.userId, user.id)
 		)
 	)
