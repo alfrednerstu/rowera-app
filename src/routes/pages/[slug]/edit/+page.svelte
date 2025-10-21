@@ -5,6 +5,7 @@
 
 	let { data } = $props()
 
+	let primitives = $state(data.page.primitives || [])
 
 	const fields = [
 		{
@@ -38,7 +39,10 @@
 			const response = await fetch(`/api/pages/${data.page.id}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(formData)
+				body: JSON.stringify({
+					...formData,
+					primitives
+				})
 			})
 
 			if (response.ok) {
@@ -59,4 +63,8 @@
 	submitLabel="Update Page"
 	cancelUrl="/pages"
 	onSubmit={handleSubmit}
-/>
+>
+	{#snippet children()}
+		<ContentEditor bind:primitives availablePrimitives={data.primitives} mode="full" />
+	{/snippet}
+</CrudForm>
