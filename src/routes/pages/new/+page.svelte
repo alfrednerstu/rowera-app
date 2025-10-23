@@ -1,7 +1,6 @@
 <script>
 	import CrudForm from '$lib/components/CrudForm.svelte'
-	import PrimitivePartialManager from '$lib/components/PrimitivePartialManager.svelte'
-	import ContentBuilder from '$lib/components/ContentBuilder.svelte'
+	import ContentEditor from '$lib/components/ContentEditor.svelte'
 	import { goto } from '$app/navigation'
 
 	let { data } = $props()
@@ -23,23 +22,7 @@
 		}
 	]
 
-	let selectedItems = $state([])
-	let contentData = $state([])
-
-	// Build content items for ContentBuilder
-	let contentItems = $derived(selectedItems.map(item => {
-		if (item.type === 'primitive') {
-			return {
-				primitiveId: item.id,
-				type: 'primitive'
-			}
-		} else {
-			return {
-				partialId: item.id,
-				type: 'partial'
-			}
-		}
-	}))
+	let primitives = $state([])
 
 	async function handleSubmit(formData) {
 		try {
@@ -48,7 +31,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					...formData,
-					content: contentData
+					primitives
 				})
 			})
 
@@ -71,21 +54,6 @@
 	onSubmit={handleSubmit}
 >
 	{#snippet children()}
-		<PrimitivePartialManager
-			primitives={data.primitives}
-			partials={data.partials}
-			bind:selectedItems
-			label="Page Content"
-		/>
-
-		{#if selectedItems.length > 0}
-			<ContentBuilder
-				{contentItems}
-				primitives={data.primitives}
-				partials={data.partials}
-				bind:contentData
-				label="Fill in content"
-			/>
-		{/if}
+		<ContentEditor bind:primitives availablePrimitives={data.primitives} mode="full" />
 	{/snippet}
 </CrudForm>
