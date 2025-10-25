@@ -24,11 +24,13 @@
 	</nav>
 </header>
 
-<section class="form-container">
-	<form onsubmit={handleSubmit}>
-		{#each fields as field}
-			<div class="form-group">
+<form onsubmit={handleSubmit}>
+	{#each fields as field}
+		<section class="field-box">
+			<header class="field-box-header">
 				<label for={field.name}>{field.label}</label>
+			</header>
+			<div class="field-box-content">
 				{#if field.type === 'textarea'}
 					<textarea
 						id={field.name}
@@ -55,21 +57,29 @@
 						bind:value={formData[field.name]}
 						placeholder={field.placeholder}
 						required={field.required}
+						oninput={(e) => field.onInput?.(e)}
 					/>
 				{/if}
 			</div>
-		{/each}
+		</section>
+	{/each}
 
-		{#if children}
-			{@render children()}
-		{/if}
+	{#if children}
+		<section class="field-box">
+			<header class="field-box-header">
+				<h2>Content</h2>
+			</header>
+			<div class="field-box-content">
+				{@render children()}
+			</div>
+		</section>
+	{/if}
 
-		<div class="form-actions">
-			<button type="submit">{submitLabel}</button>
-			<button><a href={cancelUrl}>Cancel</a></button>
-		</div>
-	</form>
-</section>
+	<div class="form-actions">
+		<button type="submit">{submitLabel}</button>
+		<button type="button"><a href={cancelUrl}>Cancel</a></button>
+	</div>
+</form>
 
 <style>
 	.page-header {
@@ -84,21 +94,35 @@
 		gap: 1rem;
 	}
 
-	.form-container {
-		background: var(--surface-color);
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.field-box {
+		background: var(--base-color);
 		border-radius: 8px;
 		border: 1px solid var(--quad-color);
-		padding: 2rem;
+		overflow: hidden;
 	}
 
-	.form-group {
-		margin-bottom: 1.5rem;
+	.field-box-header {
+		background: var(--surface-color);
+		padding: 1rem;
+		border-bottom: 1px solid var(--quad-color);
 	}
 
-	label {
-		display: block;
-		margin-bottom: 0.5rem;
-		font-weight: 500;
+	.field-box-header label,
+	.field-box-header h2 {
+		margin: 0;
+		font-weight: 600;
+		font-size: 1rem;
+	}
+
+	.field-box-content {
+		background: var(--base-color);
+		padding: 1rem;
 	}
 
 	input, textarea, select {
@@ -126,6 +150,5 @@
 		display: flex;
 		gap: 1rem;
 		padding-top: 1rem;
-		border-top: 1px solid var(--quad-color);
 	}
 </style>
