@@ -7,6 +7,35 @@
 
 	let primitives = $state(data.page.primitives || [])
 
+	// Track if slug was manually edited
+	let slugManuallyEdited = $state(false)
+	let titleFieldValue = $state(data.page.title || '')
+	let slugFieldValue = $state(data.page.slug || '')
+
+	// Generate slug from title
+	function generateSlug(text) {
+		return text
+			.toLowerCase()
+			.trim()
+			.replace(/\s+/g, '-')
+			.replace(/[^a-z0-9-]/g, '')
+	}
+
+	// Auto-update slug when title changes (if not manually edited)
+	$effect(() => {
+		const generatedSlug = generateSlug(titleFieldValue)
+		if (!slugManuallyEdited && generatedSlug !== slugFieldValue) {
+			slugFieldValue = generatedSlug
+		}
+	})
+
+	// Check if slug matches generated version to determine if it's been manually edited
+	function handleSlugInput(e) {
+		slugFieldValue = e.target.value
+		const generatedSlug = generateSlug(titleFieldValue)
+		slugManuallyEdited = slugFieldValue !== generatedSlug
+	}
+
 	const fields = [
 		{
 			name: 'title',
@@ -20,19 +49,16 @@
 			label: 'Slug',
 			type: 'text',
 			placeholder: 'page-url-slug',
-			required: true
-		},
-		{
-			name: 'projectId',
-			label: 'Project',
-			type: 'select',
 			required: true,
-			options: data.projects.map(project => ({
-				value: project.id,
-				label: project.name
-			}))
+			onInput: handleSlugInput
 		}
 	]
+
+	// Keep formData in sync with our tracked values
+	$effect(() => {
+		data.page.title = titleFieldValue
+		data.page.slug = slugFieldValue
+	})
 
 	async function handleSubmit(formData) {
 		try {
@@ -41,6 +67,8 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					...formData,
+					title: titleFieldValue,
+					slug: slugFieldValue,
 					primitives
 				})
 			})
@@ -59,7 +87,7 @@
 <CrudForm
 	title="Edit Page"
 	{fields}
-	item={data.page}
+	item={{ title: titleFieldValue, slug: slugFieldValue }}
 	submitLabel="Update Page"
 	cancelUrl="/pages"
 	onSubmit={handleSubmit}
