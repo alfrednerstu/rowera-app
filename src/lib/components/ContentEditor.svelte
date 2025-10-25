@@ -109,26 +109,23 @@
 
 	<ul class="primitive-list">
 		{#each primitives as item, index (item.id)}
-			<li
-				class="primitive-item"
-				class:dragging={draggedIndex === index}
-				draggable="true"
-				ondragstart={() => handleDragStart(index)}
-				ondragover={(e) => handleDragOver(e, index)}
-				ondragend={handleDragEnd}
-			>
-				<div class="primitive-header">
-					<span class="drag-handle" aria-label="Drag to reorder">☰</span>
-					<h4>{item.primitiveName}</h4>
+			<li class="field-box">
+				<header class="field-box-header">
+					<span class="drag-handle" aria-label="Drag to reorder" draggable="true" ondragstart={() => handleDragStart(index)}>☰</span>
+					<h2>{item.primitiveName}</h2>
 					<div class="primitive-actions">
 						<button type="button" onclick={() => moveUp(index)} disabled={index === 0} aria-label="Move up" class="icon-button">↑</button>
 						<button type="button" onclick={() => moveDown(index)} disabled={index === primitives.length - 1} aria-label="Move down" class="icon-button">↓</button>
 						<button type="button" onclick={() => removePrimitive(index)} aria-label="Remove" class="icon-button danger">×</button>
 					</div>
-				</div>
+				</header>
 
 				{#if mode === 'full' || mode === 'content'}
-					<div class="primitive-content">
+					<div class="field-box-content"
+						class:dragging={draggedIndex === index}
+						ondragover={(e) => handleDragOver(e, index)}
+						ondragend={handleDragEnd}
+					>
 						{#if item.primitiveFields && item.primitiveFields.length > 0}
 							{#each item.primitiveFields as field}
 								<div class="field">
@@ -222,13 +219,11 @@
 
 <style>
 	.content-editor {
-		margin: 1.5rem 0;
-		padding: 1rem;
-		border: 1px solid var(--quad-color);
-		border-radius: 8px;
-		background: var(--quint-color);
-		min-height: 300px;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
 		position: relative;
+		padding-bottom: 4rem;
 	}
 
 	.empty-message {
@@ -242,29 +237,43 @@
 	.primitive-list {
 		list-style: none;
 		padding: 0;
-		margin: 0 0 4rem 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
 	}
 
-	.primitive-item {
-		margin-bottom: 1rem;
+	.field-box {
 		background: var(--base-color);
-		border: 1px solid var(--quad-color);
 		border-radius: 8px;
-		transition: opacity 0.2s, transform 0.2s;
+		border: 1px solid var(--quad-color);
+		overflow: hidden;
 	}
 
-	.primitive-item.dragging {
-		opacity: 0.5;
-	}
-
-	.primitive-header {
+	.field-box-header {
+		background: var(--surface-color);
+		padding: 1rem;
+		border-bottom: 1px solid var(--quad-color);
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
-		padding: 0.75rem;
-		border-bottom: 1px solid var(--quad-color);
-		background: var(--surface-color);
-		border-radius: 8px 8px 0 0;
+	}
+
+	.field-box-header h2 {
+		margin: 0;
+		font-weight: 600;
+		font-size: 1rem;
+		flex: 1;
+	}
+
+	.field-box-content {
+		background: var(--base-color);
+		padding: 1rem;
+		transition: opacity 0.2s;
+	}
+
+	.field-box-content.dragging {
+		opacity: 0.5;
 	}
 
 	.drag-handle {
@@ -276,13 +285,6 @@
 
 	.drag-handle:active {
 		cursor: grabbing;
-	}
-
-	.primitive-header h4 {
-		margin: 0;
-		flex: 1;
-		font-size: 1rem;
-		font-weight: 600;
 	}
 
 	.primitive-actions {
@@ -315,10 +317,6 @@
 		background: var(--accent-color);
 	}
 
-	.primitive-content {
-		padding: 1rem;
-	}
-
 	.field {
 		margin-bottom: 1rem;
 	}
@@ -339,11 +337,16 @@
 	.field select {
 		width: 100%;
 		padding: 0.75rem;
-		border: 1px solid var(--quad-color);
-		border-radius: 4px;
+		border: none;
 		font-size: 1rem;
 		font-family: inherit;
-		background: var(--base-color);
+		background: transparent;
+	}
+
+	.field input:focus,
+	.field textarea:focus,
+	.field select:focus {
+		outline: none;
 	}
 
 	.field textarea {
@@ -353,7 +356,7 @@
 
 	.add-button-container {
 		position: absolute;
-		bottom: 1rem;
+		bottom: 0;
 		left: 0;
 		right: 0;
 		display: flex;
@@ -368,10 +371,14 @@
 		color: var(--base-color);
 		border: none;
 		font-size: 2rem;
-		line-height: 1;
 		cursor: pointer;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 		transition: transform 0.2s, box-shadow 0.2s;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+		line-height: 0;
 	}
 
 	.add-button:hover {

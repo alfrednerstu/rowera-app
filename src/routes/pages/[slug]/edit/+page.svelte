@@ -33,7 +33,9 @@
 	function handleSlugInput(e) {
 		slugFieldValue = e.target.value
 		const generatedSlug = generateSlug(titleFieldValue)
-		slugManuallyEdited = slugFieldValue !== generatedSlug
+		// Normalize both for comparison (case-insensitive, spaces to dashes)
+		const normalizedSlug = slugFieldValue.toLowerCase().replace(/\s+/g, '-')
+		slugManuallyEdited = normalizedSlug !== generatedSlug
 	}
 
 	const fields = [

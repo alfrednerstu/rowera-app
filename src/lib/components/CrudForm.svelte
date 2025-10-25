@@ -51,28 +51,35 @@
 						{/each}
 					</select>
 				{:else}
-					<input
-						id={field.name}
-						type={field.type || 'text'}
-						bind:value={formData[field.name]}
-						placeholder={field.placeholder}
-						required={field.required}
-						oninput={(e) => field.onInput?.(e)}
-					/>
+					{#if field.name === 'slug'}
+						<div class="slug-input-wrapper">
+							<span class="slug-prefix">/</span>
+							<input
+								id={field.name}
+								type={field.type || 'text'}
+								bind:value={formData[field.name]}
+								placeholder={field.placeholder}
+								required={field.required}
+								oninput={(e) => field.onInput?.(e)}
+							/>
+						</div>
+					{:else}
+						<input
+							id={field.name}
+							type={field.type || 'text'}
+							bind:value={formData[field.name]}
+							placeholder={field.placeholder}
+							required={field.required}
+							oninput={(e) => field.onInput?.(e)}
+						/>
+					{/if}
 				{/if}
 			</div>
 		</section>
 	{/each}
 
 	{#if children}
-		<section class="field-box">
-			<header class="field-box-header">
-				<h2>Content</h2>
-			</header>
-			<div class="field-box-content">
-				{@render children()}
-			</div>
-		</section>
+		{@render children()}
 	{/if}
 
 	<div class="form-actions">
@@ -128,22 +135,34 @@
 	input, textarea, select {
 		width: 100%;
 		padding: 0.75rem;
-		border: 1px solid var(--quad-color);
-		border-radius: 4px;
+		border: none;
 		font-size: 1rem;
-		transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-		background: var(--base-color);
+		background: transparent;
 	}
 
 	input:focus, textarea:focus, select:focus {
-		outline: 0;
-		border-color: var(--accent-color);
-		box-shadow: 0 0 0 0.2rem var(--accent-tertiary-color);
+		outline: none;
 	}
 
 	textarea {
 		min-height: 120px;
 		resize: vertical;
+	}
+
+	.slug-input-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.slug-prefix {
+		font-size: 1rem;
+		color: var(--text-color);
+		opacity: 0.7;
+	}
+
+	.slug-input-wrapper input {
+		flex: 1;
 	}
 
 	.form-actions {
