@@ -11,8 +11,14 @@
 	// Track heading context/depth as we render
 	let headingContext = $state({ level: startingHeadingLevel, count: 0 })
 
-	// Layout primitives that increment heading depth when nested
-	const containerPrimitives = ['Section', 'Article', 'Aside', 'Nav', 'Header', 'Footer', 'Main']
+	// Major container primitives that create new sections (and reset to base nesting level)
+	const majorContainers = ['Section', 'Article', 'Main', 'Nav', 'Header', 'Footer']
+
+	// Aside is special - it nests within current context without resetting
+	const nestingContainers = ['Aside']
+
+	// All layout containers
+	const containerPrimitives = [...majorContainers, ...nestingContainers]
 
 	/**
 	 * Process a primitive's tag template and content to generate HTML
@@ -100,31 +106,70 @@
 	}
 
 	/**
-	 * Render content with automatic heading hierarchy
+	 * Render content with automatic heading hierarchy based on container nesting
+	 *
+	 * In a flat content list, containers create "scopes":
+	 * - Major containers (Section, Article, Main, etc.) mark new sibling sections
+	 * - Headings after a major container are nested one level deeper
+	 * - Aside nests deeper without resetting the scope
+	 *
+	 * Example:
+	 *   Heading "Title" → h1
+	 *   Section → starts nesting scope
+	 *   Heading "Features" → h2 (nested in section)
+	 *   Heading "Details" → h2 (still in section, sibling to Features)
+	 *   Section → new sibling section (same nesting level)
+	 *   Heading "Pricing" → h2 (nested in this section)
+	 *   Aside → deeper nesting
+	 *   Heading "Note" → h3 (nested in aside, which is in section)
 	 */
-	function renderContent(items, currentLevel = startingHeadingLevel) {
+	function renderContent(items) {
 		let html = ''
+		let nestingDepth = 0 // Track how deep we are in containers
+		let inMajorContainer = false // Are we inside a major container scope?
+		let inAside = false // Track if we're in an Aside
 
 		for (const item of items) {
 			if (!item.primitiveName && !item.partialName) continue
 
-			// Determine heading level for this context
-			let headingLevel = currentLevel
+			const primitiveName = item.primitiveName
 
-			// First heading in the page should be h1
-			if (item.primitiveName === 'Heading' && headingContext.count === 0) {
-				headingLevel = 1
-			}
-			// Subsequent headings at root level should be h2
-			else if (item.primitiveName === 'Heading' && currentLevel === startingHeadingLevel) {
-				headingLevel = headingContext.count === 0 ? 1 : 2
+			// Handle major containers - they mark section boundaries and reset depth
+			if (majorContainers.includes(primitiveName)) {
+				// Major containers create a new section at depth 1
+				nestingDepth = 1
+				inMajorContainer = true
+				inAside = false // Exiting any previous Aside
 			}
 
+			// Handle nesting containers (like Aside) - they nest deeper
+			else if (nestingContainers.includes(primitiveName)) {
+				// Aside nests one level deeper than current context
+				if (inMajorContainer && !inAside) {
+					nestingDepth = 2
+					inAside = true
+				} else if (!inMajorContainer) {
+					// Aside at root level
+					nestingDepth = 1
+					inAside = true
+				}
+				// Multiple Asides in a row stay at the same depth (siblings)
+			}
+
+			// Calculate heading level based on nesting depth
+			let headingLevel = startingHeadingLevel + nestingDepth
+
+			// Special case: first heading in entire document
+			if (primitiveName === 'Heading' && headingContext.count === 0) {
+				headingLevel = startingHeadingLevel
+			}
+
+			// Cap at h6 for accessibility
+			headingLevel = Math.min(headingLevel, 6)
+
+			// Render the primitive with the calculated heading level
 			if (item.primitiveName) {
 				const rendered = renderPrimitive(item, headingLevel)
-
-				// If this is a container, increment level for its children
-				// Note: For now, containers don't have nested content in the current data structure
 				html += rendered
 			} else if (item.partialName) {
 				// Render partial content (preserved from original implementation)
