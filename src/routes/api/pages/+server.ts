@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request, locals, cookies }) => {
 	}
 
 	try {
-		const { title, slug, content } = await request.json()
+		const { title, slug, plateId, content } = await request.json()
 
 		if (!title?.trim()) {
 			return json({ error: 'Page title is required' }, { status: 400 })
@@ -46,6 +46,7 @@ export const POST: RequestHandler = async ({ request, locals, cookies }) => {
 			title: title.trim(),
 			slug: slug.trim(),
 			projectId,
+			plateId: plateId || null,
 			userId: locals.user.id
 		}).returning()
 

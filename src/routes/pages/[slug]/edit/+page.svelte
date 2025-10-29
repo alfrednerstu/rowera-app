@@ -53,6 +53,15 @@
 			placeholder: 'page-url-slug',
 			required: true,
 			onInput: handleSlugInput
+		},
+		{
+			name: 'plateId',
+			label: 'Plate',
+			type: 'select',
+			options: [
+				{ value: '', label: 'No Plate (Content Only)' },
+				...data.plates.map(p => ({ value: p.id, label: p.name }))
+			]
 		}
 	]
 
@@ -89,7 +98,7 @@
 <CrudForm
 	title="Edit Page"
 	{fields}
-	item={{ title: titleFieldValue, slug: slugFieldValue }}
+	item={{ title: titleFieldValue, slug: slugFieldValue, plateId: data.page.plateId || '' }}
 	submitLabel="Update Page"
 	cancelUrl="/pages"
 	onSubmit={handleSubmit}
