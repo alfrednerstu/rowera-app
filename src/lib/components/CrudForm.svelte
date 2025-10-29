@@ -108,7 +108,7 @@
 	}
 
 	.field-box {
-		background: transparent;
+		background: var(--surface-color);
 		border-radius: 8px;
 		border: 1px solid var(--quad-color);
 		overflow: hidden;
