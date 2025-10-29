@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit'
 import { db } from '$lib/server/db'
-import { page, project, pageContent } from '$lib/server/db/schema'
-import { eq, and } from 'drizzle-orm'
+import { page, project, pageContent, publication, packet } from '$lib/server/db/schema'
+import { eq, and, or, sql } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 
 export const POST: RequestHandler = async ({ request, locals, cookies }) => {
@@ -14,10 +14,6 @@ export const POST: RequestHandler = async ({ request, locals, cookies }) => {
 
 		if (!title?.trim()) {
 			return json({ error: 'Page title is required' }, { status: 400 })
-		}
-
-		if (!slug?.trim()) {
-			return json({ error: 'Page slug is required' }, { status: 400 })
 		}
 
 		// Get projectId from cookie
@@ -42,9 +38,30 @@ export const POST: RequestHandler = async ({ request, locals, cookies }) => {
 			return json({ error: 'Project not found or access denied' }, { status: 404 })
 		}
 
+		// Generate slug from title if not provided
+		let finalSlug = slug?.trim() || title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+
+		// Check if slug is unique across pages, publications, and packets
+		const isSlugUnique = async (slugToCheck: string) => {
+			const [pageExists, publicationExists, packetExists] = await Promise.all([
+				db.select({ id: page.id }).from(page).where(and(eq(page.slug, slugToCheck), eq(page.projectId, projectId))).limit(1),
+				db.select({ id: publication.id }).from(publication).where(and(eq(publication.slug, slugToCheck), eq(publication.projectId, projectId))).limit(1),
+				db.select({ id: packet.id }).from(packet).where(and(eq(packet.slug, slugToCheck), eq(packet.projectId, projectId))).limit(1)
+			])
+			return pageExists.length === 0 && publicationExists.length === 0 && packetExists.length === 0
+		}
+
+		// Make slug unique by appending counter if necessary
+		let counter = 1
+		let uniqueSlug = finalSlug
+		while (!(await isSlugUnique(uniqueSlug))) {
+			uniqueSlug = `${finalSlug}-${counter}`
+			counter++
+		}
+
 		const [newPage] = await db.insert(page).values({
 			title: title.trim(),
-			slug: slug.trim(),
+			slug: uniqueSlug,
 			projectId,
 			userId: locals.user.id
 		}).returning()
