@@ -10,7 +10,7 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 	}
 	
 	try {
-		const { name, slug, projectId, primitives } = await request.json()
+		const { name, slug, projectId, plateId, primitives } = await request.json()
 
 		if (!name?.trim()) {
 			return json({ error: 'Page name is required' }, { status: 400 })
@@ -45,6 +45,7 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
 				name: name.trim(),
 				slug: slug.trim(),
 				projectId,
+				plateId: plateId || null,
 				primitives: primitives || null,
 				updatedAt: new Date()
 			})

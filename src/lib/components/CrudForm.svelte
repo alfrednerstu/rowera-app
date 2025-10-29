@@ -108,7 +108,7 @@
 	}
 
 	.field-box {
-		background: var(--base-color);
+		background: var(--surface-color);
 		border-radius: 8px;
 		border: 1px solid var(--quad-color);
 		overflow: hidden;
@@ -128,13 +128,13 @@
 	}
 
 	.field-box-content {
-		background: var(--base-color);
+		background: var(--surface-color);
 		padding: 1rem;
 	}
 
 	input, textarea, select {
 		width: 100%;
-		padding: 0.75rem;
+		padding: 0;
 		border: none;
 		font-size: 1rem;
 		background: transparent;
@@ -152,7 +152,7 @@
 	.slug-input-wrapper {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0;
 	}
 
 	.slug-prefix {

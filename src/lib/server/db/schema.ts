@@ -94,6 +94,7 @@ export const piece = pgTable('piece', {
   publishedAt: timestamp('published_at'),
   packetId: uuid('packet_id').notNull().references(() => packet.id, { onDelete: 'cascade' }),
   presetId: uuid('preset_id').references(() => preset.id, { onDelete: 'restrict' }),
+  plateId: uuid('plate_id').references(() => plate.id, { onDelete: 'restrict' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
@@ -170,6 +171,7 @@ export const post = pgTable('post', {
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   publicationId: uuid('publication_id').references(() => publication.id, { onDelete: 'cascade' }),
   presetId: uuid('preset_id').references(() => preset.id, { onDelete: 'restrict' }),
+  plateId: uuid('plate_id').references(() => plate.id, { onDelete: 'restrict' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
@@ -208,6 +210,7 @@ export const page = pgTable('page', {
   publishedAt: timestamp('published_at'),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   projectId: uuid('project_id').references(() => project.id, { onDelete: 'cascade' }),
+  plateId: uuid('plate_id').references(() => plate.id, { onDelete: 'restrict' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
@@ -240,6 +243,27 @@ export const partialPrimitive = pgTable('partial_primitive', {
   partialId: uuid('partial_id').notNull().references(() => partial.id, { onDelete: 'cascade' }),
   primitiveId: uuid('primitive_id').notNull().references(() => primitive.id, { onDelete: 'restrict' }),
   order: integer('order').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
+// Plate - defines the structural layout for pages/posts/pieces
+export const plate = pgTable('plate', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(),
+  description: text('description'),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
+// Plate Content - ordered partials with a slot marker for main content
+export const plateContent = pgTable('plate_content', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  plateId: uuid('plate_id').notNull().references(() => plate.id, { onDelete: 'cascade' }),
+  order: integer('order').notNull(),
+  partialId: uuid('partial_id').references(() => partial.id, { onDelete: 'restrict' }),
+  isContentSlot: boolean('is_content_slot').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
@@ -370,6 +394,7 @@ export const userRelations = relations(user, ({ many }) => ({
   posts: many(post),
   pages: many(page),
   partials: many(partial),
+  plates: many(plate),
   presentations: many(presentation),
   sessions: many(session),
   accounts: many(account),
@@ -400,6 +425,10 @@ export const postRelations = relations(post, ({ one, many }) => ({
   preset: one(preset, {
     fields: [post.presetId!],
     references: [preset.id]
+  }),
+  plate: one(plate, {
+    fields: [post.plateId!],
+    references: [plate.id]
   }),
   content: many(postContent)
 }));
@@ -470,6 +499,10 @@ export const pageRelations = relations(page, ({ one, many }) => ({
     fields: [page.projectId!],
     references: [project.id]
   }),
+  plate: one(plate, {
+    fields: [page.plateId!],
+    references: [plate.id]
+  }),
   content: many(pageContent)
 }));
 
@@ -504,6 +537,28 @@ export const partialPrimitiveRelations = relations(partialPrimitive, ({ one }) =
   primitive: one(primitive, {
     fields: [partialPrimitive.primitiveId],
     references: [primitive.id]
+  })
+}));
+
+export const plateRelations = relations(plate, ({ one, many }) => ({
+  user: one(user, {
+    fields: [plate.userId],
+    references: [user.id]
+  }),
+  content: many(plateContent),
+  pages: many(page),
+  posts: many(post),
+  pieces: many(piece)
+}));
+
+export const plateContentRelations = relations(plateContent, ({ one }) => ({
+  plate: one(plate, {
+    fields: [plateContent.plateId],
+    references: [plate.id]
+  }),
+  partial: one(partial, {
+    fields: [plateContent.partialId!],
+    references: [partial.id]
   })
 }));
 
@@ -571,6 +626,10 @@ export const pieceRelations = relations(piece, ({ one, many }) => ({
   preset: one(preset, {
     fields: [piece.presetId!],
     references: [preset.id]
+  }),
+  plate: one(plate, {
+    fields: [piece.plateId!],
+    references: [plate.id]
   }),
   content: many(pieceContent)
 }));

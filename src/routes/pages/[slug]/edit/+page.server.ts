@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db'
-import { page, project, primitive, primitiveField } from '$lib/server/db/schema'
+import { page, project, primitive, primitiveField, plate } from '$lib/server/db/schema'
 import { error, redirect } from '@sveltejs/kit'
 import { eq, and } from 'drizzle-orm'
 
@@ -16,6 +16,7 @@ export const load = async ({ params, locals }) => {
 		title: page.title,
 		slug: page.slug,
 		projectId: page.projectId,
+		plateId: page.plateId,
 		createdAt: page.createdAt,
 		updatedAt: page.updatedAt
 	})
@@ -36,6 +37,9 @@ export const load = async ({ params, locals }) => {
 	// Get all user's projects for the select field
 	const userProjects = await db.select().from(project).where(eq(project.userId, locals.user.id))
 
+	// Get all user's plates for the select field
+	const userPlates = await db.select().from(plate).where(eq(plate.userId, locals.user.id))
+
 	// Get all available primitives with their fields
 	const allPrimitives = await db.select().from(primitive)
 
@@ -51,6 +55,7 @@ export const load = async ({ params, locals }) => {
 	return {
 		page: pageResult[0],
 		projects: userProjects,
+		plates: userPlates,
 		primitives: primitivesWithFields
 	}
 }
