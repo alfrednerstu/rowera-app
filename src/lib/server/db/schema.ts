@@ -206,7 +206,7 @@ export const postContent = pgTable('post_content', {
 export const page = pgTable('page', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: varchar('title', { length: 500 }).notNull(),
-  slug: varchar('slug', { length: 500 }).notNull().unique(),
+  slug: varchar('slug', { length: 500 }).notNull(),
   publishedAt: timestamp('published_at'),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   projectId: uuid('project_id').references(() => project.id, { onDelete: 'cascade' }),

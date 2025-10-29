@@ -18,7 +18,7 @@
 			label: 'Slug',
 			type: 'text',
 			placeholder: 'page-url-slug',
-			required: true
+			required: false
 		}
 	]
 
