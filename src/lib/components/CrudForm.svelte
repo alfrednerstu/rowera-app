@@ -128,7 +128,7 @@
 	}
 
 	.field-box-content {
-		background: var(--surface-color);
+		background: transparent;
 		padding: 1rem;
 	}
 
